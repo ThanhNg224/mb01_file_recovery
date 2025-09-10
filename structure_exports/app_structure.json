@@ -1,0 +1,89 @@
+{
+  "project": "kotlin-android-mvvm-template",
+  "stack": {
+    "ui": "Jetpack Compose (Material3, Coil)",
+    "di": "Hilt",
+    "network": "Retrofit + kotlinx.serialization",
+    "arch": "MVVM + Repository",
+    "nav": "androidx.navigation.compose"
+  },
+  "env": { "baseUrl": "BuildConfig.BASE_URL" },
+
+  "modules": {
+    "di": [
+      "NetworkModule: provides ApiService (Retrofit) + Repository (binds RepositoryImpl)"
+    ],
+    "app": [
+      "MyApplication: @HiltAndroidApp",
+      "MainActivity: setContent -> KotlinAndroidTemplateTheme -> App()"
+    ],
+    "presentation": {
+      "App": "NavHost(start='home') -> composable('home') -> HomeScreen(state)",
+      "screen": {
+        "HomeScreen": "renders ApiState<ProductDetailsDto> (Loading/Error/Success)"
+      },
+      "viewmodel": {
+        "HomeViewModel": {
+          "state": "productDetailsState: StateFlow<ApiState<ProductDetailsDto>>",
+          "init": "getProductDetails()",
+          "actions": ["getProductDetails() -> repository.getProductDetails()"]
+        }
+      },
+      "theme": ["Color", "Type (Typography)", "Theme (dark/light/dynamic)"]
+    },
+    "data": {
+      "network": {
+        "ApiService": {
+          "GET /products/1": "suspend fun getProductDetails(): ProductDetailsDto"
+        }
+      },
+      "repository": {
+        "Repository": ["suspend fun getProductDetails(): ApiState<ProductDetailsDto>"],
+        "RepositoryImpl": "calls ApiService, wraps result in ApiState.Success/Error"
+      },
+      "model": ["ProductDetailsDto", "Dimensions", "Meta", "Review"],
+      "util": ["ApiState { Success<T>, Error(msg), Loading }"]
+    }
+  },
+
+  "data_flow": "HomeViewModel.getProductDetails() -> Repository.getProductDetails() -> ApiService.getProductDetails() -> ApiState -> HomeScreen renders",
+
+  "screen_states": {
+    "Loading": "CircularProgressIndicator(center)",
+    "Error": "Text(errorMsg)",
+    "Success": "Title 'Product Details', Image(images[0]), Brand, Description"
+  },
+
+  "api_contract": {
+    "base": "<BASE_URL>",
+    "endpoints": [
+      { "GET products/1": "returns ProductDetailsDto" }
+    ]
+  },
+
+  "ext_points": {
+    "change_home_to_welcome": [
+      "Edit HomeScreen: show static Welcome UI or intro cards instead of product",
+      "Or split: create WelcomeScreen + set NavHost startDestination='welcome'",
+      "If keeping API: move product fetch behind a CTA or onResume of a later screen"
+    ],
+    "replace_api": [
+      "Update ApiService endpoint + DTOs",
+      "Adjust RepositoryImpl mapping and HomeViewModel usage"
+    ]
+  },
+
+  "key_files": [
+    "di/NetworkModule.kt",
+    "MyApplication.kt",
+    "MainActivity.kt",
+    "presentation/App.kt",
+    "presentation/screen/Home.kt",
+    "presentation/viewmodel/HomeViewModel.kt",
+    "network/ApiService.kt",
+    "repository/Repository.kt",
+    "repository/RepositoryImpl.kt",
+    "util/ApiState.kt",
+    "model/*"
+  ]
+}
