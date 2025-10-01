@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="admob_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
+
+    <string name="open_splash" translatable="false">ca-app-pub-3940256099942544/9257395921</string>
+    <string name="open_resume" translatable="false">ca-app-pub-3940256099942544/9257395921</string>
+
+    <string name="inter_open" translatable="false">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="inter_default" translatable="false">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="inter_resume" translatable="false">ca-app-pub-3940256099942544/1033173712</string>
+
+    <string name="reward_default" translatable="false">ca-app-pub-3940256099942544/5224354917</string>
+
+    <string name="banner_default" translatable="false">ca-app-pub-3940256099942544/9214589741</string>
+
+    <string name="native_home" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
+    <bool name="preload_inter">true</bool>
+    <bool name="preload_reward">true</bool>
+
+</resources>
