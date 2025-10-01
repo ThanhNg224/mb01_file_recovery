@@ -63,8 +63,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    
-    implementation("com.github.quanvh:metabrain:1.0.1")
+
+
+    implementation("com.github.quanvh:metabrain:1.0.3")
     implementation("com.intuit.sdp:sdp-android:1.1.1")
     implementation("com.intuit.ssp:ssp-android:1.1.1")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
