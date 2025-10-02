@@ -14,7 +14,7 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:replace="android:dataExtractionRules,android:fullBackupContent">
         <activity
-            android:name=".IntroActivity"
+            android:name=".ui.intro.IntroActivity"
             android:exported="true">
         </activity>
 
