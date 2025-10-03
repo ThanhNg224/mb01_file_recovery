@@ -1,16 +1,26 @@
 package com.meta.brain.file.recovery
 
 import androidx.lifecycle.LifecycleOwner
+import com.meta.brain.module.ads.AdsController
 import com.meta.brain.module.base.MetaBrainApp
 import com.meta.brain.module.data.DataManager
-import com.meta.brain.file.recovery.ui.intro.IntroActivity
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class
-App : MetaBrainApp() {
+class App : MetaBrainApp() {
+
+    override fun onCreate() {
+        super.onCreate()
+
+        DataManager.init(this)
+
+
+        AdsController.initAdmob(this)
+    }
+
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
-        DataManager.setStartActivity(IntroActivity::class.java)
+        // Keep DataManager initialization for MetaBrain module compatibility
+        DataManager.setStartActivity(MainActivity::class.java)
     }
 }
