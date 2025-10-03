@@ -8,18 +8,45 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- Fragment container takes full screen -->
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/nav_host_fragment"
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:defaultNavHost="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:navGraph="@navigation/nav_graph"
             app:layout_constraintTop_toTopOf="parent"
-            app:navGraph="@navigation/nav_graph" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- Floating rounded bottom navigation overlay -->
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_nav"
+            android:layout_width="0dp"
+            android:layout_height="72dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/bg_bottom_nav_rounded"
+            android:elevation="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            app:menu="@menu/menu_bottom_nav"
+            app:itemIconTint="@color/nav_item_color"
+            app:itemTextColor="@color/nav_item_color"
+            app:itemActiveIndicatorStyle="@style/BottomNavActiveIndicator"
+            app:itemRippleColor="@color/nav_ripple_color"
+            app:labelVisibilityMode="labeled"
+            app:itemIconSize="28dp"
+            app:itemPaddingTop="4dp"
+            app:itemPaddingBottom="4dp"
+            app:itemTextAppearanceActive="@style/BottomNavTextActive"
+            app:itemTextAppearanceInactive="@style/BottomNavTextInactive"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </layout>

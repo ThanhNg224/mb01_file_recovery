@@ -50,10 +50,6 @@ class IntroFragment : Fragment() {
             }
         }
 
-        viewModel.startTouchCount.observe(viewLifecycleOwner) { count ->
-            Log.d("IntroFragment", "Start button touched $count time(s)")
-        }
-
         viewModel.navigateToHome.observe(viewLifecycleOwner) { event ->
             event.getContentIfNotHandled()?.let {
                 navigateToHome()

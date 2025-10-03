@@ -3,6 +3,6 @@
     <dimen name="size_header">24sp</dimen>
     <dimen name="size_title">20sp</dimen>
     <dimen name="size_description">18sp</dimen>
-    <dimen name="size_detail">14sp</dimen>
+    <dimen name="size_detail">16sp</dimen>
 
 </resources>

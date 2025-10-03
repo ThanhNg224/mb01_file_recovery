@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.navigation.fragment.ktx)
     implementation(libs.navigation.ui.ktx)
+    implementation(libs.androidx.gridlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -77,6 +78,9 @@ dependencies {
     // Navigation dependencies
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+
+    // Material Components dependency
+    implementation("com.google.android.material:material:1.12.0")
 
     implementation("com.github.quanvh:metabrain:1.0.3")
     implementation("com.intuit.sdp:sdp-android:1.1.1")

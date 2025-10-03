@@ -4,38 +4,301 @@
 
     <data />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_onboarding"
-        android:padding="16dp">
+        android:fillViewport="true"
+        android:background="@color/home_bg">
 
-        <TextView
-            android:id="@+id/tv_welcome"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Welcome Home"
-            android:textSize="@dimen/size_title"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tv_placeholder"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="This is the Home screen placeholder"
-            android:textSize="@dimen/size_detail"
-            android:textColor="@android:color/black"
-            android:gravity="center"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_welcome" />
+            <!-- HEADER: logo text + ADS + help -->
+            <LinearLayout
+                android:id="@+id/header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/tvBrand"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="RELive"
+                    android:textStyle="bold"
+                    android:textSize="32sp"
+                    android:textColor="@color/home_text_primary" />
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAds"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:minWidth="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="ADS"
+                    android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:textSize="12sp"
+                    app:cornerRadius="8dp" />
+
+                <ImageButton
+                    android:id="@+id/btnHelp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_icon_btn"
+                    android:contentDescription="@string/abc_action_bar_home_description"
+                    android:padding="8dp"
+                    app:srcCompat="@android:drawable/ic_menu_help" />
+            </LinearLayout>
+
+            <!-- BANNER: Quét nhanh -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardQuickScan"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/header"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/home_banner_bg"
+                app:strokeColor="@color/home_banner_border"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvQuickTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Quét nhanh"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:textColor="@color/home_accent_blue" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Tìm tất cả các file đã bị xoá trên thiết bị của bạn"
+                        android:textSize="12sp"
+                        android:textColor="@color/home_text_secondary" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 2 Ô lớn: Ảnh / Video -->
+            <LinearLayout
+                android:id="@+id/rowBigTiles"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@+id/cardQuickScan"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tilePhoto"
+                    android:layout_width="0dp"
+                    android:layout_height="110dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardBackgroundColor="@color/tile_orange">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical">
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            app:srcCompat="@android:drawable/ic_menu_gallery"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Khôi phục ảnh"
+                            android:textStyle="bold"
+                            android:textColor="@android:color/white"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tileVideo"
+                    android:layout_width="0dp"
+                    android:layout_height="110dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardBackgroundColor="@color/tile_yellow">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical">
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            app:srcCompat="@android:drawable/ic_menu_slideshow"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Khôi phục video"
+                            android:textStyle="bold"
+                            android:textColor="@android:color/white"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- GRID 2x2: Audio / Danh bạ / Tài liệu khác / SMS -->
+            <androidx.gridlayout.widget.GridLayout
+                android:id="@+id/gridSmall"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:columnCount="2"
+                app:rowCount="2"
+                app:layout_constraintTop_toBottomOf="@+id/rowBigTiles"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:useDefaultMargins="true">
+
+                <!-- item -->
+                <include layout="@layout/item_home_tile"
+                    android:id="@+id/tileAudio"
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:tag="Khôi phục audio|@android:drawable/ic_btn_speak_now"
+                    app:layout_columnWeight="1"
+                    app:layout_rowWeight="1" />
+
+                <include layout="@layout/item_home_tile"
+                    android:id="@+id/tileContacts"
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:tag="Khôi phục danh bạ|@android:drawable/ic_menu_myplaces"
+                    app:layout_columnWeight="1"
+                    app:layout_rowWeight="1" />
+
+                <include layout="@layout/item_home_tile"
+                    android:id="@+id/tileDocs"
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:tag="Tài liệu khác|@android:drawable/ic_menu_agenda"
+                    app:layout_columnWeight="1"
+                    app:layout_rowWeight="1" />
+
+                <include layout="@layout/item_home_tile"
+                    android:id="@+id/tileSms"
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:tag="Khôi phục SMS|@android:drawable/ic_dialog_email"
+                    app:layout_columnWeight="1"
+                    app:layout_rowWeight="1" />
+            </androidx.gridlayout.widget.GridLayout>
+
+            <!-- ADS banner -->
+            <FrameLayout
+                android:id="@+id/adsBanner"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_ads_placeholder"
+                app:layout_constraintTop_toBottomOf="@+id/gridSmall"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <!-- 2 box cuối: Đã khôi phục / Kho lưu trữ -->
+            <LinearLayout
+                android:id="@+id/rowBottom"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@+id/adsBanner"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tileRecovered"
+                    android:layout_width="0dp"
+                    android:layout_height="96dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardBackgroundColor="@android:color/white"
+                    app:cardCornerRadius="16dp"
+                    app:strokeColor="@color/home_divider"
+                    app:strokeWidth="1dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Đã khôi phục"
+                            android:textStyle="bold"
+                            android:textColor="@color/home_text_primary" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Quản lý các file bạn đã khôi phục thành công."
+                            android:textSize="12sp"
+                            android:textColor="@color/home_text_secondary"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tileVault"
+                    android:layout_width="0dp"
+                    android:layout_height="96dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardBackgroundColor="@android:color/white"
+                    app:cardCornerRadius="16dp"
+                    app:strokeColor="@color/home_divider"
+                    app:strokeWidth="1dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Kho lưu trữ"
+                            android:textStyle="bold"
+                            android:textColor="@color/home_text_primary"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Tạo kho lưu trữ an toàn cho dữ liệu."
+                            android:textSize="12sp"
+                            android:textColor="@color/home_text_secondary"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
 </layout>

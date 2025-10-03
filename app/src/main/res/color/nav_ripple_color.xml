@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Ripple color with transparency -->
+    <item android:color="#20000000" />
+</selector>
+

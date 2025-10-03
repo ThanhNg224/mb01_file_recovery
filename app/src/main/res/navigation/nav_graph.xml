@@ -12,7 +12,11 @@
         tools:layout="@layout/fragment_intro">
         <action
             android:id="@+id/action_intro_to_home"
-            app:destination="@id/homeFragment" />
+            app:destination="@id/homeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
     <fragment
@@ -20,5 +24,24 @@
         android:name="com.meta.brain.file.recovery.ui.home.HomeFragment"
         android:label="Home"
         tools:layout="@layout/fragment_home" />
+
+<!--    &lt;!&ndash; Additional fragments for bottom navigation &ndash;&gt;-->
+<!--    <fragment-->
+<!--        android:id="@+id/scanFragment"-->
+<!--        android:name="com.meta.brain.file.recovery.ui.scan.ScanFragment"-->
+<!--        android:label="History"-->
+<!--        tools:layout="@layout/fragment_scan" />-->
+
+<!--    <fragment-->
+<!--        android:id="@+id/deletedFragment"-->
+<!--        android:name="com.meta.brain.file.recovery.ui.deleted.DeletedFragment"-->
+<!--        android:label="Archive"-->
+<!--        tools:layout="@layout/fragment_deleted" />-->
+
+<!--    <fragment-->
+<!--        android:id="@+id/settingsFragment"-->
+<!--        android:name="com.meta.brain.file.recovery.ui.settings.SettingsFragment"-->
+<!--        android:label="Settings"-->
+<!--        tools:layout="@layout/fragment_settings" />-->
 
 </navigation>
