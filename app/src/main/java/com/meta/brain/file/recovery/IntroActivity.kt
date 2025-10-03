@@ -9,7 +9,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class IntroActivity : DataBindActivity<IntroActivityBinding>(R.layout.intro_activity) {
 
     override fun initView() {
-        // Activity chỉ host NavHostFragment. Không xử lý UI/Ads/Navigation ở đây.
-        // Mọi logic: IntroFragment + IntroViewModel.
+
     }
 }

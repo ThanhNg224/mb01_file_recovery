@@ -44,17 +44,13 @@ class IntroViewModel @Inject constructor(
     }
 }
 
-/**
- * Used as a wrapper for data that is exposed via a LiveData that represents an event.
- */
+
 class Event<out T>(private val content: T) {
 
     var hasBeenHandled = false
-        private set // Allow external read but not write
+        private set
 
-    /**
-     * Returns the content and prevents its use again.
-     */
+
     fun getContentIfNotHandled(): T? {
         return if (hasBeenHandled) {
             null
@@ -64,8 +60,6 @@ class Event<out T>(private val content: T) {
         }
     }
 
-    /**
-     * Returns the content, even if it's already been handled.
-     */
+
     fun peekContent(): T = content
 }
