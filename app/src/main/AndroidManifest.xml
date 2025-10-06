@@ -2,6 +2,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+
+    <!-- Media permissions for Android 13+ -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+
+    <!-- Legacy permission for Android 10-12 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"
+        tools:targetApi="28" />
+
+    <!-- Permission for document scanning on Android 11+ -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -23,12 +37,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="com.meta.brain.module.loading.LoadingActivity"
-            tools:node="remove" />
-        <activity
-            android:name="com.meta.brain.module.language.LanguageActivity"
-            tools:node="remove" />
 
         <!-- AdMob config -->
         <meta-data

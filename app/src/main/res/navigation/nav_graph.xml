@@ -23,7 +23,22 @@
         android:id="@+id/homeFragment"
         android:name="com.meta.brain.file.recovery.ui.home.HomeFragment"
         android:label="Home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_home_to_results"
+            app:destination="@id/resultsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <!-- Results Fragment for showing scan results -->
+    <fragment
+        android:id="@+id/resultsFragment"
+        android:name="com.meta.brain.file.recovery.ui.results.ResultsFragment"
+        android:label="Scan Results"
+        tools:layout="@layout/fragment_results" />
 
     <!-- Additional fragments for bottom navigation -->
     <fragment

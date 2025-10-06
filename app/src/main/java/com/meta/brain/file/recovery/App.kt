@@ -12,10 +12,6 @@ class App : MetaBrainApp() {
     override fun onCreate() {
         super.onCreate()
 
-        DataManager.init(this)
-
-
-        AdsController.initAdmob(this)
     }
 
     override fun onStart(owner: LifecycleOwner) {

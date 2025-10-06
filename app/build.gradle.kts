@@ -82,7 +82,7 @@ dependencies {
     // Material Components dependency
     implementation("com.google.android.material:material:1.12.0")
 
-    implementation("com.github.quanvh:metabrain:1.0.3")
+    implementation("com.github.quanvh:metabrain:1.0.4")
     implementation("com.intuit.sdp:sdp-android:1.1.1")
     implementation("com.intuit.ssp:ssp-android:1.1.1")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")

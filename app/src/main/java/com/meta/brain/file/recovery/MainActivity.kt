@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Enable edge-to-edge for Android 14/15+; we'll handle insets manually
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val navHost = supportFragmentManager
@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
         bottomNav.setupWithNavController(navController) // NavigationUI integration
 
-        // Apply system bar insets (gesture nav). Also push items a bit down with extraTop.
+
         val extraTop = resources.getDimensionPixelSize(R.dimen.bottom_nav_item_offset_top)
         ViewCompat.setOnApplyWindowInsetsListener(bottomNav) { v, insets ->
             val sys = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         }
         bottomNav.clipToPadding = false
 
-        // Optional: Hide bottom nav on intro/onboarding destinations
+
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val hideOn = setOf(R.id.introFragment)
             val shouldShow = destination.id !in hideOn
@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Add haptic feedback on reselection
+
         bottomNav.setOnItemReselectedListener {
             bottomNav.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
         }
