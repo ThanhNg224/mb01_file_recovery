@@ -138,6 +138,58 @@ class HomeViewModel @Inject constructor(
         _uiState.value = MediaUiState.Idle
     }
 
+    /**
+     * Start deep scan with comprehensive file system scanning
+     * Includes hidden files, deleted files, trash, and unindexed files
+     */
+    fun deepScan(
+        types: Set<MediaType>,
+        minSize: Long? = null,
+        fromSec: Long? = null,
+        toSec: Long? = null
+    ) {
+        if (isLoading) return // Guard against concurrent calls
+
+        viewModelScope.launch {
+            try {
+                isLoading = true
+                _uiState.value = MediaUiState.Loading
+
+                // Reset state for new scan
+                mediaBuffer.clear()
+                currentCursor = null
+
+                val result = mediaRepository.deepScan(
+                    types = types,
+                    minSize = minSize,
+                    fromSec = fromSec,
+                    toSec = toSec,
+                    pageSize = PAGE_SIZE,
+                    cursor = null
+                )
+
+                mediaBuffer.addAll(result.items)
+                currentCursor = result.nextCursor
+
+                _uiState.value = if (result.items.isEmpty()) {
+                    MediaUiState.Empty
+                } else {
+                    MediaUiState.Items(
+                        list = mediaBuffer.toList(),
+                        canLoadMore = result.nextCursor != null,
+                        appending = false
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.value = MediaUiState.Error(
+                    e.message ?: "Unknown error occurred during deep scan"
+                )
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
     companion object {
         private const val PAGE_SIZE = 300
     }

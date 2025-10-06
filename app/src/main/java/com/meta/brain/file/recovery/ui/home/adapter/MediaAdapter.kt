@@ -63,6 +63,7 @@ class MediaAdapter(
                 com.meta.brain.file.recovery.data.model.MediaKind.IMAGE -> "IMG"
                 com.meta.brain.file.recovery.data.model.MediaKind.VIDEO -> "VID"
                 com.meta.brain.file.recovery.data.model.MediaKind.DOCUMENT -> "DOC"
+                com.meta.brain.file.recovery.data.model.MediaKind.AUDIO -> "AUD"
                 com.meta.brain.file.recovery.data.model.MediaKind.OTHER -> "FILE"
             }
 

@@ -117,6 +117,15 @@ class HomeFragment : Fragment() {
                 requestPermissions()
             }
         }
+
+        // Setup Deep Scan button
+        binding.btnDeepScan.setOnClickListener {
+            if (hasPermissions) {
+                performDeepScan()
+            } else {
+                requestPermissions()
+            }
+        }
     }
 
     private fun setupExistingViews() {
@@ -218,6 +227,45 @@ class HomeFragment : Fragment() {
         val fromSec = calendar.timeInMillis / 1000
 
         viewModel.quickScan(
+            types = selectedTypes,
+            minSize = minSize,
+            fromSec = fromSec,
+            toSec = toSec
+        )
+    }
+
+    private fun performDeepScan() {
+        // Reset navigation flag for new scan
+        hasNavigatedToResults = false
+
+        val selectedTypes = when {
+            binding.chipImages.isChecked -> setOf(MediaType.IMAGES)
+            binding.chipVideos.isChecked -> setOf(MediaType.VIDEOS)
+            binding.chipDocuments.isChecked -> setOf(MediaType.DOCUMENTS)
+            else -> setOf(MediaType.ALL)
+        }
+
+        // Check for MANAGE_EXTERNAL_STORAGE permission if scanning documents on Android 11+
+        if (selectedTypes.contains(MediaType.DOCUMENTS) || selectedTypes.contains(MediaType.ALL)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !checkManageStoragePermission()) {
+                showManageStoragePermissionDialog()
+                return
+            }
+        }
+
+        val minSize = when (binding.spinnerMinSize.selectedItemPosition) {
+            1 -> 50L * 1024 // 50KB
+            2 -> 1024L * 1024 // 1MB
+            else -> null // No minimum
+        }
+
+        // Last 12 months by default
+        val calendar = Calendar.getInstance()
+        val toSec = calendar.timeInMillis / 1000
+        calendar.add(Calendar.MONTH, -12)
+        val fromSec = calendar.timeInMillis / 1000
+
+        viewModel.deepScan(
             types = selectedTypes,
             minSize = minSize,
             fromSec = fromSec,

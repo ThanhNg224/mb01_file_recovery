@@ -6,7 +6,7 @@ import android.net.Uri
  * Media kind classification
  */
 enum class MediaKind {
-    IMAGE, VIDEO, DOCUMENT, OTHER
+    IMAGE, VIDEO, DOCUMENT, AUDIO, OTHER
 }
 
 /**
@@ -68,7 +68,7 @@ data class MediaEntry(
  * Media type filter
  */
 enum class MediaType {
-    IMAGES, VIDEOS, DOCUMENTS, ALL
+    IMAGES, VIDEOS, DOCUMENTS, AUDIO, ALL
 }
 
 /**

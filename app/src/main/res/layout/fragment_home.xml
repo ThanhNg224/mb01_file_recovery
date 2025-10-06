@@ -96,7 +96,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="Tìm tất cả các file đã bị xoá trên thiết bị của bạn"
+                        android:text="Tìm tất cả các file chưa bị xóa trên thiết bị của bạn"
                         android:textSize="12sp"
                         android:textColor="@color/home_text_secondary" />
 
@@ -169,6 +169,55 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- BANNER: Deep Scan -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardDeepScan"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/cardQuickScan"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/home_banner_bg"
+                app:strokeColor="@color/home_banner_border"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvDeepTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Quét sâu"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:textColor="@color/home_accent_blue" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Quét toàn bộ hệ thống, bao gồm file ẩn, file đã xóa, thùng rác và file không được lập chỉ mục"
+                        android:textSize="12sp"
+                        android:textColor="@color/home_text_secondary" />
+
+                    <!-- Deep Scan Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDeepScan"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Deep Scan"
+                        android:textAllCaps="false"
+                        style="@style/Widget.Material3.Button.TonalButton" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- 2 Ô lớn: Ảnh / Video -->
             <LinearLayout
                 android:id="@+id/rowBigTiles"
@@ -176,7 +225,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:orientation="horizontal"
-                app:layout_constraintTop_toBottomOf="@+id/cardQuickScan"
+                app:layout_constraintTop_toBottomOf="@+id/cardDeepScan"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
