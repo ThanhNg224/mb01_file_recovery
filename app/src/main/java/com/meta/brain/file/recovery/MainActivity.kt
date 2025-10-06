@@ -2,67 +2,67 @@ package com.meta.brain.file.recovery
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.navigation.NavController
+import androidx.core.view.updatePadding
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import com.meta.brain.file.recovery.databinding.ActivityMainBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var navController: NavController
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        // Enable edge-to-edge for Android 14/15+; we'll handle insets manually
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        setupNavigation()
-        setupBottomNavigation()
-    }
-
-    private fun setupNavigation() {
-        val navHostFragment = supportFragmentManager
+        val navHost = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController = navHostFragment.navController
-    }
+        val navController = navHost.navController
 
-    private fun setupBottomNavigation() {
-        binding.bottomNav.setupWithNavController(navController)
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
+        bottomNav.setupWithNavController(navController) // NavigationUI integration
 
+        // Apply system bar insets (gesture nav). Also push items a bit down with extraTop.
+        val extraTop = resources.getDimensionPixelSize(R.dimen.bottom_nav_item_offset_top)
+        ViewCompat.setOnApplyWindowInsetsListener(bottomNav) { v, insets ->
+            val sys = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = extraTop, bottom = sys.bottom)
+            insets
+        }
+        bottomNav.clipToPadding = false
 
+        // Optional: Hide bottom nav on intro/onboarding destinations
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val hideOn = setOf(R.id.introFragment)
             val shouldShow = destination.id !in hideOn
 
-            // Animate bottom navigation visibility changes
-            if (shouldShow && !binding.bottomNav.isVisible) {
-                binding.bottomNav.animate()
+            if (shouldShow && !bottomNav.isVisible) {
+                bottomNav.animate()
                     .translationY(0f)
                     .alpha(1f)
                     .setDuration(300)
-                    .setInterpolator(android.view.animation.DecelerateInterpolator())
-                    .withStartAction { binding.bottomNav.isVisible = true }
+                    .withStartAction { bottomNav.isVisible = true }
                     .start()
-            } else if (!shouldShow && binding.bottomNav.isVisible) {
-                binding.bottomNav.animate()
-                    .translationY(binding.bottomNav.height.toFloat())
+            } else if (!shouldShow && bottomNav.isVisible) {
+                bottomNav.animate()
+                    .translationY(bottomNav.height.toFloat())
                     .alpha(0f)
                     .setDuration(300)
-                    .setInterpolator(android.view.animation.AccelerateInterpolator())
-                    .withEndAction { binding.bottomNav.isVisible = false }
+                    .withEndAction { bottomNav.isVisible = false }
                     .start()
             }
         }
 
-
-        binding.bottomNav.setOnItemReselectedListener {
-
-            binding.bottomNav.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+        // Add haptic feedback on reselection
+        bottomNav.setOnItemReselectedListener {
+            bottomNav.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
         }
     }
 }

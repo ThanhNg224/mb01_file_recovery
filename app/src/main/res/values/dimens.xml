@@ -5,4 +5,9 @@
     <dimen name="size_description">18sp</dimen>
     <dimen name="size_detail">16sp</dimen>
 
+    <!-- Navigation bar dimensions for Material 3 -->
+    <dimen name="bottom_nav_icon_24">24dp</dimen>
+    <dimen name="bottom_nav_item_offset_top">8dp</dimen>
+    <dimen name="nav_extra_top_padding">8dp</dimen>
+
 </resources>

@@ -29,7 +29,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // setup small tiles from tag: "Title|@drawable/..."
+
         setupIncludeTile(binding.tileAudio.root)
         setupIncludeTile(binding.tileContacts.root)
         setupIncludeTile(binding.tileDocs.root)

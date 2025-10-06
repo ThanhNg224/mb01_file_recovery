@@ -8,12 +8,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
-        android:background="@color/home_bg">
+        android:background="@color/home_bg"
+        android:clipToPadding="false">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:paddingBottom="120dp">
 
             <!-- HEADER: logo text + ADS + help -->
             <LinearLayout
@@ -167,51 +169,60 @@
             </LinearLayout>
 
             <!-- GRID 2x2: Audio / Danh bạ / Tài liệu khác / SMS -->
-            <androidx.gridlayout.widget.GridLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/gridSmall"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:columnCount="2"
-                app:rowCount="2"
                 app:layout_constraintTop_toBottomOf="@+id/rowBigTiles"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:useDefaultMargins="true">
+                app:layout_constraintEnd_toEndOf="parent">
 
-                <!-- item -->
+                <!-- Top row -->
                 <include layout="@layout/item_home_tile"
                     android:id="@+id/tileAudio"
                     android:layout_width="0dp"
                     android:layout_height="100dp"
+                    android:layout_marginEnd="8dp"
                     android:tag="Khôi phục audio|@android:drawable/ic_btn_speak_now"
-                    app:layout_columnWeight="1"
-                    app:layout_rowWeight="1" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/tileContacts" />
 
                 <include layout="@layout/item_home_tile"
                     android:id="@+id/tileContacts"
                     android:layout_width="0dp"
                     android:layout_height="100dp"
+                    android:layout_marginStart="8dp"
                     android:tag="Khôi phục danh bạ|@android:drawable/ic_menu_myplaces"
-                    app:layout_columnWeight="1"
-                    app:layout_rowWeight="1" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/tileAudio"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
+                <!-- Bottom row -->
                 <include layout="@layout/item_home_tile"
                     android:id="@+id/tileDocs"
                     android:layout_width="0dp"
                     android:layout_height="100dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="8dp"
                     android:tag="Tài liệu khác|@android:drawable/ic_menu_agenda"
-                    app:layout_columnWeight="1"
-                    app:layout_rowWeight="1" />
+                    app:layout_constraintTop_toBottomOf="@+id/tileAudio"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/tileSms" />
 
                 <include layout="@layout/item_home_tile"
                     android:id="@+id/tileSms"
                     android:layout_width="0dp"
                     android:layout_height="100dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="8dp"
                     android:tag="Khôi phục SMS|@android:drawable/ic_dialog_email"
-                    app:layout_columnWeight="1"
-                    app:layout_rowWeight="1" />
-            </androidx.gridlayout.widget.GridLayout>
+                    app:layout_constraintTop_toBottomOf="@+id/tileContacts"
+                    app:layout_constraintStart_toEndOf="@+id/tileDocs"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!-- ADS banner -->
             <FrameLayout

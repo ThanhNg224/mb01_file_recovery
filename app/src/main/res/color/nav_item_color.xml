@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Selected state - darker for better contrast on transparent background -->
-    <item android:state_checked="true" android:color="#FF1976D2" />
+
+    <item android:state_checked="true" android:color="#FF2196F3" />
     <!-- Pressed state -->
-    <item android:state_pressed="true" android:color="#FF1976D2" />
-    <!-- Default state - darker gray for better visibility -->
-    <item android:color="#FF757575" />
+    <item android:state_pressed="true" android:color="#FF2196F3" />
+
+    <item android:color="#FF616161" />
 </selector>

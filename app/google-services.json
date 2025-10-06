@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "803995235442",
+    "firebase_url": "https://push-example-a2abd.firebaseio.com",
+    "project_id": "push-example-a2abd",
+    "storage_bucket": "push-example-a2abd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:803995235442:android:3e3a6c35fcbc3c82c7beeb",
+        "android_client_info": {
+          "package_name": "com.meta.brain.base"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "803995235442-g4ft4p3qje9of9v1l8m55ga53tg5t35e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfwmiuQo7hDST6CZqh7_ThsWA69Yn_OjI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "803995235442-g4ft4p3qje9of9v1l8m55ga53tg5t35e.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "803995235442-up1718u8l6jsntrh5vgt1inc5v9lnf83.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.puzzle.game.wood.block"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:803995235442:android:08d0495c854d4f3cc7beeb",
+        "android_client_info": {
+          "package_name": "com.meta.brain.file.recovery"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "803995235442-g4ft4p3qje9of9v1l8m55ga53tg5t35e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfwmiuQo7hDST6CZqh7_ThsWA69Yn_OjI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "803995235442-g4ft4p3qje9of9v1l8m55ga53tg5t35e.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "803995235442-up1718u8l6jsntrh5vgt1inc5v9lnf83.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.puzzle.game.wood.block"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
