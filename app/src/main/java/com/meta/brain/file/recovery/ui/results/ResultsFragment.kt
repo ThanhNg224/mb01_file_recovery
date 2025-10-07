@@ -30,7 +30,7 @@ class ResultsFragment : Fragment() {
     private var _binding: FragmentResultsBinding? = null
     private val binding get() = _binding!!
 
-    // Share the same ViewModel with HomeFragment to access scan results
+
     private val sharedViewModel: HomeViewModel by activityViewModels()
 
     @Inject
@@ -91,7 +91,7 @@ class ResultsFragment : Fragment() {
     }
 
     private fun setupTabs() {
-        // Add tabs with Vietnamese labels and counts (will be updated when data loads)
+
         binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Ảnh (0)"))
         binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Video (0)"))
         binding.tabLayout.addTab(binding.tabLayout.newTab().setText("File khác (0)"))

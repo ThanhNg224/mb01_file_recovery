@@ -35,8 +35,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
     buildFeatures {
         viewBinding = true
@@ -80,32 +82,32 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
 
     // Material Components dependency
-    implementation("com.google.android.material:material:1.12.0")
+    implementation(libs.material)
 
-    implementation("com.github.quanvh:metabrain:1.0.4")
-    implementation("com.intuit.sdp:sdp-android:1.1.1")
-    implementation("com.intuit.ssp:ssp-android:1.1.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
-    implementation("androidx.recyclerview:recyclerview:1.4.0")
-    implementation("androidx.cardview:cardview:1.0.0")
-    implementation("de.hdodenhof:circleimageview:3.1.0")
-    implementation("com.github.bumptech.glide:glide:5.0.5")
-    implementation("com.airbnb.android:lottie:6.6.9")
-    implementation("com.google.code.gson:gson:2.13.2")
+    implementation(libs.metabrain)
+    implementation(libs.sdp.android)
+    implementation(libs.ssp.android)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.cardview)
+    implementation(libs.circleimageview)
+    implementation(libs.glide)
+    implementation(libs.lottie)
+    implementation(libs.gson)
 
     // Firebase BoM
     implementation(platform ("com.google.firebase:firebase-bom:33.2.0"))
 
     // Firebase SDKs
-    implementation("com.google.firebase:firebase-analytics-ktx")
-    implementation("com.google.firebase:firebase-config-ktx")
-    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation(libs.firebase.analytics.ktx)
+    implementation(libs.firebase.config.ktx)
+    implementation(libs.firebase.crashlytics.ktx)
 
     // Admob
-    implementation("com.google.android.ump:user-messaging-platform:3.2.0")
-    implementation("com.google.android.gms:play-services-ads:24.6.0")
+    implementation(libs.user.messaging.platform)
+    implementation(libs.play.services.ads)
 
-    implementation("com.google.dagger:hilt-android:2.57.2")
-    kapt("com.google.dagger:hilt-compiler:2.57.2")
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
 
 }

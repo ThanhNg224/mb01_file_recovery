@@ -150,7 +150,7 @@ class HomeFragment : Fragment() {
                 android.util.Log.d("HomeFragment", "UI State changed: $state")
                 updateUI(state)
 
-                // Navigate to ResultsFragment when we have scan results
+                // Navigate to ResultsFragment when done loading items
                 if (state is MediaUiState.Items && state.list.isNotEmpty() && !hasNavigatedToResults) {
                     android.util.Log.d("HomeFragment", "Navigating to results with ${state.list.size} items")
                     hasNavigatedToResults = true // Set the flag to true
