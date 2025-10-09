@@ -38,7 +38,7 @@ class MediaRepository @Inject constructor(
 
         val allItems = mutableListOf<MediaEntry>()
 
-        // Scan images if requested
+        // Scan images
         if (types.contains(MediaType.IMAGES) || types.contains(MediaType.ALL)) {
             android.util.Log.d("MediaRepository", "Scanning images...")
             val images = queryImages(minSize, fromSec, toSec, pageSize, cursor)
@@ -46,12 +46,20 @@ class MediaRepository @Inject constructor(
             allItems.addAll(images)
         }
 
-        // Scan videos if requested
+        // Scan videos
         if (types.contains(MediaType.VIDEOS) || types.contains(MediaType.ALL)) {
             android.util.Log.d("MediaRepository", "Scanning videos...")
             val videos = queryVideos(minSize, fromSec, toSec, pageSize, cursor)
             android.util.Log.d("MediaRepository", "Found ${videos.size} videos")
             allItems.addAll(videos)
+        }
+
+        // Scan audio
+        if (types.contains(MediaType.AUDIO) || types.contains(MediaType.ALL)) {
+            android.util.Log.d("MediaRepository", "Scanning audio...")
+            val audio = queryAudio(minSize, fromSec, toSec, pageSize, cursor)
+            android.util.Log.d("MediaRepository", "Found ${audio.size} audio files")
+            allItems.addAll(audio)
         }
 
         // Scan documents if requested
@@ -89,7 +97,7 @@ class MediaRepository @Inject constructor(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 contentResolver.loadThumbnail(uri, Size(width, height), null)
             } else {
-                // Fallback for older APIs: return null, as Thumbnails API is deprecated
+                // Fallback for older APIs: return null
                 null
             }
         } catch (_: Exception) {
@@ -226,6 +234,74 @@ class MediaRepository @Inject constructor(
             }
         } catch (e: Exception) {
             android.util.Log.e("MediaRepository", "Error querying videos: ${e.message}")
+        }
+
+        return items
+    }
+
+    private fun queryAudio(
+        minSize: Long?,
+        fromSec: Long?,
+        toSec: Long?,
+        pageSize: Int,
+        cursor: ScanCursor?
+    ): List<MediaEntry> {
+        val projection = arrayOf(
+            MediaStore.Audio.Media._ID,
+            MediaStore.Audio.Media.DISPLAY_NAME,
+            MediaStore.Audio.Media.MIME_TYPE,
+            MediaStore.Audio.Media.SIZE,
+            MediaStore.Audio.Media.DATE_ADDED,
+            MediaStore.Audio.Media.DATE_MODIFIED,
+            MediaStore.Audio.Media.DURATION
+        )
+
+        val selection = buildSelection(minSize, fromSec, toSec, cursor, false)
+        val sortOrder = "${MediaStore.Audio.Media.DATE_ADDED} DESC"
+
+        val items = mutableListOf<MediaEntry>()
+
+        try {
+            contentResolver.query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection.first,
+                selection.second,
+                sortOrder
+            )?.use { cursor ->
+                val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+                val nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
+                val mimeColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.MIME_TYPE)
+                val sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)
+                val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
+                val dateModifiedColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
+                val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+
+                var count = 0
+                while (cursor.moveToNext() && count < pageSize) {
+                    val id = cursor.getLong(idColumn)
+                    val uri = Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id.toString())
+
+                    val dateAdded = cursor.getLong(dateAddedColumn)
+                    val dateModified = cursor.getLong(dateModifiedColumn)
+
+                    items.add(
+                        MediaEntry(
+                            uri = uri,
+                            displayName = cursor.getString(nameColumn),
+                            mimeType = cursor.getString(mimeColumn),
+                            size = cursor.getLong(sizeColumn),
+                            dateAdded = dateAdded,
+                            dateTaken = if (dateModified > 0) dateModified else dateAdded,
+                            durationMs = cursor.getLong(durationColumn),
+                            isVideo = false
+                        )
+                    )
+                    count++
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("MediaRepository", "Error querying audio: ${e.message}")
         }
 
         return items
@@ -376,6 +452,13 @@ class MediaRepository @Inject constructor(
             val videos = queryVideos(minSize, fromSec, toSec, pageSize, cursor)
             android.util.Log.d("MediaRepository", "Found ${videos.size} videos")
             allItems.addAll(videos)
+        }
+
+        if (types.contains(MediaType.AUDIO) || types.contains(MediaType.ALL)) {
+            android.util.Log.d("MediaRepository", "Deep scanning audio...")
+            val audio = queryAudio(minSize, fromSec, toSec, pageSize, cursor)
+            android.util.Log.d("MediaRepository", "Found ${audio.size} audio files")
+            allItems.addAll(audio)
         }
 
         if (types.contains(MediaType.DOCUMENTS) || types.contains(MediaType.ALL)) {
@@ -935,8 +1018,9 @@ class MediaRepository @Inject constructor(
             when {
                 types.contains(MediaType.IMAGES) && mediaKind != com.meta.brain.file.recovery.data.model.MediaKind.IMAGE -> return null
                 types.contains(MediaType.VIDEOS) && mediaKind != com.meta.brain.file.recovery.data.model.MediaKind.VIDEO -> return null
+                types.contains(MediaType.AUDIO) && mediaKind != com.meta.brain.file.recovery.data.model.MediaKind.AUDIO -> return null
                 types.contains(MediaType.DOCUMENTS) && mediaKind != com.meta.brain.file.recovery.data.model.MediaKind.DOCUMENT -> return null
-                !types.contains(MediaType.ALL) && !types.contains(MediaType.IMAGES) && !types.contains(MediaType.VIDEOS) && !types.contains(MediaType.DOCUMENTS) -> return null
+                !types.contains(MediaType.ALL) && !types.contains(MediaType.IMAGES) && !types.contains(MediaType.VIDEOS) && !types.contains(MediaType.AUDIO) && !types.contains(MediaType.DOCUMENTS) -> return null
             }
 
             // Create file URI
@@ -982,8 +1066,9 @@ class MediaRepository @Inject constructor(
             when {
                 types.contains(MediaType.IMAGES) && mediaKind != com.meta.brain.file.recovery.data.model.MediaKind.IMAGE -> return null
                 types.contains(MediaType.VIDEOS) && mediaKind != com.meta.brain.file.recovery.data.model.MediaKind.VIDEO -> return null
+                types.contains(MediaType.AUDIO) && mediaKind != com.meta.brain.file.recovery.data.model.MediaKind.AUDIO -> return null
                 types.contains(MediaType.DOCUMENTS) && mediaKind != com.meta.brain.file.recovery.data.model.MediaKind.DOCUMENT -> return null
-                !types.contains(MediaType.ALL) && !types.contains(MediaType.IMAGES) && !types.contains(MediaType.VIDEOS) && !types.contains(MediaType.DOCUMENTS) -> return null
+                !types.contains(MediaType.ALL) && !types.contains(MediaType.IMAGES) && !types.contains(MediaType.VIDEOS) && !types.contains(MediaType.AUDIO) && !types.contains(MediaType.DOCUMENTS) -> return null
             }
 
             return MediaEntry(
@@ -1026,16 +1111,32 @@ class MediaRepository @Inject constructor(
 
     private fun getMimeTypeFromExtension(extension: String): String? {
         return when (extension.lowercase()) {
+            // Image formats
             "jpg", "jpeg" -> "image/jpeg"
             "png" -> "image/png"
             "gif" -> "image/gif"
             "webp" -> "image/webp"
             "bmp" -> "image/bmp"
+            // Video formats
             "mp4" -> "video/mp4"
             "avi" -> "video/avi"
             "mov" -> "video/quicktime"
             "mkv" -> "video/x-matroska"
             "webm" -> "video/webm"
+            "3gp" -> "video/3gpp"
+            "flv" -> "video/x-flv"
+            // Audio formats
+            "mp3" -> "audio/mpeg"
+            "m4a" -> "audio/mp4"
+            "aac" -> "audio/aac"
+            "wav" -> "audio/wav"
+            "ogg" -> "audio/ogg"
+            "flac" -> "audio/flac"
+            "wma" -> "audio/x-ms-wma"
+            "opus" -> "audio/opus"
+            "amr" -> "audio/amr"
+            "3ga" -> "audio/3gpp"
+            // Document formats
             "pdf" -> "application/pdf"
             "doc" -> "application/msword"
             "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -1104,8 +1205,6 @@ class MediaRepository @Inject constructor(
         resultList: MutableList<MediaEntry>
     ) {
         try {
-            // Scan for files that are in MediaStore but their physical path doesn't exist
-            // These are orphaned entries that might indicate deleted files still in database
 
             val projection = arrayOf(
                 MediaStore.Files.FileColumns._ID,

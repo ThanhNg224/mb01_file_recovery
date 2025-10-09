@@ -71,8 +71,8 @@ class ResultsFragment : Fragment() {
                 }
             } catch (e: Exception) {
                 android.util.Log.e("ResultsFragment", "Navigation error: ${e.message}")
-                // Fallback: finish activity or handle manually
-                requireActivity().onBackPressed()
+
+                requireActivity().finish()
             }
         }
 
@@ -94,6 +94,7 @@ class ResultsFragment : Fragment() {
 
         binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Ảnh (0)"))
         binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Video (0)"))
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Audio (0)"))
         binding.tabLayout.addTab(binding.tabLayout.newTab().setText("File khác (0)"))
 
         binding.tabLayout.addOnTabSelectedListener(object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
@@ -101,7 +102,8 @@ class ResultsFragment : Fragment() {
                 when (tab?.position) {
                     0 -> filterByMediaKind(MediaKind.IMAGE)
                     1 -> filterByMediaKind(MediaKind.VIDEO)
-                    2 -> filterByMediaKind(null) // File khác = DOCUMENT + OTHER
+                    2 -> filterByMediaKind(MediaKind.AUDIO)
+                    3 -> filterByMediaKind(null) // File khác = DOCUMENT + OTHER
                 }
             }
 
@@ -235,6 +237,8 @@ class ResultsFragment : Fragment() {
                 allMediaItems.filter { it.mediaKind == MediaKind.IMAGE }
             MediaKind.VIDEO ->
                 allMediaItems.filter { it.mediaKind == MediaKind.VIDEO }
+            MediaKind.AUDIO ->
+                allMediaItems.filter { it.mediaKind == MediaKind.AUDIO }
             null -> // Other Files tab
                 allMediaItems.filter {
                     it.mediaKind == MediaKind.DOCUMENT ||
@@ -249,6 +253,7 @@ class ResultsFragment : Fragment() {
     private fun updateTabCounts() {
         val imageCount = allMediaItems.count { it.mediaKind == MediaKind.IMAGE }
         val videoCount = allMediaItems.count { it.mediaKind == MediaKind.VIDEO }
+        val audioCount = allMediaItems.count { it.mediaKind == MediaKind.AUDIO }
         val otherCount = allMediaItems.count {
             it.mediaKind == MediaKind.DOCUMENT ||
             it.mediaKind == MediaKind.OTHER
@@ -256,7 +261,8 @@ class ResultsFragment : Fragment() {
 
         binding.tabLayout.getTabAt(0)?.text = "Ảnh ($imageCount)"
         binding.tabLayout.getTabAt(1)?.text = "Video ($videoCount)"
-        binding.tabLayout.getTabAt(2)?.text = "File khác ($otherCount)"
+        binding.tabLayout.getTabAt(2)?.text = "Audio ($audioCount)"
+        binding.tabLayout.getTabAt(3)?.text = "File khác ($otherCount)"
     }
 
     private fun updateResultsInfo(count: Int, filterInfo: String) {
@@ -271,15 +277,21 @@ class ResultsFragment : Fragment() {
     private fun generateFilterInfo(items: List<MediaEntry>): String {
         val imageCount = items.count { it.mediaKind == MediaKind.IMAGE }
         val videoCount = items.count { it.mediaKind == MediaKind.VIDEO }
+        val audioCount = items.count { it.mediaKind == MediaKind.AUDIO }
         val docCount = items.count { it.mediaKind == MediaKind.DOCUMENT }
 
         return when {
-            imageCount > 0 && videoCount > 0 && docCount > 0 -> "All file types"
+            imageCount > 0 && videoCount > 0 && audioCount > 0 && docCount > 0 -> "All file types"
+            imageCount > 0 && videoCount > 0 && audioCount > 0 -> "Images, Videos & Audio"
             imageCount > 0 && videoCount > 0 -> "Images & Videos"
+            imageCount > 0 && audioCount > 0 -> "Images & Audio"
+            videoCount > 0 && audioCount > 0 -> "Videos & Audio"
             imageCount > 0 && docCount > 0 -> "Images & Documents"
             videoCount > 0 && docCount > 0 -> "Videos & Documents"
+            audioCount > 0 && docCount > 0 -> "Audio & Documents"
             imageCount > 0 -> "Images only"
             videoCount > 0 -> "Videos only"
+            audioCount > 0 -> "Audio only"
             docCount > 0 -> "Documents only"
             else -> "All media"
         }

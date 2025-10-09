@@ -120,7 +120,7 @@ class MediaAdapter(
                         thumbnailImage.setImageBitmap(it)
                     }
                 } catch (e: Exception) {
-                    // Keep placeholder on error
+                    // errors
                 }
             }
         }

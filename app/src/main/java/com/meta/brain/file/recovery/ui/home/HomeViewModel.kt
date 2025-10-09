@@ -50,7 +50,7 @@ class HomeViewModel @Inject constructor(
         fromSec: Long? = null,
         toSec: Long? = null
     ) {
-        if (isLoading) return // Guard against concurrent calls
+        if (isLoading) return
 
         viewModelScope.launch {
             try {
@@ -107,7 +107,7 @@ class HomeViewModel @Inject constructor(
                 _uiState.value = currentState.copy(appending = true)
 
                 val result = mediaRepository.quickScan(
-                    types = setOf(MediaType.ALL), // Use previous filter settings
+                    types = setOf(MediaType.ALL),
                     pageSize = PAGE_SIZE,
                     cursor = currentCursor
                 )
@@ -148,7 +148,7 @@ class HomeViewModel @Inject constructor(
         fromSec: Long? = null,
         toSec: Long? = null
     ) {
-        if (isLoading) return // Guard against concurrent calls
+        if (isLoading) return
 
         viewModelScope.launch {
             try {

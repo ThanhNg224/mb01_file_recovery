@@ -77,6 +77,7 @@ class HomeFragment : Fragment() {
             if (isChecked) {
                 binding.chipVideos.isChecked = false
                 binding.chipDocuments.isChecked = false
+                binding.chipAudio.isChecked = false
                 binding.chipAll.isChecked = false
             }
         }
@@ -85,6 +86,7 @@ class HomeFragment : Fragment() {
             if (isChecked) {
                 binding.chipImages.isChecked = false
                 binding.chipDocuments.isChecked = false
+                binding.chipAudio.isChecked = false
                 binding.chipAll.isChecked = false
             }
         }
@@ -93,6 +95,16 @@ class HomeFragment : Fragment() {
             if (isChecked) {
                 binding.chipImages.isChecked = false
                 binding.chipVideos.isChecked = false
+                binding.chipAudio.isChecked = false
+                binding.chipAll.isChecked = false
+            }
+        }
+
+        binding.chipAudio.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                binding.chipImages.isChecked = false
+                binding.chipVideos.isChecked = false
+                binding.chipDocuments.isChecked = false
                 binding.chipAll.isChecked = false
             }
         }
@@ -102,6 +114,7 @@ class HomeFragment : Fragment() {
                 binding.chipImages.isChecked = false
                 binding.chipVideos.isChecked = false
                 binding.chipDocuments.isChecked = false
+                binding.chipAudio.isChecked = false
             }
         }
 
@@ -202,6 +215,7 @@ class HomeFragment : Fragment() {
         val selectedTypes = when {
             binding.chipImages.isChecked -> setOf(MediaType.IMAGES)
             binding.chipVideos.isChecked -> setOf(MediaType.VIDEOS)
+            binding.chipAudio.isChecked -> setOf(MediaType.AUDIO)
             binding.chipDocuments.isChecked -> setOf(MediaType.DOCUMENTS)
             else -> setOf(MediaType.ALL)
         }
@@ -241,6 +255,7 @@ class HomeFragment : Fragment() {
         val selectedTypes = when {
             binding.chipImages.isChecked -> setOf(MediaType.IMAGES)
             binding.chipVideos.isChecked -> setOf(MediaType.VIDEOS)
+            binding.chipAudio.isChecked -> setOf(MediaType.AUDIO)
             binding.chipDocuments.isChecked -> setOf(MediaType.DOCUMENTS)
             else -> setOf(MediaType.ALL)
         }

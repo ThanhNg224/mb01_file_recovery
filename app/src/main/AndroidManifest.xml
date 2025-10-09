@@ -37,6 +37,13 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.meta.brain.module.loading.LoadingActivity"
+            android:exported="false"
+            tools:node="merge"
+            tools:replace="android:exported">
+            <intent-filter tools:node="removeAll" />
+        </activity>
 
         <!-- AdMob config -->
         <meta-data

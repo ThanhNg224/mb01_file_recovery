@@ -10,4 +10,21 @@
     <string name="history">History</string>
     <string name="settings">Settings</string>
     <string name="archive">Archive</string>
+
+    <!-- Onboarding strings -->
+    <string name="next">Next</string>
+    <string name="skip">Skip</string>
+    <string name="finish">Finish</string>
+
+    <!-- Onboarding page 1 -->
+    <string name="onboarding_title_1">Recover Delete Files</string>
+    <string name="onboarding_desc_1">Quickly recover images, videos, audios and documents</string>
+
+    <!-- Onboarding page 2 -->
+    <string name="onboarding_title_2">Absolute security</string>
+    <string name="onboarding_desc_2">Set data encryption to prevent theft</string>
+
+    <!-- Onboarding page 3 -->
+    <string name="onboarding_title_3">Storage space</string>
+    <string name="onboarding_desc_3">Protect your important data from loss or corruption</string>
 </resources>

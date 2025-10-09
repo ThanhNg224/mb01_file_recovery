@@ -1,7 +1,6 @@
 package com.meta.brain.file.recovery.ui.intro
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,8 +9,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.meta.brain.file.recovery.R
 import com.meta.brain.file.recovery.databinding.FragmentIntroBinding
-import com.meta.brain.module.ads.AdEvent
-import com.meta.brain.module.ads.AdsController
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -19,7 +16,7 @@ class IntroFragment : Fragment() {
 
     private var _binding: FragmentIntroBinding? = null
     private val binding get() = _binding!!
-    
+
     private val viewModel: IntroViewModel by viewModels()
 
     override fun onCreateView(
@@ -44,31 +41,15 @@ class IntroFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.showAdEvent.observe(viewLifecycleOwner) { event ->
+        viewModel.navigateToOnboarding.observe(viewLifecycleOwner) { event ->
             event.getContentIfNotHandled()?.let {
-                showInterstitialAd()
-            }
-        }
-
-        viewModel.navigateToHome.observe(viewLifecycleOwner) { event ->
-            event.getContentIfNotHandled()?.let {
-                navigateToHome()
+                navigateToOnboarding()
             }
         }
     }
 
-    private fun showInterstitialAd() {
-        requireActivity().let { activity ->
-            AdsController.showInter(activity, object : AdEvent() {
-                override fun onComplete() {
-                    viewModel.onAdCompleted()
-                }
-            })
-        }
-    }
-
-    private fun navigateToHome() {
-        findNavController().navigate(R.id.action_intro_to_home)
+    private fun navigateToOnboarding() {
+        findNavController().navigate(R.id.action_intro_to_onboarding)
     }
 
     override fun onDestroyView() {

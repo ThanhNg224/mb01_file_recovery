@@ -12,18 +12,12 @@ class IntroViewModel @Inject constructor(
     private val metricsRepository: MetricsRepository
 ) : ViewModel() {
 
-    private val _showAdEvent = MutableLiveData<Event<Unit>>()
-    val showAdEvent: LiveData<Event<Unit>> = _showAdEvent
-
-    private val _navigateToHome = MutableLiveData<Event<Unit>>()
-    val navigateToHome: LiveData<Event<Unit>> = _navigateToHome
+    private val _navigateToOnboarding = MutableLiveData<Event<Unit>>()
+    val navigateToOnboarding: LiveData<Event<Unit>> = _navigateToOnboarding
 
     fun onStartButtonClicked() {
-        _showAdEvent.value = Event(Unit)
-    }
-
-    fun onAdCompleted() {
-        _navigateToHome.value = Event(Unit)
+        // TODO: Add analytics event: "Intro_Started"
+        _navigateToOnboarding.value = Event(Unit)
     }
 }
 
