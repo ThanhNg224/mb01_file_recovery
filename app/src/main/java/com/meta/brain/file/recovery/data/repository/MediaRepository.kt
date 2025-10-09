@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Size
 import com.meta.brain.file.recovery.data.model.MediaEntry
@@ -121,7 +122,7 @@ class MediaRepository @Inject constructor(
             MediaStore.Images.Media.DATE_MODIFIED
         )
 
-        val selection = buildSelection(minSize, fromSec, toSec, cursor, false)
+        val selection = buildSelection(minSize, fromSec, toSec, cursor)
         val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
 
         val items = mutableListOf<MediaEntry>()
@@ -188,7 +189,7 @@ class MediaRepository @Inject constructor(
             MediaStore.Video.Media.DURATION
         )
 
-        val selection = buildSelection(minSize, fromSec, toSec, cursor, true)
+        val selection = buildSelection(minSize, fromSec, toSec, cursor)
         val sortOrder = "${MediaStore.Video.Media.DATE_ADDED} DESC"
 
         val items = mutableListOf<MediaEntry>()
@@ -256,7 +257,7 @@ class MediaRepository @Inject constructor(
             MediaStore.Audio.Media.DURATION
         )
 
-        val selection = buildSelection(minSize, fromSec, toSec, cursor, false)
+        val selection = buildSelection(minSize, fromSec, toSec, cursor)
         val sortOrder = "${MediaStore.Audio.Media.DATE_ADDED} DESC"
 
         val items = mutableListOf<MediaEntry>()
@@ -523,6 +524,7 @@ class MediaRepository @Inject constructor(
 
         try {
             // Expanded hidden file directories on Android
+            val sdcardPath = Environment.getExternalStorageDirectory().path
             val hiddenDirs = listOf(
                 "/storage/emulated/0/.hidden",
                 "/storage/emulated/0/.trash",
@@ -532,9 +534,9 @@ class MediaRepository @Inject constructor(
                 "/storage/emulated/0/Android/data/.hidden",
                 "/storage/emulated/0/DCIM/.thumbnails",
                 "/storage/emulated/0/Pictures/.thumbnails",
-                "/sdcard/.hidden",
-                "/sdcard/.cache",
-                "/sdcard/.temp",
+                "$sdcardPath/.hidden",
+                "$sdcardPath/.cache",
+                "$sdcardPath/.temp",
                 // App-specific hidden directories
                 "/storage/emulated/0/.WhatsApp",
                 "/storage/emulated/0/.Telegram",
@@ -578,6 +580,7 @@ class MediaRepository @Inject constructor(
 
         try {
             // Comprehensive trash/recycle bin directories
+            val sdcardPath = Environment.getExternalStorageDirectory().path
             val trashDirs = listOf(
                 // System trash directories
                 "/storage/emulated/0/.Trash",
@@ -586,9 +589,9 @@ class MediaRepository @Inject constructor(
                 "/storage/emulated/0/RECYCLE.BIN",
                 "/storage/emulated/0/.recycle.bin",
                 "/storage/emulated/0/.Trash-1000",
-                "/sdcard/.Trash-1000",
-                "/sdcard/Trash",
-                "/sdcard/.trash",
+                "$sdcardPath/.Trash-1000",
+                "$sdcardPath/Trash",
+                "$sdcardPath/.trash",
                 // MediaStore trash
                 "/storage/emulated/0/Android/data/com.android.providers.media/cache/.trash",
                 "/storage/emulated/0/Android/data/com.android.providers.media/.trash",
@@ -655,6 +658,7 @@ class MediaRepository @Inject constructor(
             }
 
             // Check temporary directories where deleted files might still exist
+            val sdcardPath = Environment.getExternalStorageDirectory().path
             val tempDirs = listOf(
                 "/storage/emulated/0/Android/data/com.android.providers.media/files/.pending",
                 "/storage/emulated/0/Android/data/com.android.providers.media/files/.deleted",
@@ -672,7 +676,14 @@ class MediaRepository @Inject constructor(
                 "/storage/emulated/0/.backup",
                 "/storage/emulated/0/backup",
                 "/storage/emulated/0/Backups",
-                "/storage/emulated/0/Android/data/backup"
+                "/storage/emulated/0/Android/data/backup",
+                "$sdcardPath/.temp",
+                "$sdcardPath/tmp",
+                "$sdcardPath/.tmp",
+                "$sdcardPath/temp",
+                "$sdcardPath/.backup",
+                "$sdcardPath/backup",
+                "$sdcardPath/Backups"
             )
 
             tempDirs.forEach { dirPath ->
@@ -703,6 +714,7 @@ class MediaRepository @Inject constructor(
 
         try {
             // Expanded directories that might contain unindexed files
+            val sdcardPath = Environment.getExternalStorageDirectory().path
             val unindexedDirs = listOf(
                 // Standard directories
                 "/storage/emulated/0/Download",
@@ -747,7 +759,24 @@ class MediaRepository @Inject constructor(
                 "/storage/emulated/0/MyFiles",
                 // SD card paths
                 "/storage/sdcard1",
-                "/mnt/extSdCard"
+                "/mnt/extSdCard",
+                "$sdcardPath/Download",
+                "$sdcardPath/Downloads",
+                "$sdcardPath/Documents",
+                "$sdcardPath/Music",
+                "$sdcardPath/Movies",
+                "$sdcardPath/Pictures",
+                "$sdcardPath/DCIM",
+                "$sdcardPath/DCIM/Camera",
+                "$sdcardPath/DCIM/Screenshots",
+                "$sdcardPath/bluetooth",
+                "$sdcardPath/Bluetooth",
+                "$sdcardPath/Recordings",
+                "$sdcardPath/Voice Recorder",
+                "$sdcardPath/Call Recordings",
+                "$sdcardPath/Media",
+                "$sdcardPath/Files",
+                "$sdcardPath/MyFiles"
             )
 
             unindexedDirs.forEach { dirPath ->
@@ -772,8 +801,7 @@ class MediaRepository @Inject constructor(
         minSize: Long?,
         fromSec: Long?,
         toSec: Long?,
-        cursor: ScanCursor?,
-        isVideo: Boolean
+        cursor: ScanCursor?
     ): Pair<String?, Array<String>?> {
         val conditions = mutableListOf<String>()
         val args = mutableListOf<String>()
@@ -975,7 +1003,7 @@ class MediaRepository @Inject constructor(
                             val fileExists = try {
                                 contentResolver.openInputStream(uri)?.close()
                                 true
-                            } catch (e: Exception) {
+                            } catch (_: Exception) {
                                 false
                             }
 
@@ -984,7 +1012,7 @@ class MediaRepository @Inject constructor(
                                 val mediaEntry = createMediaEntryFromCursor(cursor, uri, types, minSize, fromSec, toSec)
                                 mediaEntry?.let { resultList.add(it) }
                             }
-                        } catch (e: Exception) {
+                        } catch (_: Exception) {
                             // Continue with next file
                         }
                     }
@@ -1012,7 +1040,7 @@ class MediaRepository @Inject constructor(
 
             // Determine MIME type from file extension
             val mimeType = getMimeTypeFromExtension(file.extension)
-            val mediaKind = determineMediaKind(mimeType, false)
+            val mediaKind = determineMediaKind(mimeType)
 
             // Apply type filter
             when {
@@ -1060,7 +1088,7 @@ class MediaRepository @Inject constructor(
             if (minSize != null && size < minSize) return null
             if (fromSec != null && toSec != null && (dateAdded < fromSec || dateAdded > toSec)) return null
 
-            val mediaKind = determineMediaKind(mimeType, false)
+            val mediaKind = determineMediaKind(mimeType)
 
             // Apply type filter
             when {
@@ -1082,7 +1110,7 @@ class MediaRepository @Inject constructor(
                 isVideo = mediaKind == com.meta.brain.file.recovery.data.model.MediaKind.VIDEO,
                 mediaKind = mediaKind
             )
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             return null
         }
     }
@@ -1102,7 +1130,7 @@ class MediaRepository @Inject constructor(
             )?.use { cursor ->
                 return cursor.count > 0
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // If we can't check, assume it's indexed
             return true
         }
@@ -1150,7 +1178,7 @@ class MediaRepository @Inject constructor(
         }
     }
 
-    private fun determineMediaKind(mimeType: String?, isVideo: Boolean): com.meta.brain.file.recovery.data.model.MediaKind {
+    private fun determineMediaKind(mimeType: String?): com.meta.brain.file.recovery.data.model.MediaKind {
         return when {
             mimeType == null -> com.meta.brain.file.recovery.data.model.MediaKind.OTHER
             mimeType.startsWith("image/") -> com.meta.brain.file.recovery.data.model.MediaKind.IMAGE
@@ -1170,9 +1198,10 @@ class MediaRepository @Inject constructor(
     ) {
         try {
             // Scan root storage for directories with "trash", "deleted", "recycle" in their names
+            val sdcardPath = Environment.getExternalStorageDirectory().path
             val rootDirs = listOf(
                 "/storage/emulated/0",
-                "/sdcard"
+                sdcardPath
             )
 
             rootDirs.forEach { rootPath ->
@@ -1243,7 +1272,7 @@ class MediaRepository @Inject constructor(
                                 }
                             }
                         }
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         // Continue with next file
                     }
                 }
@@ -1262,9 +1291,10 @@ class MediaRepository @Inject constructor(
     ) {
         try {
             // Scan the root of storage for any unindexed media files
+            val sdcardPath = Environment.getExternalStorageDirectory().path
             val rootPaths = listOf(
                 "/storage/emulated/0",
-                "/sdcard"
+                sdcardPath
             )
 
             rootPaths.forEach { rootPath ->

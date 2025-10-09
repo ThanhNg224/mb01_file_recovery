@@ -69,9 +69,7 @@ class OnboardingFragment : Fragment() {
         for (i in 0 until tabLayout.tabCount) {
             val tab = tabLayout.getTabAt(i)
             val dot = tab?.customView?.findViewById<ImageView>(R.id.tab_dot)
-            if (dot != null) {
-                dot.setImageResource(if (i == selectedIndex) R.drawable.tab_selected else R.drawable.tab_unselected)
-            }
+            dot?.setImageResource(if (i == selectedIndex) R.drawable.tab_selected else R.drawable.tab_unselected)
         }
     }
 

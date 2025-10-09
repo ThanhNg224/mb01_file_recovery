@@ -24,6 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -361,9 +362,9 @@ class HomeFragment : Fragment() {
             ).setAction("Settings") {
                 try {
                     val intent = android.content.Intent(android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                    intent.data = android.net.Uri.parse("package:${requireContext().packageName}")
+                    intent.data = "package:${requireContext().packageName}".toUri()
                     startActivity(intent)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     // Fallback to general settings
                     val intent = android.content.Intent(android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
                     startActivity(intent)

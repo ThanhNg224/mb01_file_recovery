@@ -120,7 +120,7 @@ class HomeViewModel @Inject constructor(
                     canLoadMore = result.nextCursor != null,
                     appending = false
                 )
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Revert to previous state on error
                 _uiState.value = currentState.copy(appending = false)
             } finally {

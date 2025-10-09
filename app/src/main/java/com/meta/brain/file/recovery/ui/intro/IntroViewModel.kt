@@ -3,13 +3,11 @@ package com.meta.brain.file.recovery.ui.intro
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.meta.brain.file.recovery.data.repository.MetricsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class IntroViewModel @Inject constructor(
-    private val metricsRepository: MetricsRepository
 ) : ViewModel() {
 
     private val _navigateToOnboarding = MutableLiveData<Event<Unit>>()
@@ -38,5 +36,4 @@ class Event<out T>(private val content: T) {
     }
 
 
-    fun peekContent(): T = content
 }

@@ -12,7 +12,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.meta.brain.file.recovery.R
 import com.meta.brain.file.recovery.data.model.MediaEntry
 import com.meta.brain.file.recovery.data.model.MediaKind
 import com.meta.brain.file.recovery.data.repository.MediaRepository
