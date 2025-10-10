@@ -100,70 +100,18 @@
                         android:textSize="12sp"
                         android:textColor="@color/home_text_secondary" />
 
-                    <!-- Quick Scan Controls -->
+                    <!-- Quick Scan Controls removed for simplicity -->
+                    <!--
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:orientation="horizontal"
                         android:gravity="center_vertical">
-
-                        <!-- Filter Chips -->
-                        <com.google.android.material.chip.ChipGroup
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            app:singleSelection="true">
-
-                            <com.google.android.material.chip.Chip
-                                android:id="@+id/chipAll"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="All"
-                                android:textSize="12sp"
-                                style="@style/Widget.Material3.Chip.Filter" />
-
-                            <com.google.android.material.chip.Chip
-                                android:id="@+id/chipImages"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Images"
-                                android:textSize="12sp"
-                                style="@style/Widget.Material3.Chip.Filter" />
-
-                            <com.google.android.material.chip.Chip
-                                android:id="@+id/chipVideos"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Videos"
-                                android:textSize="12sp"
-                                style="@style/Widget.Material3.Chip.Filter" />
-
-                            <com.google.android.material.chip.Chip
-                                android:id="@+id/chipAudio"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Audio"
-                                android:textSize="12sp"
-                                style="@style/Widget.Material3.Chip.Filter" />
-
-                            <com.google.android.material.chip.Chip
-                                android:id="@+id/chipDocuments"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Documents"
-                                android:textSize="12sp"
-                                style="@style/Widget.Material3.Chip.Filter" />
-                        </com.google.android.material.chip.ChipGroup>
-
-                        <!-- Size Filter Spinner -->
-                        <Spinner
-                            android:id="@+id/spinnerMinSize"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:entries="@array/min_size_options" />
+                        <com.google.android.material.chip.ChipGroup ... />
+                        <Spinner ... />
                     </LinearLayout>
+                    -->
 
                     <!-- Quick Scan Button -->
                     <com.google.android.material.button.MaterialButton

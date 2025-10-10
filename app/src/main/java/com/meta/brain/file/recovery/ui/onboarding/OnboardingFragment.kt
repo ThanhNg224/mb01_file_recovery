@@ -134,7 +134,13 @@ class OnboardingFragment : Fragment() {
     }
 
     private fun navigateToHome() {
-        findNavController().navigate(R.id.action_onboarding_to_home)
+        findNavController().navigate(
+            R.id.action_onboarding_to_home,
+            null,
+            androidx.navigation.NavOptions.Builder()
+                .setPopUpTo(R.id.introFragment, true)
+                .build()
+        )
     }
 
     override fun onDestroyView() {

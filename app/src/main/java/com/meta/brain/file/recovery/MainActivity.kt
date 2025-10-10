@@ -8,7 +8,6 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -16,7 +15,6 @@ import com.meta.brain.file.recovery.data.repository.MetricsRepository
 import com.meta.brain.module.loading.LoadingActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -59,18 +57,6 @@ class MainActivity : AppCompatActivity() {
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHost.navController
 
-        // Set dynamic start destination based on onboarding status
-        lifecycleScope.launch {
-            val onboardingDone = metricsRepository.onboardingDone.first()
-            val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
-
-            navGraph.setStartDestination(
-                if (onboardingDone) R.id.homeFragment else R.id.introFragment
-            )
-
-            navController.graph = navGraph
-        }
-
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
         bottomNav.setupWithNavController(navController)
         // Handle insets for bottom nav
@@ -82,11 +68,35 @@ class MainActivity : AppCompatActivity() {
         }
         bottomNav.clipToPadding = false
 
+        // Set dynamic start destination based on onboarding status
+        if (savedInstanceState == null) {
+            // Synchronously get onboarding status before setting the graph
+            val onboardingDone = kotlinx.coroutines.runBlocking { metricsRepository.onboardingDone.first() }
+            val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
+            navGraph.setStartDestination(
+                if (onboardingDone) R.id.homeFragment else R.id.introFragment
+            )
+            navController.graph = navGraph
+            // Immediately trigger destination change logic for current destination
+            navController.currentDestination?.let { destination ->
+                val hideOn = setOf(R.id.introFragment, R.id.onboardingFragment)
+                val shouldShow = destination.id !in hideOn
+                if (shouldShow && !bottomNav.isVisible) {
+                    bottomNav.isVisible = true
+                    bottomNav.translationY = 0f
+                    bottomNav.alpha = 1f
+                } else if (!shouldShow && bottomNav.isVisible) {
+                    bottomNav.isVisible = false
+                    bottomNav.translationY = bottomNav.height.toFloat()
+                    bottomNav.alpha = 0f
+                }
+            }
+        }
+
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            // Hide bottom nav on intro and onboarding screens
+            android.util.Log.d("NavBarDebug", "Destination changed: ${destination.label} (${destination.id})")
             val hideOn = setOf(R.id.introFragment, R.id.onboardingFragment)
             val shouldShow = destination.id !in hideOn
-
             if (shouldShow && !bottomNav.isVisible) {
                 bottomNav.animate()
                     .translationY(0f)

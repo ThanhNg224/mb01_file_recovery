@@ -6,5 +6,10 @@
         <item>50KB+</item>
         <item>1MB+</item>
     </string-array>
-</resources>
 
+    <!-- Default size range for custom size filter (in MB) -->
+    <array name="default_size_range">
+        <item>0</item>
+        <item>100</item>
+    </array>
+</resources>

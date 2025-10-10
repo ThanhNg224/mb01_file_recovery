@@ -41,6 +41,13 @@
         android:label="Home"
         tools:layout="@layout/fragment_home">
         <action
+            android:id="@+id/action_home_to_scan_loading"
+            app:destination="@id/scanLoadingFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
             android:id="@+id/action_home_to_results"
             app:destination="@id/resultsFragment"
             app:enterAnim="@anim/slide_in_right"
@@ -49,12 +56,36 @@
             app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
+    <!-- Scan Loading Fragment -->
+    <fragment
+        android:id="@+id/scanLoadingFragment"
+        android:name="com.meta.brain.file.recovery.ui.scanloading.ScanLoadingFragment"
+        android:label="Scanning"
+        tools:layout="@layout/fragment_scan_loading">
+        <argument
+            android:name="scanConfig"
+            app:argType="com.meta.brain.file.recovery.data.model.ScanConfig" />
+        <action
+            android:id="@+id/action_scan_loading_to_results"
+            app:destination="@id/resultsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+
     <!-- Results Fragment for showing scan results -->
     <fragment
         android:id="@+id/resultsFragment"
         android:name="com.meta.brain.file.recovery.ui.results.ResultsFragment"
         android:label="Scan Results"
-        tools:layout="@layout/fragment_results" />
+        tools:layout="@layout/fragment_results">
+        <argument
+            android:name="scanConfig"
+            app:argType="com.meta.brain.file.recovery.data.model.ScanConfig" />
+    </fragment>
 
     <!-- Additional fragments for bottom navigation -->
     <fragment

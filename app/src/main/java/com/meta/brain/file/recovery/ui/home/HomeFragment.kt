@@ -12,17 +12,15 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.meta.brain.file.recovery.R
-import com.meta.brain.file.recovery.data.model.MediaType
+import com.meta.brain.file.recovery.data.model.ScanConfig
+import com.meta.brain.file.recovery.data.model.ScanDepth
+import com.meta.brain.file.recovery.data.model.ScanTarget
 import com.meta.brain.file.recovery.data.repository.MediaRepository
 import com.meta.brain.file.recovery.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import java.util.Calendar
 import javax.inject.Inject
 import androidx.core.net.toUri
 
@@ -33,13 +31,12 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     // Use activity-scoped ViewModel to share with ResultsFragment
-    private val viewModel: HomeViewModel by activityViewModels()
+    // private val viewModel: HomeViewModel by activityViewModels()
 
     @Inject
     lateinit var mediaRepository: MediaRepository
 
     private var hasPermissions = false
-    private var hasNavigatedToResults = false // Flag to prevent auto-navigation loop
 
     // Permission request launcher
     private val permissionLauncher = registerForActivityResult(
@@ -65,68 +62,68 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupFilters()
+//        setupFilters()
         setupQuickScan()
         setupExistingViews()
-        observeViewModel()
         checkPermissions()
     }
 
-    private fun setupFilters() {
-        // Filter chips for media types
-        binding.chipImages.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                binding.chipVideos.isChecked = false
-                binding.chipDocuments.isChecked = false
-                binding.chipAudio.isChecked = false
-                binding.chipAll.isChecked = false
-            }
-        }
-
-        binding.chipVideos.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                binding.chipImages.isChecked = false
-                binding.chipDocuments.isChecked = false
-                binding.chipAudio.isChecked = false
-                binding.chipAll.isChecked = false
-            }
-        }
-
-        binding.chipDocuments.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                binding.chipImages.isChecked = false
-                binding.chipVideos.isChecked = false
-                binding.chipAudio.isChecked = false
-                binding.chipAll.isChecked = false
-            }
-        }
-
-        binding.chipAudio.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                binding.chipImages.isChecked = false
-                binding.chipVideos.isChecked = false
-                binding.chipDocuments.isChecked = false
-                binding.chipAll.isChecked = false
-            }
-        }
-
-        binding.chipAll.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                binding.chipImages.isChecked = false
-                binding.chipVideos.isChecked = false
-                binding.chipDocuments.isChecked = false
-                binding.chipAudio.isChecked = false
-            }
-        }
-
-        // Default to "All"
-        binding.chipAll.isChecked = true
-    }
+//    private fun setupFilters() {
+//        // Filter chips for media types
+//        binding.chipImages.setOnCheckedChangeListener { _, isChecked ->
+//            if (isChecked) {
+//                binding.chipVideos.isChecked = false
+//                binding.chipDocuments.isChecked = false
+//                binding.chipAudio.isChecked = false
+//                binding.chipAll.isChecked = false
+//            }
+//        }
+//
+//        binding.chipVideos.setOnCheckedChangeListener { _, isChecked ->
+//            if (isChecked) {
+//                binding.chipImages.isChecked = false
+//                binding.chipDocuments.isChecked = false
+//                binding.chipAudio.isChecked = false
+//                binding.chipAll.isChecked = false
+//            }
+//        }
+//
+//        binding.chipDocuments.setOnCheckedChangeListener { _, isChecked ->
+//            if (isChecked) {
+//                binding.chipImages.isChecked = false
+//                binding.chipVideos.isChecked = false
+//                binding.chipAudio.isChecked = false
+//                binding.chipAll.isChecked = false
+//            }
+//        }
+//
+//        binding.chipAudio.setOnCheckedChangeListener { _, isChecked ->
+//            if (isChecked) {
+//                binding.chipImages.isChecked = false
+//                binding.chipVideos.isChecked = false
+//                binding.chipDocuments.isChecked = false
+//                binding.chipAll.isChecked = false
+//            }
+//        }
+//
+//        binding.chipAll.setOnCheckedChangeListener { _, isChecked ->
+//            if (isChecked) {
+//                binding.chipImages.isChecked = false
+//                binding.chipVideos.isChecked = false
+//                binding.chipDocuments.isChecked = false
+//                binding.chipAudio.isChecked = false
+//            }
+//        }
+//
+//        // Default to "All"
+//        binding.chipAll.isChecked = true
+//    }
 
     private fun setupQuickScan() {
         binding.btnQuickScan.setOnClickListener {
             if (hasPermissions) {
-                performQuickScan()
+                // Always scan for all file types and any size in Quick Scan
+                navigateToScanLoading(ScanDepth.QUICK, forceAll = true)
             } else {
                 requestPermissions()
             }
@@ -135,10 +132,55 @@ class HomeFragment : Fragment() {
         // Setup Deep Scan button
         binding.btnDeepScan.setOnClickListener {
             if (hasPermissions) {
-                performDeepScan()
+                navigateToScanLoading(ScanDepth.DEEP)
             } else {
                 requestPermissions()
             }
+        }
+    }
+
+    // Modified to accept forceAll for Quick Scan
+    private fun navigateToScanLoading(depth: ScanDepth, forceAll: Boolean = false) {
+        val selectedTarget = if (forceAll && depth == ScanDepth.QUICK) {
+            ScanTarget.ALL
+        } else {
+            when {
+//                binding.chipImages.isChecked -> ScanTarget.PHOTOS
+//                binding.chipVideos.isChecked -> ScanTarget.VIDEOS
+//                binding.chipAudio.isChecked -> ScanTarget.AUDIO
+//                binding.chipDocuments.isChecked -> ScanTarget.DOCUMENTS
+                else -> ScanTarget.ALL
+            }
+        }
+
+        // Check for MANAGE_EXTERNAL_STORAGE permission if scanning documents on Android 11+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !checkManageStoragePermission()) {
+            showManageStoragePermissionDialog()
+            return
+        }
+
+
+        // Scan ALL files regardless of date
+
+        val minDurationMs = when (depth) {
+            ScanDepth.QUICK -> 2500L
+            ScanDepth.DEEP -> 4000L
+        }
+
+        val scanConfig = ScanConfig(
+            target = selectedTarget,
+            depth = depth,
+            minDurationMs = minDurationMs,
+            fromSec = null,
+            toSec = null
+        )
+
+        try {
+            val action = HomeFragmentDirections.actionHomeToScanLoading(scanConfig)
+            findNavController().navigate(action)
+        } catch (e: Exception) {
+            android.util.Log.e("HomeFragment", "Navigation error: ${e.message}")
+            Snackbar.make(binding.root, "Navigation error occurred", Snackbar.LENGTH_SHORT).show()
         }
     }
 
@@ -156,137 +198,6 @@ class HomeFragment : Fragment() {
         binding.btnHelp.setOnClickListener { toast("Help") }
         binding.btnAds.setOnClickListener { toast("Open Ads") }
         binding.adsBanner.setOnClickListener { toast("ADS area") }
-    }
-
-    private fun observeViewModel() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.uiState.collect { state ->
-                android.util.Log.d("HomeFragment", "UI State changed: $state")
-                updateUI(state)
-
-                // Navigate to ResultsFragment when done loading items
-                if (state is MediaUiState.Items && state.list.isNotEmpty() && !hasNavigatedToResults) {
-                    android.util.Log.d("HomeFragment", "Navigating to results with ${state.list.size} items")
-                    hasNavigatedToResults = true // Set the flag to true
-                    try {
-                        findNavController().navigate(R.id.action_home_to_results)
-                    } catch (e: Exception) {
-                        android.util.Log.e("HomeFragment", "Navigation error: ${e.message}")
-                    }
-                }
-            }
-        }
-    }
-
-    private fun updateUI(state: MediaUiState) {
-        when (state) {
-            is MediaUiState.Idle -> {
-            }
-
-            is MediaUiState.Loading -> {
-
-                binding.btnQuickScan.text = "Scanning..."
-                binding.btnQuickScan.isEnabled = false
-            }
-
-            is MediaUiState.Items -> {
-                binding.btnQuickScan.text = if (hasPermissions) "Quick Scan" else "Grant Permissions"
-                binding.btnQuickScan.isEnabled = true
-            }
-
-            is MediaUiState.Empty -> {
-                binding.btnQuickScan.text = if (hasPermissions) "Quick Scan" else "Grant Permissions"
-                binding.btnQuickScan.isEnabled = true
-                Snackbar.make(binding.root, "No media files found", Snackbar.LENGTH_LONG).show()
-            }
-
-            is MediaUiState.Error -> {
-                // Reset button and show error
-                binding.btnQuickScan.text = if (hasPermissions) "Quick Scan" else "Grant Permissions"
-                binding.btnQuickScan.isEnabled = true
-                Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
-            }
-        }
-    }
-
-    private fun performQuickScan() {
-        // Reset navigation flag for new scan
-        hasNavigatedToResults = false
-
-        val selectedTypes = when {
-            binding.chipImages.isChecked -> setOf(MediaType.IMAGES)
-            binding.chipVideos.isChecked -> setOf(MediaType.VIDEOS)
-            binding.chipAudio.isChecked -> setOf(MediaType.AUDIO)
-            binding.chipDocuments.isChecked -> setOf(MediaType.DOCUMENTS)
-            else -> setOf(MediaType.ALL)
-        }
-
-        // Check for MANAGE_EXTERNAL_STORAGE permission if scanning documents on Android 11+
-        if (selectedTypes.contains(MediaType.DOCUMENTS) || selectedTypes.contains(MediaType.ALL)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !checkManageStoragePermission()) {
-                showManageStoragePermissionDialog()
-                return
-            }
-        }
-
-        val minSize = when (binding.spinnerMinSize.selectedItemPosition) {
-            1 -> 50L * 1024 // 50KB
-            2 -> 1024L * 1024 // 1MB
-            else -> null // No minimum
-        }
-
-        // Last 12 months by default
-        val calendar = Calendar.getInstance()
-        val toSec = calendar.timeInMillis / 1000
-        calendar.add(Calendar.MONTH, -12)
-        val fromSec = calendar.timeInMillis / 1000
-
-        viewModel.quickScan(
-            types = selectedTypes,
-            minSize = minSize,
-            fromSec = fromSec,
-            toSec = toSec
-        )
-    }
-
-    private fun performDeepScan() {
-        // Reset navigation flag for new scan
-        hasNavigatedToResults = false
-
-        val selectedTypes = when {
-            binding.chipImages.isChecked -> setOf(MediaType.IMAGES)
-            binding.chipVideos.isChecked -> setOf(MediaType.VIDEOS)
-            binding.chipAudio.isChecked -> setOf(MediaType.AUDIO)
-            binding.chipDocuments.isChecked -> setOf(MediaType.DOCUMENTS)
-            else -> setOf(MediaType.ALL)
-        }
-
-        // Check for MANAGE_EXTERNAL_STORAGE permission if scanning documents on Android 11+
-        if (selectedTypes.contains(MediaType.DOCUMENTS) || selectedTypes.contains(MediaType.ALL)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !checkManageStoragePermission()) {
-                showManageStoragePermissionDialog()
-                return
-            }
-        }
-
-        val minSize = when (binding.spinnerMinSize.selectedItemPosition) {
-            1 -> 50L * 1024 // 50KB
-            2 -> 1024L * 1024 // 1MB
-            else -> null // No minimum
-        }
-
-        // Last 12 months by default
-        val calendar = Calendar.getInstance()
-        val toSec = calendar.timeInMillis / 1000
-        calendar.add(Calendar.MONTH, -12)
-        val fromSec = calendar.timeInMillis / 1000
-
-        viewModel.deepScan(
-            types = selectedTypes,
-            minSize = minSize,
-            fromSec = fromSec,
-            toSec = toSec
-        )
     }
 
     private fun checkPermissions() {
@@ -349,7 +260,7 @@ class HomeFragment : Fragment() {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             android.os.Environment.isExternalStorageManager()
         } else {
-            true // Not needed for older versions
+            true // Not required below Android 11
         }
     }
 
@@ -403,8 +314,8 @@ class HomeFragment : Fragment() {
         val iconRes = parts.getOrNull(1)?.let { resName ->
             // resName like "@android:drawable/ic_dialog_email"
             val cleaned = resName.removePrefix("@").replace("/", ":")
-            val (pkg, type, name) = cleaned.split(":")
-            resources.getIdentifier(name, type, if (pkg == "android") null else requireContext().packageName)
+            val (_, _, _) = cleaned.split(":")
+            android.R.drawable.ic_menu_help // fallback to a static icon
         } ?: android.R.drawable.ic_menu_help
 
         v.findViewById<TextView>(R.id.tvTitle).text = title

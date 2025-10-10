@@ -7,8 +7,11 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.meta.brain.file.recovery.R
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -20,7 +23,12 @@ import com.meta.brain.file.recovery.ui.home.HomeViewModel
 import com.meta.brain.file.recovery.ui.home.MediaUiState
 import com.meta.brain.file.recovery.ui.home.adapter.MediaAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -31,6 +39,7 @@ class ResultsFragment : Fragment() {
 
 
     private val sharedViewModel: HomeViewModel by activityViewModels()
+    private val filterViewModel: ResultsFilterViewModel by viewModels()
 
     @Inject
     lateinit var mediaRepository: MediaRepository
@@ -39,6 +48,8 @@ class ResultsFragment : Fragment() {
 
     private var allMediaItems: List<MediaEntry> = emptyList()
     private var currentTabFilter: MediaKind? = null
+
+    private val args: ResultsFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,6 +67,27 @@ class ResultsFragment : Fragment() {
         setupTabs()
         setupRecyclerView()
         observeViewModel()
+        observeFilterViewModel()
+
+        // Fetch results if scanConfig is provided
+        args.scanConfig.let { config ->
+            val types = config.toMediaTypes()
+            if (config.depth == com.meta.brain.file.recovery.data.model.ScanDepth.QUICK) {
+                sharedViewModel.quickScan(
+                    types = types,
+                    minSize = config.minSize,
+                    fromSec = config.fromSec,
+                    toSec = config.toSec
+                )
+            } else {
+                sharedViewModel.deepScan(
+                    types = types,
+                    minSize = config.minSize,
+                    fromSec = config.fromSec,
+                    toSec = config.toSec
+                )
+            }
+        }
     }
 
     private fun setupToolbar() {
@@ -75,6 +107,15 @@ class ResultsFragment : Fragment() {
             }
         }
 
+        // Filter button click handler - access via findViewById since it's inside toolbar
+        val filterButton = binding.toolbar.findViewById<View>(R.id.btnFilter)
+        filterButton?.setOnClickListener {
+            android.util.Log.d("ResultsFragment", "Filter button clicked")
+            showFilterSheet()
+        } ?: run {
+            android.util.Log.e("ResultsFragment", "Filter button not found in toolbar!")
+        }
+
         // Also handle system back button
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             android.util.Log.d("ResultsFragment", "System back button pressed")
@@ -87,6 +128,12 @@ class ResultsFragment : Fragment() {
                 requireActivity().finish()
             }
         }
+    }
+
+    private fun showFilterSheet() {
+        android.util.Log.d("ResultsFragment", "Showing filter sheet")
+        val filterSheet = ResultsFilterSheet()
+        filterSheet.show(childFragmentManager, "filter_sheet")
     }
 
     private fun setupTabs() {
@@ -116,8 +163,7 @@ class ResultsFragment : Fragment() {
             openMediaPreview(mediaEntry)
         }
 
-        val spanCount = if (resources.configuration.orientation ==
-            android.content.res.Configuration.ORIENTATION_LANDSCAPE) 5 else 3
+        val spanCount = filterViewModel.filterSpec.value.spanCount
 
         binding.rvMediaGrid.apply {
             layoutManager = GridLayoutManager(requireContext(), spanCount)
@@ -154,6 +200,76 @@ class ResultsFragment : Fragment() {
         }
     }
 
+    private fun observeFilterViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            filterViewModel.filterSpec.collect { spec ->
+                android.util.Log.d("ResultsFragment", "Filter spec changed: $spec")
+                updateFilterSummary(spec)
+                updateGridSpan(spec.spanCount)
+                applyFiltersAndSort()
+            }
+        }
+    }
+
+    private fun updateFilterSummary(spec: ResultsFilterSpec) {
+        val parts = mutableListOf<String>()
+
+        // Date part
+        when (spec.datePreset) {
+            DatePreset.ANY -> parts.add("All")
+            DatePreset.LAST_1_MONTH -> parts.add("Last 1M")
+            DatePreset.LAST_6_MONTHS -> parts.add("Last 6M")
+            DatePreset.CUSTOM -> {
+                if (spec.fromMillis != null && spec.toMillis != null) {
+                    val format = SimpleDateFormat("MMM dd", Locale.getDefault())
+                    parts.add("${format.format(Date(spec.fromMillis))}–${format.format(Date(spec.toMillis))}")
+                }
+            }
+        }
+
+        // Size part
+        when (spec.sizePreset) {
+            SizePreset.ANY -> parts.add("Any size")
+            SizePreset.LT_1MB -> parts.add("0–1 MB")
+            SizePreset.FROM_1_TO_5MB -> parts.add("1–5 MB")
+            SizePreset.GT_5MB -> parts.add("> 5 MB")
+            SizePreset.CUSTOM -> {
+                if (spec.minSizeBytes != null && spec.maxSizeBytes != null) {
+                    parts.add("${formatSize(spec.minSizeBytes)}–${formatSize(spec.maxSizeBytes)}")
+                }
+            }
+        }
+
+        // Sort part
+        val sortLabel = when (spec.sortBy) {
+            SortBy.DATE -> "Date"
+            SortBy.SIZE -> "Size"
+            SortBy.NAME -> "Name"
+        }
+        val sortDir = if (spec.sortDir == SortDirection.DESC) "↓" else "↑"
+        parts.add("$sortLabel $sortDir")
+
+        // Span count
+        parts.add("${spec.spanCount} cols")
+
+        binding.tvFilterInfo.text = parts.joinToString(" · ")
+    }
+
+    private fun formatSize(bytes: Long): String {
+        return when {
+            bytes < 1024 * 1024 -> "${bytes / 1024}KB"
+            bytes < 1024 * 1024 * 1024 -> "${bytes / (1024 * 1024)}MB"
+            else -> String.format(Locale.US, "%.1fGB", bytes / (1024.0 * 1024.0 * 1024.0))
+        }
+    }
+
+    private fun updateGridSpan(spanCount: Int) {
+        val layoutManager = binding.rvMediaGrid.layoutManager as? GridLayoutManager
+        if (layoutManager?.spanCount != spanCount) {
+            layoutManager?.spanCount = spanCount
+        }
+    }
+
     private fun updateUI(state: MediaUiState) {
         android.util.Log.d("ResultsFragment", "Updating UI with state: ${state::class.simpleName}")
 
@@ -164,7 +280,7 @@ class ResultsFragment : Fragment() {
                 binding.rvMediaGrid.visibility = View.GONE
                 binding.layoutEmptyState.visibility = View.VISIBLE
                 binding.layoutErrorState.visibility = View.GONE
-                updateResultsInfo(0, "No scan performed")
+                updateResultsInfo(0)
             }
 
             is MediaUiState.Loading -> {
@@ -173,7 +289,7 @@ class ResultsFragment : Fragment() {
                 binding.rvMediaGrid.visibility = View.GONE
                 binding.layoutEmptyState.visibility = View.GONE
                 binding.layoutErrorState.visibility = View.GONE
-                updateResultsInfo(0, "Scanning...")
+                updateResultsInfo(0)
             }
 
             is MediaUiState.Items -> {
@@ -195,8 +311,6 @@ class ResultsFragment : Fragment() {
                     binding.tabLayout.selectTab(binding.tabLayout.getTabAt(0))
                     filterByMediaKind(MediaKind.IMAGE)
                 }
-
-                updateResultsInfo(state.list.size, generateFilterInfo(state.list))
             }
 
             is MediaUiState.Empty -> {
@@ -206,7 +320,7 @@ class ResultsFragment : Fragment() {
                 binding.rvMediaGrid.visibility = View.GONE
                 binding.layoutEmptyState.visibility = View.VISIBLE
                 binding.layoutErrorState.visibility = View.GONE
-                updateResultsInfo(0, "No results")
+                updateResultsInfo(0)
             }
 
             is MediaUiState.Error -> {
@@ -218,7 +332,7 @@ class ResultsFragment : Fragment() {
                 binding.layoutErrorState.visibility = View.VISIBLE
 
                 binding.tvErrorMessage.text = state.message
-                updateResultsInfo(0, "Error")
+                updateResultsInfo(0)
 
                 Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG)
                     .setAction("Retry") {
@@ -231,22 +345,88 @@ class ResultsFragment : Fragment() {
 
     private fun filterByMediaKind(kind: MediaKind?) {
         currentTabFilter = kind
-        val filtered = when (kind) {
-            MediaKind.IMAGE ->
-                allMediaItems.filter { it.mediaKind == MediaKind.IMAGE }
-            MediaKind.VIDEO ->
-                allMediaItems.filter { it.mediaKind == MediaKind.VIDEO }
-            MediaKind.AUDIO ->
-                allMediaItems.filter { it.mediaKind == MediaKind.AUDIO }
-            null -> // Other Files tab
-                allMediaItems.filter {
-                    it.mediaKind == MediaKind.DOCUMENT ||
-                    it.mediaKind == MediaKind.OTHER
+        applyFiltersAndSort()
+    }
+
+    private fun applyFiltersAndSort() {
+        val startTime = System.currentTimeMillis()
+
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
+            val spec = filterViewModel.filterSpec.value
+
+            // Step 1: Filter by tab (media kind)
+            var filtered = when (currentTabFilter) {
+                MediaKind.IMAGE ->
+                    allMediaItems.filter { it.mediaKind == MediaKind.IMAGE }
+                MediaKind.VIDEO ->
+                    allMediaItems.filter { it.mediaKind == MediaKind.VIDEO }
+                MediaKind.AUDIO ->
+                    allMediaItems.filter { it.mediaKind == MediaKind.AUDIO }
+                null -> // Other Files tab
+                    allMediaItems.filter {
+                        it.mediaKind == MediaKind.DOCUMENT ||
+                        it.mediaKind == MediaKind.OTHER
+                    }
+                else -> emptyList()
+            }
+
+            // Step 2: Apply date filter
+            val (fromMillis, toMillis) = spec.getEffectiveDateRange()
+            if (fromMillis != null || toMillis != null) {
+                filtered = filtered.filter { entry ->
+                    val timestamp = (entry.dateTaken ?: entry.dateAdded) * 1000L
+                    val afterFrom = fromMillis == null || timestamp >= fromMillis
+                    val beforeTo = toMillis == null || timestamp <= toMillis
+                    afterFrom && beforeTo
                 }
-            else -> emptyList()
+            }
+
+            // Step 3: Apply size filter
+            val (minSize, maxSize) = spec.getEffectiveSizeRange()
+            if (minSize != null || maxSize != null) {
+                filtered = filtered.filter { entry ->
+                    val largerThanMin = minSize == null || entry.size >= minSize
+                    val smallerThanMax = maxSize == null || entry.size <= maxSize
+                    largerThanMin && smallerThanMax
+                }
+            }
+
+            // Step 4: Sort
+            filtered = when (spec.sortBy) {
+                SortBy.DATE -> {
+                    filtered.sortedBy { (it.dateTaken ?: it.dateAdded) }
+                }
+                SortBy.SIZE -> {
+                    filtered.sortedBy { it.size }
+                }
+                SortBy.NAME -> {
+                    filtered.sortedBy { it.displayName?.lowercase() ?: "" }
+                }
+            }
+
+            // Apply sort direction
+            if (spec.sortDir == SortDirection.DESC) {
+                filtered = filtered.reversed()
+            }
+
+            val elapsedTime = System.currentTimeMillis() - startTime
+            android.util.Log.d("ResultsFragment", "Filtering took ${elapsedTime}ms, result: ${filtered.size} items")
+
+            // Step 5: Update UI on main thread
+            withContext(Dispatchers.Main) {
+                mediaAdapter.submitList(filtered)
+                updateResultsInfo(filtered.size)
+
+                // Show empty state if no results after filtering
+                if (filtered.isEmpty() && allMediaItems.isNotEmpty()) {
+                    binding.rvMediaGrid.visibility = View.GONE
+                    binding.layoutEmptyState.visibility = View.VISIBLE
+                } else if (filtered.isNotEmpty()) {
+                    binding.rvMediaGrid.visibility = View.VISIBLE
+                    binding.layoutEmptyState.visibility = View.GONE
+                }
+            }
         }
-        mediaAdapter.submitList(filtered)
-        android.util.Log.d("ResultsFragment", "Filtered ${filtered.size} items for kind: $kind")
     }
 
     private fun updateTabCounts() {
@@ -264,35 +444,11 @@ class ResultsFragment : Fragment() {
         binding.tabLayout.getTabAt(3)?.text = "File khác ($otherCount)"
     }
 
-    private fun updateResultsInfo(count: Int, filterInfo: String) {
+    private fun updateResultsInfo(count: Int) {
         binding.tvResultsCount.text = if (count == 1) {
             "Found $count media file"
         } else {
             "Found $count media files"
-        }
-        binding.tvFilterInfo.text = filterInfo
-    }
-
-    private fun generateFilterInfo(items: List<MediaEntry>): String {
-        val imageCount = items.count { it.mediaKind == MediaKind.IMAGE }
-        val videoCount = items.count { it.mediaKind == MediaKind.VIDEO }
-        val audioCount = items.count { it.mediaKind == MediaKind.AUDIO }
-        val docCount = items.count { it.mediaKind == MediaKind.DOCUMENT }
-
-        return when {
-            imageCount > 0 && videoCount > 0 && audioCount > 0 && docCount > 0 -> "All file types"
-            imageCount > 0 && videoCount > 0 && audioCount > 0 -> "Images, Videos & Audio"
-            imageCount > 0 && videoCount > 0 -> "Images & Videos"
-            imageCount > 0 && audioCount > 0 -> "Images & Audio"
-            videoCount > 0 && audioCount > 0 -> "Videos & Audio"
-            imageCount > 0 && docCount > 0 -> "Images & Documents"
-            videoCount > 0 && docCount > 0 -> "Videos & Documents"
-            audioCount > 0 && docCount > 0 -> "Audio & Documents"
-            imageCount > 0 -> "Images only"
-            videoCount > 0 -> "Videos only"
-            audioCount > 0 -> "Audio only"
-            docCount > 0 -> "Documents only"
-            else -> "All media"
         }
     }
 

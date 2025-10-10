@@ -22,7 +22,20 @@
             app:navigationIconTint="@color/home_text_primary"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:id="@+id/btnFilter"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="8dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_filter"
+                android:contentDescription="@string/filter_results"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/home_text_primary" />
+        </com.google.android.material.appbar.MaterialToolbar>
 
         <!-- Results Info Card -->
         <com.google.android.material.card.MaterialCardView
@@ -67,9 +80,14 @@
                     android:layout_height="wrap_content"
                     android:text="All • Any size"
                     android:textSize="12sp"
-                    android:textColor="@color/home_text_secondary"
-                    android:background="@drawable/bg_media_badge"
-                    android:padding="6dp" />
+                    android:textColor="@color/home_accent_blue"
+                    android:background="@android:color/white"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:elevation="2dp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
