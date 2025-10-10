@@ -44,9 +44,6 @@ android {
             "https://dummyjson.com/"
         }
 
-        /* TODO: Add base URL in local.properties file as:-
-         *  BASE_URL=https://dummyjson.com/
-        */
         buildConfigField("String", "BASE_URL", "\"${baseUrl}\"")
     }
 

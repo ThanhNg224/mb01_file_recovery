@@ -127,8 +127,13 @@ fun HomeScreen(productDetails: ApiState<ProductDetailsDto>) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(GradientStart, GradientEnd)
+                        )
+                    )
                     .verticalScroll(rememberScrollState())
+                    .padding(bottom = 80.dp) // Add bottom padding
             ) {
                 // Header with gradient
                 Box(
