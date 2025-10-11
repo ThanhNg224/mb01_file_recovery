@@ -140,7 +140,7 @@ class HomeViewModel @Inject constructor(
 
     /**
      * Start deep scan with comprehensive file system scanning
-     * Includes hidden files, deleted files, trash, and unindexed files
+     * Includes hidden files, archive files, trash, and unindexed files
      */
     fun deepScan(
         types: Set<MediaType>,

@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Home screen colors -->
-    <color name="home_bg">#F5F5F5</color>
+    <color name="bottom_nav_bg_start">#F8F9FA</color>
+    <color name="bottom_nav_bg_end">#E0E3E7</color>
+    <color name="bottom_nav_bg_start_night">#23272F</color>
+    <color name="bottom_nav_bg_end_night">#1A1C20</color>
     <color name="home_text_primary">#212121</color>
     <color name="home_text_secondary">#757575</color>
+    <color name="home_bg">#F5F5F5</color>
+    <color name="home_banner_border">#E0E0E0</color>
+    <color name="home_banner_bg">#FFFFFF</color>
     <color name="home_accent_blue">#1976D2</color>
-    <color name="home_banner_bg">#E3F2FD</color>
-    <color name="home_banner_border">#BBDEFB</color>
-    <color name="home_divider">#E0E0E0</color>
-
-    <!-- Tile colors -->
     <color name="tile_orange">#FF9800</color>
-    <color name="tile_yellow">#FFC107</color>
-
-    <!-- System colors -->
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="tile_yellow">#FFEB3B</color>
+    <color name="home_divider">#BDBDBD</color>
+    <color name="app_bg_surface">#F4F6F8</color>
 </resources>
-

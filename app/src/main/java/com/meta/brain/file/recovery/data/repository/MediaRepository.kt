@@ -425,7 +425,7 @@ class MediaRepository @Inject constructor(
     }
 
     /**
-     * Performs comprehensive deep scan including hidden files, deleted files, trash, and unindexed files
+     * Performs comprehensive deep scan including hidden files, archive files, trash, and unindexed files
      * Requires MANAGE_EXTERNAL_STORAGE permission on Android 11+
      */
     suspend fun deepScan(
@@ -481,11 +481,11 @@ class MediaRepository @Inject constructor(
         android.util.Log.d("MediaRepository", "Found ${trashFiles.size} trash files")
         allItems.addAll(trashFiles)
 
-        // 4. Scan for recently deleted files (Android 11+ with MANAGE_EXTERNAL_STORAGE)
+        // 4. Scan for recently archive files (Android 11+ with MANAGE_EXTERNAL_STORAGE)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            android.util.Log.d("MediaRepository", "Scanning deleted files...")
+            android.util.Log.d("MediaRepository", "Scanning archive files...")
             val deletedFiles = scanDeletedFiles(types, minSize, fromSec, toSec)
-            android.util.Log.d("MediaRepository", "Found ${deletedFiles.size} deleted files")
+            android.util.Log.d("MediaRepository", "Found ${deletedFiles.size} archive files")
             allItems.addAll(deletedFiles)
         }
 
@@ -598,8 +598,8 @@ class MediaRepository @Inject constructor(
                 // File manager app trash directories
                 "/storage/emulated/0/.RecycleBin",
                 "/storage/emulated/0/Files/Trash",
-                "/storage/emulated/0/.deleted",
-                "/storage/emulated/0/deleted",
+                "/storage/emulated/0/.archive",
+                "/storage/emulated/0/archive",
                 // Gallery app trash
                 "/storage/emulated/0/DCIM/.trashed",
                 "/storage/emulated/0/Pictures/.trashed",
@@ -632,7 +632,7 @@ class MediaRepository @Inject constructor(
                 }
             }
 
-            // Scan for any directory with "trash" or "deleted" in name
+            // Scan for any directory with "trash" or "archive" in name
             scanForTrashNamedDirectories(types, minSize, fromSec, toSec, trashFiles)
 
         } catch (e: Exception) {
@@ -651,22 +651,22 @@ class MediaRepository @Inject constructor(
         val deletedFiles = mutableListOf<MediaEntry>()
 
         try {
-            // On Android 11+, try to access recently deleted files through MediaStore
+            // On Android 11+, try to access recently archive files through MediaStore
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                // Scan MediaStore for files marked as deleted/trashed
+                // Scan MediaStore for files marked as archive/trashed
                 scanMediaStoreDeleted(types, minSize, fromSec, toSec, deletedFiles)
             }
 
-            // Check temporary directories where deleted files might still exist
+            // Check temporary directories where archive files might still exist
             val sdcardPath = Environment.getExternalStorageDirectory().path
             val tempDirs = listOf(
                 "/storage/emulated/0/Android/data/com.android.providers.media/files/.pending",
-                "/storage/emulated/0/Android/data/com.android.providers.media/files/.deleted",
+                "/storage/emulated/0/Android/data/com.android.providers.media/files/.archive",
                 "/storage/emulated/0/.temp",
                 "/storage/emulated/0/tmp",
                 "/storage/emulated/0/.tmp",
                 "/storage/emulated/0/temp",
-                // App cache directories that might contain deleted files
+                // App cache directories that might contain archive files
                 "/storage/emulated/0/Android/data/com.android.gallery3d/cache",
                 "/storage/emulated/0/Android/data/com.google.android.apps.photos/cache",
                 // System temporary directories
@@ -689,7 +689,7 @@ class MediaRepository @Inject constructor(
             tempDirs.forEach { dirPath ->
                 val dir = java.io.File(dirPath)
                 if (dir.exists() && dir.canRead()) {
-                    android.util.Log.d("MediaRepository", "Scanning temp/deleted directory: $dirPath")
+                    android.util.Log.d("MediaRepository", "Scanning temp/archive directory: $dirPath")
                     scanDirectoryRecursively(dir, types, minSize, fromSec, toSec, deletedFiles)
                 }
             }
@@ -698,7 +698,7 @@ class MediaRepository @Inject constructor(
             scanOrphanedFiles(types, minSize, fromSec, toSec, deletedFiles)
 
         } catch (e: Exception) {
-            android.util.Log.e("MediaRepository", "Error scanning deleted files: ${e.message}")
+            android.util.Log.e("MediaRepository", "Error scanning archive files: ${e.message}")
         }
 
         return deletedFiles
@@ -975,7 +975,7 @@ class MediaRepository @Inject constructor(
     ) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                // Query MediaStore for recently deleted files
+                // Query MediaStore for recently archive files
                 // Note: This requires special permissions and may not be available on all devices
                 val projection = arrayOf(
                     MediaStore.Files.FileColumns._ID,
@@ -986,7 +986,7 @@ class MediaRepository @Inject constructor(
                     MediaStore.Files.FileColumns.DATE_MODIFIED
                 )
 
-                // Try to query files that might be marked as deleted
+                // Try to query files that might be marked as archive
                 contentResolver.query(
                     MediaStore.Files.getContentUri("external"),
                     projection,
@@ -999,7 +999,7 @@ class MediaRepository @Inject constructor(
                             val id = cursor.getLong(0)
                             val uri = Uri.withAppendedPath(MediaStore.Files.getContentUri("external"), id.toString())
 
-                            // Check if file actually exists (if not, it might be deleted)
+                            // Check if file actually exists (if not, it might be archive)
                             val fileExists = try {
                                 contentResolver.openInputStream(uri)?.close()
                                 true
@@ -1008,7 +1008,7 @@ class MediaRepository @Inject constructor(
                             }
 
                             if (!fileExists) {
-                                // File doesn't exist but is still in MediaStore - might be recently deleted
+                                // File doesn't exist but is still in MediaStore - might be recently archive
                                 val mediaEntry = createMediaEntryFromCursor(cursor, uri, types, minSize, fromSec, toSec)
                                 mediaEntry?.let { resultList.add(it) }
                             }
@@ -1019,7 +1019,7 @@ class MediaRepository @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            android.util.Log.e("MediaRepository", "Error scanning MediaStore for deleted files: ${e.message}")
+            android.util.Log.e("MediaRepository", "Error scanning MediaStore for archive files: ${e.message}")
         }
     }
 
@@ -1197,7 +1197,7 @@ class MediaRepository @Inject constructor(
         resultList: MutableList<MediaEntry>
     ) {
         try {
-            // Scan root storage for directories with "trash", "deleted", "recycle" in their names
+            // Scan root storage for directories with "trash", "archive", "recycle" in their names
             val sdcardPath = Environment.getExternalStorageDirectory().path
             val rootDirs = listOf(
                 "/storage/emulated/0",
@@ -1211,7 +1211,7 @@ class MediaRepository @Inject constructor(
                         if (dir.isDirectory) {
                             val dirName = dir.name.lowercase()
                             if (dirName.contains("trash") ||
-                                dirName.contains("deleted") ||
+                                dirName.contains("archive") ||
                                 dirName.contains("recycle") ||
                                 dirName.contains("bin")) {
                                 android.util.Log.d("MediaRepository", "Found trash-named directory: ${dir.path}")

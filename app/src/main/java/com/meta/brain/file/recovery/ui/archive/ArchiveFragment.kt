@@ -1,4 +1,4 @@
-package com.meta.brain.file.recovery.ui.deleted
+package com.meta.brain.file.recovery.ui.archive
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import com.meta.brain.file.recovery.R
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class DeletedFragment : Fragment() {
+class ArchiveFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -21,6 +21,6 @@ class DeletedFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // TODO: Implement deleted files/archive functionality
+        // TODO: Implement archive files/archive functionality
     }
 }

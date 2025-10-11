@@ -1,4 +1,4 @@
-package com.meta.brain.file.recovery.ui.scan
+package com.meta.brain.file.recovery.ui.history
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import com.meta.brain.file.recovery.R
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ScanFragment : Fragment() {
+class HistoryFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -51,13 +51,22 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
+        bottomNav.alpha = 0f
+        bottomNav.post {
+            bottomNav.animate()
+                .alpha(1f)
+                .setDuration(400)
+                .setStartDelay(100)
+                .start()
+        }
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val navHost = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHost.navController
 
-        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
         bottomNav.setupWithNavController(navController)
         // Handle insets for bottom nav
         val extraTop = resources.getDimensionPixelSize(R.dimen.bottom_nav_item_offset_top)

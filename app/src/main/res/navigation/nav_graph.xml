@@ -90,13 +90,13 @@
     <!-- Additional fragments for bottom navigation -->
     <fragment
         android:id="@+id/scanFragment"
-        android:name="com.meta.brain.file.recovery.ui.scan.ScanFragment"
+        android:name="com.meta.brain.file.recovery.ui.history.HistoryFragment"
         android:label="History"
         tools:layout="@layout/fragment_scan" />
 
     <fragment
         android:id="@+id/deletedFragment"
-        android:name="com.meta.brain.file.recovery.ui.deleted.DeletedFragment"
+        android:name="com.meta.brain.file.recovery.ui.archive.ArchiveFragment"
         android:label="Archive"
         tools:layout="@layout/fragment_deleted" />
 
