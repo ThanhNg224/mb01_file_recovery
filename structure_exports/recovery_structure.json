@@ -1,0 +1,51 @@
+{
+  "project_info": {
+    "name": "recovery",
+    "path": "D:\\Works\\mb01_file_recovery\\app\\src\\main\\java\\com\\meta\\brain\\file\\recovery",
+    "generated_at": "2025-10-02T11:04:45.887245",
+    "total_files": 2,
+    "total_size": 1536
+  },
+  "structure": {
+    "App.kt": {
+      "type": "file",
+      "info": {
+        "size": 363,
+        "last_modified": "2025-10-02T11:04:45.8812471",
+        "mime_type": "text/plain",
+        "extension": ".kt"
+      }
+    },
+    "IntroActivity.kt": {
+      "type": "file",
+      "info": {
+        "size": 1173,
+        "last_modified": "2025-10-02T11:04:45.8842445",
+        "mime_type": "text/plain",
+        "extension": ".kt"
+      }
+    }
+  },
+  "files": [
+    {
+      "path": "App.kt",
+      "content": "package com.meta.brain.file.recovery\r\n\r\nimport androidx.lifecycle.LifecycleOwner\r\nimport com.meta.brain.module.base.MetaBrainApp\r\nimport com.meta.brain.module.data.DataManager\r\n\r\nclass App : MetaBrainApp() {\r\n    override fun onStart(owner: LifecycleOwner) {\r\n        super.onStart(owner)\r\n        DataManager.setStartActivity(IntroActivity::class.java)\r\n    }\r\n}",
+      "info": {
+        "size": 363,
+        "last_modified": "2025-10-02T11:04:45.8812471",
+        "mime_type": "text/plain",
+        "extension": ".kt"
+      }
+    },
+    {
+      "path": "IntroActivity.kt",
+      "content": "package com.meta.brain.file.recovery\r\n\r\nimport android.util.Log\r\nimport com.meta.brain.file.recovery.databinding.IntroActivityBinding\r\nimport com.meta.brain.module.ads.AdEvent\r\nimport com.meta.brain.module.ads.AdsController\r\nimport com.meta.brain.module.base.DataBindActivity\r\nimport androidx.core.content.edit\r\n\r\nclass IntroActivity : DataBindActivity<IntroActivityBinding>(R.layout.intro_activity) {\r\n    private val prefs by lazy { getSharedPreferences(\"metrics\", MODE_PRIVATE) }\r\n    override fun initView(){\r\n        binding.btnStart.setOnClickListener {\r\n            AdsController.showInter(this,object : AdEvent(){\r\n                override fun onComplete() {\r\n                    startHome()\r\n                }\r\n            })\r\n        }\r\n    }\r\n\r\n    fun startHome(){\r\n        val count = bumpStartTouchCount()\r\n        Log.d(\"IntroActivity\", \"Start button touched $count time(s) \")\r\n//        startActivity(Intent(this, HomeActivity::class.java))\r\n//        finish()\r\n    }\r\n    private fun bumpStartTouchCount(): Int {\r\n        val next = prefs.getInt(\"start_touches\", 0) + 1\r\n        prefs.edit { putInt(\"start_touches\", next) }\r\n        return next\r\n    }\r\n}\r\n",
+      "info": {
+        "size": 1173,
+        "last_modified": "2025-10-02T11:04:45.8842445",
+        "mime_type": "text/plain",
+        "extension": ".kt"
+      }
+    }
+  ]
+}

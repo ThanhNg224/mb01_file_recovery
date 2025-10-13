@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/introFragment">
+
+    <fragment
+        android:id="@+id/introFragment"
+        android:name="com.meta.brain.file.recovery.ui.intro.IntroFragment"
+        android:label="Intro"
+        tools:layout="@layout/fragment_intro">
+        <action
+            android:id="@+id/action_intro_to_onboarding"
+            app:destination="@id/onboardingFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/onboardingFragment"
+        android:name="com.meta.brain.file.recovery.ui.onboarding.OnboardingFragment"
+        android:label="Onboarding"
+        tools:layout="@layout/fragment_onboarding">
+        <action
+            android:id="@+id/action_onboarding_to_home"
+            app:destination="@id/homeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@id/introFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.meta.brain.file.recovery.ui.home.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_home_to_scan_loading"
+            app:destination="@id/scanLoadingFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_home_to_results"
+            app:destination="@id/resultsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <!-- Scan Loading Fragment -->
+    <fragment
+        android:id="@+id/scanLoadingFragment"
+        android:name="com.meta.brain.file.recovery.ui.scanloading.ScanLoadingFragment"
+        android:label="Scanning"
+        tools:layout="@layout/fragment_scan_loading">
+        <argument
+            android:name="scanConfig"
+            app:argType="com.meta.brain.file.recovery.data.model.ScanConfig" />
+        <action
+            android:id="@+id/action_scan_loading_to_results"
+            app:destination="@id/resultsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+
+    <!-- Results Fragment for showing scan results -->
+    <fragment
+        android:id="@+id/resultsFragment"
+        android:name="com.meta.brain.file.recovery.ui.results.ResultsFragment"
+        android:label="Scan Results"
+        tools:layout="@layout/fragment_results">
+        <argument
+            android:name="scanConfig"
+            app:argType="com.meta.brain.file.recovery.data.model.ScanConfig" />
+    </fragment>
+
+    <!-- Additional fragments for bottom navigation -->
+    <fragment
+        android:id="@+id/scanFragment"
+        android:name="com.meta.brain.file.recovery.ui.history.HistoryFragment"
+        android:label="History"
+        tools:layout="@layout/fragment_scan" />
+
+    <fragment
+        android:id="@+id/deletedFragment"
+        android:name="com.meta.brain.file.recovery.ui.archive.ArchiveFragment"
+        android:label="Archive"
+        tools:layout="@layout/fragment_deleted" />
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.meta.brain.file.recovery.ui.settings.SettingsFragment"
+        android:label="Settings"
+        tools:layout="@layout/fragment_settings" />
+
+</navigation>

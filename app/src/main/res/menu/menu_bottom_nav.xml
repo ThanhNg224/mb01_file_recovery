@@ -1,0 +1,6 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/homeFragment"     android:icon="@drawable/home"     android:title="Home"/>
+    <item android:id="@+id/scanFragment"     android:icon="@drawable/history"     android:title="History"/>
+    <item android:id="@+id/deletedFragment"  android:icon="@drawable/archive"  android:title="Archive"/>
+    <item android:id="@+id/settingsFragment" android:icon="@drawable/settings" android:title="Settings"/>
+</menu>

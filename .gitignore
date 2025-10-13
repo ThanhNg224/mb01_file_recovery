@@ -16,3 +16,4 @@ local.properties
 .idea/
 app/src/test/
 app/src/androidTest/
+google-services.json

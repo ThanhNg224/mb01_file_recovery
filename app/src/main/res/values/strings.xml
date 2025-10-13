@@ -2,6 +2,70 @@
     <string name="app_name">File Recovery</string>
 
     <string name="how_to_work">How it works?</string>
-    <string name="scan_tip">The App help you recover deleted photos. The App will show all the images (Deleted and Not Deleted). Just Keep looking and you will find photos you are looking for. Please be patient and wait until it scans all folders and files.</string>
-    <string name="let_start">Let\'s Start</string>
+    <string name="scan_tip">It takes a moment to scan! Don\'t exit the app…</string>
+    <string name="intro">Siuu</string>
+    <string name="get_started">Get Started</string>
+    <string name="start_count_default">Start tapped: 0</string>
+    <string name="start_count_format">Start tapped: %1$d</string>
+    <string name="home">Home</string>
+    <string name="history">History</string>
+    <string name="settings">Settings</string>
+    <string name="archive">Archive</string>
+
+    <!-- Onboarding strings -->
+    <string name="next">Next</string>
+    <string name="skip">Skip</string>
+    <string name="finish">Finish</string>
+
+    <!-- Onboarding page 1 -->
+    <string name="onboarding_title_1">Recover Delete Files</string>
+    <string name="onboarding_desc_1">Quickly recover images, videos, audios and documents</string>
+
+    <!-- Onboarding page 2 -->
+    <string name="onboarding_title_2">Absolute security</string>
+    <string name="onboarding_desc_2">Set data encryption to prevent theft</string>
+
+    <!-- Onboarding page 3 -->
+    <string name="onboarding_title_3">Storage space</string>
+    <string name="onboarding_desc_3">Protect your important data from loss or corruption</string>
+
+    <!-- Scan Loading strings -->
+    <string name="scanning">Scanning</string>
+    <string name="completed">Completed</string>
+    <string name="error">Error</string>
+    <string name="info">Info</string>
+    <string name="one_hundred_percent">100%</string>
+    <string name="scan_other_documents">Scan other documents</string>
+    <string name="retry">Retry</string>
+    <string name="ad_banner_placeholder">Ad Banner Placeholder</string>
+
+    <!-- Results Filter strings -->
+    <string name="filter_results">Filter Results</string>
+    <string name="date_filter">Date Filter</string>
+    <string name="date_any">Any</string>
+    <string name="date_last_1_month">Last 1 month</string>
+    <string name="date_last_6_months">Last 6 months</string>
+    <string name="date_custom">Custom…</string>
+    <string name="size_filter">Size Filter</string>
+    <string name="size_any">Any</string>
+    <string name="size_0_1_mb">0–1 MB</string>
+    <string name="size_1_5_mb">1–5 MB</string>
+    <string name="size_gt_5_mb">&gt; 5 MB</string>
+    <string name="size_custom">Custom…</string>
+    <string name="sort_by">Sort By</string>
+    <string name="sort_date">Date</string>
+    <string name="sort_size">Size</string>
+    <string name="sort_name">Name</string>
+    <string name="sort_direction">Sort direction</string>
+    <string name="grid_columns">Grid Columns</string>
+    <string name="grid_2_cols">2 cols</string>
+    <string name="grid_3_cols">3 cols</string>
+    <string name="grid_4_cols">4 cols</string>
+    <string name="grid_5_cols">5 cols</string>
+    <string name="reset">Reset</string>
+    <string name="apply">Apply</string>
+    <string name="filter_summary">Filtered by: %1$s</string>
+    <string name="filter_summary_default">All · Any size · Date ↓ · 3 cols</string>
+    <string name="custom_date_range">%1$s – %2$s</string>
+    <string name="custom_size_range">%1$s – %2$s</string>
 </resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Size filter options for Quick Scan -->
+    <string-array name="min_size_options">
+        <item>Any size</item>
+        <item>50KB+</item>
+        <item>1MB+</item>
+    </string-array>
+
+    <!-- Default size range for custom size filter (in MB) -->
+    <array name="default_size_range">
+        <item>0</item>
+        <item>100</item>
+    </array>
+</resources>

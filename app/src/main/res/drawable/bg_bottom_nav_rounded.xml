@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Shadow/elevation effect -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#15000000" />
+            <corners android:radius="24dp" />
+        </shape>
+    </item>
+
+    <!-- Main white rounded background -->
+    <item android:top="1dp" android:bottom="1dp" android:left="1dp" android:right="1dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF" />
+            <corners android:radius="23dp" />
+            <stroke android:width="0.5dp" android:color="#E0E0E0" />
+        </shape>
+    </item>
+</layer-list>

@@ -1,0 +1,8 @@
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tab_dot"
+    android:layout_width="16dp"
+    android:layout_height="16dp"
+    android:layout_gravity="center"
+    android:src="@drawable/tab_unselected"
+    android:contentDescription="@null" />
+
