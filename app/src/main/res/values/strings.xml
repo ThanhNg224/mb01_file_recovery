@@ -68,4 +68,6 @@
     <string name="filter_summary_default">All · Any size · Date ↓ · 3 cols</string>
     <string name="custom_date_range">%1$s – %2$s</string>
     <string name="custom_size_range">%1$s – %2$s</string>
+    <string name="select">Select</string>
+    <string name="filter">Filter</string>
 </resources>

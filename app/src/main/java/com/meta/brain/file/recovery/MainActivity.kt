@@ -51,6 +51,13 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
+        val navHostView = findViewById<android.view.View>(R.id.nav_host_fragment)
+        ViewCompat.setOnApplyWindowInsetsListener(navHostView) { v, insets ->
+            val sysInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = sysInsets.top, bottom = sysInsets.bottom)
+            insets
+        }
+
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
         bottomNav.alpha = 0f
         bottomNav.post {

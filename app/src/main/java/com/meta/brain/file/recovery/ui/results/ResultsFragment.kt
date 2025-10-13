@@ -290,6 +290,10 @@ class ResultsFragment : Fragment() {
                                 showRestoreConfirmDialog()
                                 true
                             }
+                            R.id.action_delete -> {
+                                showDeleteConfirmDialog()
+                                true
+                            }
                             R.id.action_select_all -> {
                                 resultsViewModel.selectAll(mediaAdapter.currentList)
                                 true
@@ -349,6 +353,74 @@ class ResultsFragment : Fragment() {
         }
 
         dialog.show()
+    }
+
+    private fun showDeleteConfirmDialog() {
+        val selectedItems = resultsViewModel.selectedItems.value
+        if (selectedItems.isEmpty()) {
+            Snackbar.make(binding.root, "No items selected", Snackbar.LENGTH_SHORT).show()
+            return
+        }
+
+        val count = selectedItems.size
+        val totalSize = resultsViewModel.getFormattedSelectedSize()
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Delete Files")
+            .setMessage("Are you sure you want to delete $count ${if (count == 1) "file" else "files"} ($totalSize)? This action cannot be undone.")
+            .setPositiveButton("Delete") { dialog, _ ->
+                deleteSelectedFiles()
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setCancelable(true)
+            .show()
+    }
+
+    private fun deleteSelectedFiles() {
+        val selectedItems = resultsViewModel.selectedItems.value.toList()
+        
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            var successCount = 0
+            var failCount = 0
+
+            selectedItems.forEach { mediaEntry ->
+                try {
+                    val deleted = requireContext().contentResolver.delete(mediaEntry.uri, null, null)
+                    if (deleted > 0) {
+                        successCount++
+                    } else {
+                        failCount++
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("ResultsFragment", "Failed to delete ${mediaEntry.displayName}: ${e.message}")
+                    failCount++
+                }
+            }
+
+            withContext(Dispatchers.Main) {
+                // Exit selection mode
+                resultsViewModel.exitSelectionMode()
+
+                // Show result message
+                val message = if (failCount == 0) {
+                    "Deleted $successCount ${if (successCount == 1) "file" else "files"}"
+                } else {
+                    "Deleted $successCount/${selectedItems.size} (${failCount} failed)"
+                }
+                Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+
+                // Refresh the list by removing deleted items
+                if (successCount > 0) {
+                    val deletedUris = selectedItems.map { it.uri }.toSet()
+                    allMediaItems = allMediaItems.filter { it.uri !in deletedUris }
+                    updateTabCounts()
+                    applyFiltersAndSort()
+                }
+            }
+        }
     }
 
     private fun handleRestoreState(state: RestoreState) {
