@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_restore"
+        android:icon="@android:drawable/ic_menu_save"
+        android:title="Restore"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_select_all"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="Select All"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_clear"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:title="Clear"
+        app:showAsAction="ifRoom" />
+
+</menu>
+

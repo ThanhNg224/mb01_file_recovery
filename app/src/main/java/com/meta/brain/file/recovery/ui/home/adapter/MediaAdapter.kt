@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.CheckBox
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -20,15 +21,20 @@ import kotlinx.coroutines.withContext
 import android.util.LruCache
 
 /**
- * Adapter for displaying media items in a grid layout
+ * Adapter for displaying media items in a grid layout with selection support
  */
 class MediaAdapter(
     private val mediaRepository: MediaRepository,
-    private val onItemClick: (MediaEntry) -> Unit
+    private val onItemClick: (MediaEntry) -> Unit,
+    private val onItemLongClick: ((MediaEntry) -> Boolean)? = null
 ) : ListAdapter<MediaEntry, MediaAdapter.MediaViewHolder>(MediaDiffCallback()) {
 
     // LRU cache for thumbnails (10MB max)
     private val thumbnailCache = LruCache<String, Bitmap>(10 * 1024 * 1024)
+
+    // Selection mode state
+    private var isSelectionMode = false
+    private val selectedItems = mutableSetOf<MediaEntry>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MediaViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -40,9 +46,51 @@ class MediaAdapter(
         holder.bind(getItem(position))
     }
 
+    override fun onBindViewHolder(holder: MediaViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isEmpty()) {
+            super.onBindViewHolder(holder, position, payloads)
+        } else {
+            // Handle partial updates for selection changes
+            if (payloads.contains(PAYLOAD_SELECTION)) {
+                holder.updateSelection(getItem(position))
+            }
+        }
+    }
+
     override fun onViewRecycled(holder: MediaViewHolder) {
         super.onViewRecycled(holder)
         holder.cancelThumbnailJob()
+    }
+
+    /**
+     * Set selection mode and update UI
+     */
+    fun setSelectionMode(enabled: Boolean) {
+        if (isSelectionMode != enabled) {
+            isSelectionMode = enabled
+            if (!enabled) {
+                selectedItems.clear()
+            }
+            notifyItemRangeChanged(0, itemCount, PAYLOAD_SELECTION)
+        }
+    }
+
+    /**
+     * Update selected items (for efficient updates from ViewModel)
+     */
+    fun updateSelection(selected: Set<MediaEntry>) {
+        val oldSelection = selectedItems.toSet()
+        selectedItems.clear()
+        selectedItems.addAll(selected)
+
+        // Only update changed items
+        currentList.forEachIndexed { index, item ->
+            val wasSelected = oldSelection.contains(item)
+            val isSelected = selectedItems.contains(item)
+            if (wasSelected != isSelected) {
+                notifyItemChanged(index, PAYLOAD_SELECTION)
+            }
+        }
     }
 
     inner class MediaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -51,10 +99,15 @@ class MediaAdapter(
         private val sizeText: TextView = itemView.findViewById(R.id.tvSize)
         private val dateText: TextView = itemView.findViewById(R.id.tvDate)
         private val durationText: TextView = itemView.findViewById(R.id.tvDuration)
+        private val selectionOverlay: View = itemView.findViewById(R.id.vSelectionOverlay)
+        private val selectionCheckbox: CheckBox = itemView.findViewById(R.id.cbSelection)
 
         private var thumbnailJob: Job? = null
+        private var currentItem: MediaEntry? = null
 
         fun bind(item: MediaEntry) {
+            currentItem = item
+
             // Cancel any existing thumbnail job
             cancelThumbnailJob()
 
@@ -87,8 +140,27 @@ class MediaAdapter(
                 thumbnailImage.setImageResource(R.drawable.ic_document_placeholder)
             }
 
-            // Set click listener
+            // Update selection state
+            updateSelection(item)
+
+            // Set click listeners
             itemView.setOnClickListener { onItemClick(item) }
+            itemView.setOnLongClickListener {
+                onItemLongClick?.invoke(item) ?: false
+            }
+        }
+
+        fun updateSelection(item: MediaEntry) {
+            val isSelected = selectedItems.contains(item)
+
+            if (isSelectionMode) {
+                selectionOverlay.visibility = if (isSelected) View.VISIBLE else View.GONE
+                selectionCheckbox.visibility = View.VISIBLE
+                selectionCheckbox.isChecked = isSelected
+            } else {
+                selectionOverlay.visibility = View.GONE
+                selectionCheckbox.visibility = View.GONE
+            }
         }
 
         private fun loadThumbnail(item: MediaEntry) {
@@ -140,6 +212,10 @@ class MediaAdapter(
                 "${remainingSeconds}s"
             }
         }
+    }
+
+    companion object {
+        private const val PAYLOAD_SELECTION = "selection_changed"
     }
 }
 

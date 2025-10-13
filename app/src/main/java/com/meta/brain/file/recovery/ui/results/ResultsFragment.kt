@@ -1,10 +1,15 @@
 package com.meta.brain.file.recovery.ui.results
 
+import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
+import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -14,11 +19,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.meta.brain.file.recovery.data.model.MediaEntry
 import com.meta.brain.file.recovery.data.model.MediaKind
 import com.meta.brain.file.recovery.data.repository.MediaRepository
 import com.meta.brain.file.recovery.databinding.FragmentResultsBinding
+import com.meta.brain.file.recovery.databinding.DialogRestoreConfirmBinding
+import com.meta.brain.file.recovery.databinding.DialogRestoreProgressBinding
 import com.meta.brain.file.recovery.ui.home.HomeViewModel
 import com.meta.brain.file.recovery.ui.home.MediaUiState
 import com.meta.brain.file.recovery.ui.home.adapter.MediaAdapter
@@ -37,9 +45,9 @@ class ResultsFragment : Fragment() {
     private var _binding: FragmentResultsBinding? = null
     private val binding get() = _binding!!
 
-
     private val sharedViewModel: HomeViewModel by activityViewModels()
     private val filterViewModel: ResultsFilterViewModel by viewModels()
+    private val resultsViewModel: ResultsViewModel by viewModels()
 
     @Inject
     lateinit var mediaRepository: MediaRepository
@@ -48,6 +56,9 @@ class ResultsFragment : Fragment() {
 
     private var allMediaItems: List<MediaEntry> = emptyList()
     private var currentTabFilter: MediaKind? = null
+
+    private var selectionActionMode: ActionMode? = null
+    private var restoreProgressDialog: Dialog? = null
 
     private val args: ResultsFragmentArgs by navArgs()
 
@@ -68,6 +79,8 @@ class ResultsFragment : Fragment() {
         setupRecyclerView()
         observeViewModel()
         observeFilterViewModel()
+        observeSelectionViewModel()
+        observeRestoreState()
 
         // Fetch results if scanConfig is provided
         args.scanConfig.let { config ->
@@ -93,17 +106,16 @@ class ResultsFragment : Fragment() {
     private fun setupToolbar() {
         // Set up the toolbar with proper back navigation
         binding.toolbar.setNavigationOnClickListener {
-            android.util.Log.d("ResultsFragment", "Back button clicked")
-            try {
-                if (!findNavController().popBackStack()) {
-                    // If popBackStack returns false, try alternative navigation
-                    android.util.Log.d("ResultsFragment", "PopBackStack failed, trying navigateUp")
-                    findNavController().navigateUp()
-                }
-            } catch (e: Exception) {
-                android.util.Log.e("ResultsFragment", "Navigation error: ${e.message}")
+            handleBackPressed()
+        }
 
-                requireActivity().finish()
+        // Select button click handler
+        val selectButton = binding.toolbar.findViewById<View>(R.id.btnSelect)
+        selectButton?.setOnClickListener {
+            android.util.Log.d("ResultsFragment", "Select button clicked")
+            if (!resultsViewModel.isSelectionMode.value) {
+                // Enter selection mode without selecting any item initially
+                resultsViewModel.enterSelectionMode()
             }
         }
 
@@ -112,19 +124,24 @@ class ResultsFragment : Fragment() {
         filterButton?.setOnClickListener {
             android.util.Log.d("ResultsFragment", "Filter button clicked")
             showFilterSheet()
-        } ?: run {
-            android.util.Log.e("ResultsFragment", "Filter button not found in toolbar!")
         }
 
         // Also handle system back button
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            android.util.Log.d("ResultsFragment", "System back button pressed")
+            handleBackPressed()
+        }
+    }
+
+    private fun handleBackPressed() {
+        // Exit selection mode first if active
+        if (resultsViewModel.isSelectionMode.value) {
+            resultsViewModel.exitSelectionMode()
+        } else {
             try {
                 if (!findNavController().popBackStack()) {
                     findNavController().navigateUp()
                 }
             } catch (e: Exception) {
-                android.util.Log.e("ResultsFragment", "System back navigation error: ${e.message}")
                 requireActivity().finish()
             }
         }
@@ -137,7 +154,6 @@ class ResultsFragment : Fragment() {
     }
 
     private fun setupTabs() {
-
         binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Ảnh (0)"))
         binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Video (0)"))
         binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Audio (0)"))
@@ -159,9 +175,24 @@ class ResultsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        mediaAdapter = MediaAdapter(mediaRepository) { mediaEntry ->
-            openMediaPreview(mediaEntry)
-        }
+        mediaAdapter = MediaAdapter(
+            mediaRepository = mediaRepository,
+            onItemClick = { mediaEntry ->
+                if (resultsViewModel.isSelectionMode.value) {
+                    resultsViewModel.toggleSelect(mediaEntry)
+                } else {
+                    openMediaPreview(mediaEntry)
+                }
+            },
+            onItemLongClick = { mediaEntry ->
+                if (!resultsViewModel.isSelectionMode.value) {
+                    resultsViewModel.enterSelectionMode(mediaEntry)
+                    true
+                } else {
+                    false
+                }
+            }
+        )
 
         val spanCount = filterViewModel.filterSpec.value.spanCount
 
@@ -208,6 +239,214 @@ class ResultsFragment : Fragment() {
                 updateGridSpan(spec.spanCount)
                 applyFiltersAndSort()
             }
+        }
+    }
+
+    private fun observeSelectionViewModel() {
+        // Observe selection mode
+        viewLifecycleOwner.lifecycleScope.launch {
+            resultsViewModel.isSelectionMode.collect { isSelectionMode ->
+                mediaAdapter.setSelectionMode(isSelectionMode)
+
+                if (isSelectionMode) {
+                    startSelectionMode()
+                } else {
+                    stopSelectionMode()
+                }
+            }
+        }
+
+        // Observe selected items
+        viewLifecycleOwner.lifecycleScope.launch {
+            resultsViewModel.selectedItems.collect { selectedItems ->
+                mediaAdapter.updateSelection(selectedItems)
+                updateSelectionModeTitle(selectedItems.size)
+            }
+        }
+    }
+
+    private fun observeRestoreState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            resultsViewModel.restoreState.collect { state ->
+                handleRestoreState(state)
+            }
+        }
+    }
+
+    private fun startSelectionMode() {
+        if (selectionActionMode == null) {
+            selectionActionMode = (requireActivity() as? androidx.appcompat.app.AppCompatActivity)?.startSupportActionMode(
+                object : ActionMode.Callback {
+                    override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                        mode?.menuInflater?.inflate(R.menu.menu_selection, menu)
+                        return true
+                    }
+
+                    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean = false
+
+                    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+                        return when (item?.itemId) {
+                            R.id.action_restore -> {
+                                showRestoreConfirmDialog()
+                                true
+                            }
+                            R.id.action_select_all -> {
+                                resultsViewModel.selectAll(mediaAdapter.currentList)
+                                true
+                            }
+                            R.id.action_clear -> {
+                                resultsViewModel.clearSelection()
+                                true
+                            }
+                            else -> false
+                        }
+                    }
+
+                    override fun onDestroyActionMode(mode: ActionMode?) {
+                        selectionActionMode = null
+                        resultsViewModel.exitSelectionMode()
+                    }
+                }
+            )
+        }
+    }
+
+    private fun stopSelectionMode() {
+        selectionActionMode?.finish()
+        selectionActionMode = null
+    }
+
+    private fun updateSelectionModeTitle(count: Int) {
+        selectionActionMode?.title = "$count selected"
+    }
+
+    private fun showRestoreConfirmDialog() {
+        val selectedItems = resultsViewModel.selectedItems.value
+        if (selectedItems.isEmpty()) {
+            Snackbar.make(binding.root, "No items selected", Snackbar.LENGTH_SHORT).show()
+            return
+        }
+
+        val dialogBinding = DialogRestoreConfirmBinding.inflate(layoutInflater)
+        val totalSize = resultsViewModel.getFormattedSelectedSize()
+        val count = selectedItems.size
+
+        dialogBinding.tvConfirmMessage.text = "Restore $count ${if (count == 1) "file" else "files"} ($totalSize)?"
+        dialogBinding.tvDestinationPath.text = "To: Downloads/RELive/Restored"
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(dialogBinding.root)
+            .setCancelable(true)
+            .create()
+
+        dialogBinding.btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogBinding.btnRestore.setOnClickListener {
+            dialog.dismiss()
+            resultsViewModel.startRestore("RELive/Restored")
+        }
+
+        dialog.show()
+    }
+
+    private fun handleRestoreState(state: RestoreState) {
+        when (state) {
+            is RestoreState.Idle -> {
+                restoreProgressDialog?.dismiss()
+                restoreProgressDialog = null
+            }
+
+            is RestoreState.Running -> {
+                if (restoreProgressDialog == null) {
+                    showRestoreProgressDialog()
+                }
+                updateRestoreProgress(state)
+            }
+
+            is RestoreState.Done -> {
+                restoreProgressDialog?.dismiss()
+                restoreProgressDialog = null
+                showRestoreCompleteSnackbar(state)
+                resultsViewModel.resetRestoreState()
+            }
+
+            is RestoreState.Error -> {
+                restoreProgressDialog?.dismiss()
+                restoreProgressDialog = null
+                Snackbar.make(binding.root, "Restore failed: ${state.message}", Snackbar.LENGTH_LONG).show()
+                resultsViewModel.resetRestoreState()
+            }
+        }
+    }
+
+    private fun showRestoreProgressDialog() {
+        val dialogBinding = DialogRestoreProgressBinding.inflate(layoutInflater)
+
+        restoreProgressDialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(dialogBinding.root)
+            .setCancelable(false)
+            .create()
+
+        dialogBinding.btnCancelRestore.setOnClickListener {
+            resultsViewModel.cancelRestore()
+        }
+
+        restoreProgressDialog?.show()
+    }
+
+    private fun updateRestoreProgress(state: RestoreState.Running) {
+        val dialogBinding = restoreProgressDialog?.findViewById<View>(R.id.tvProgressCount)?.parent as? ViewGroup
+        if (dialogBinding != null) {
+            val progressBinding = DialogRestoreProgressBinding.bind(dialogBinding)
+            progressBinding.tvProgressCount.text = "${state.progress} / ${state.total}"
+            progressBinding.tvCurrentFile.text = state.currentFileName
+            progressBinding.progressBar.max = state.total
+            progressBinding.progressBar.progress = state.progress
+        }
+    }
+
+    private fun showRestoreCompleteSnackbar(state: RestoreState.Done) {
+        val message = if (state.failCount == 0) {
+            "Restored ${state.successCount} ${if (state.successCount == 1) "file" else "files"}"
+        } else {
+            "Restored ${state.successCount}/${state.successCount + state.failCount} (${state.failCount} failed)"
+        }
+
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setAction("Open Folder") {
+                openDownloadsFolder()
+            }
+            .show()
+    }
+
+    private fun openDownloadsFolder() {
+        try {
+            // Try to open Downloads folder - API 29+ only
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    type = "resource/folder"
+                    putExtra("android.provider.extra.INITIAL_URI", android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI)
+                }
+                startActivity(intent)
+            } else {
+                // Fallback for older versions
+                openFileManager()
+            }
+        } catch (_: Exception) {
+            openFileManager()
+        }
+    }
+
+    private fun openFileManager() {
+        try {
+            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                type = "*/*"
+            }
+            startActivity(Intent.createChooser(intent, "Open Downloads"))
+        } catch (_: Exception) {
+            Snackbar.make(binding.root, "Could not open Downloads folder", Snackbar.LENGTH_SHORT).show()
         }
     }
 
