@@ -1,6 +1,8 @@
 package com.meta.brain.file.recovery.data.model
 
 import android.net.Uri
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * Media kind classification
@@ -12,6 +14,7 @@ enum class MediaKind {
 /**
  * Represents a media entry from MediaStore (Image, Video, or Document)
  */
+@Parcelize
 data class MediaEntry(
     val uri: Uri,
     val displayName: String?,
@@ -22,7 +25,7 @@ data class MediaEntry(
     val durationMs: Long? = null,
     val isVideo: Boolean,
     val mediaKind: MediaKind = determineMediaKind(mimeType, isVideo)
-) {
+) : Parcelable {
     /**
      * Returns formatted file size (e.g., "2.5 MB")
      */

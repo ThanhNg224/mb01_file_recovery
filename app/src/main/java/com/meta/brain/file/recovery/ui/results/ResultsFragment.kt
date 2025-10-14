@@ -764,9 +764,19 @@ class ResultsFragment : Fragment() {
     }
 
     private fun openMediaPreview(mediaEntry: MediaEntry) {
-        // TODO: Implement media preview
-        val message = "Opening ${mediaEntry.displayName ?: "media file"}"
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+        // Get the current visible items from the adapter
+        val visibleItems = mediaAdapter.currentList.toTypedArray()
+        val startIndex = visibleItems.indexOf(mediaEntry)
+
+        if (startIndex >= 0) {
+            val action = ResultsFragmentDirections.actionResultsToPreview(
+                visibleItems = visibleItems,
+                startIndex = startIndex
+            )
+            findNavController().navigate(action)
+        } else {
+            Snackbar.make(binding.root, "Unable to open preview", Snackbar.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDestroyView() {

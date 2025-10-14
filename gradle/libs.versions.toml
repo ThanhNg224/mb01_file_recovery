@@ -32,6 +32,10 @@ recyclerview = "1.4.0"
 sdpAndroid = "1.1.1"
 sspAndroid = "1.1.1"
 userMessagingPlatform = "3.2.0"
+# Preview dependencies
+viewpager2 = "1.1.0"
+photoview = "2.3.0"
+exoplayer = "1.8.0"
 
 [libraries]
 androidx-cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
@@ -81,6 +85,12 @@ play-services-ads = { module = "com.google.android.gms:play-services-ads", versi
 sdp-android = { module = "com.intuit.sdp:sdp-android", version.ref = "sdpAndroid" }
 ssp-android = { module = "com.intuit.ssp:ssp-android", version.ref = "sspAndroid" }
 user-messaging-platform = { module = "com.google.android.ump:user-messaging-platform", version.ref = "userMessagingPlatform" }
+
+# Preview libraries
+androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
+photoview = { module = "io.github.chrisbanes:PhotoView", version.ref = "photoview" }
+androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "exoplayer" }
+androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "exoplayer" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -85,6 +85,27 @@
         <argument
             android:name="scanConfig"
             app:argType="com.meta.brain.file.recovery.data.model.ScanConfig" />
+        <action
+            android:id="@+id/action_results_to_preview"
+            app:destination="@id/previewFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <!-- Preview Fragment for full-screen media preview -->
+    <fragment
+        android:id="@+id/previewFragment"
+        android:name="com.meta.brain.file.recovery.ui.preview.PreviewFragment"
+        android:label="Preview"
+        tools:layout="@layout/fragment_preview">
+        <argument
+            android:name="visibleItems"
+            app:argType="com.meta.brain.file.recovery.data.model.MediaEntry[]" />
+        <argument
+            android:name="startIndex"
+            app:argType="integer" />
     </fragment>
 
     <!-- Additional fragments for bottom navigation -->
