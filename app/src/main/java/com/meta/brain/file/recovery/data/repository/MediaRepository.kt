@@ -122,7 +122,16 @@ class MediaRepository @Inject constructor(
             MediaStore.Images.Media.DATE_MODIFIED
         )
 
-        val selection = buildSelection(minSize, fromSec, toSec, cursor)
+        val (baseSelection, baseArgs) = buildSelection(minSize, fromSec, toSec, cursor)
+
+        // Exclude trashed items on Android 10+ (Android R/API 30+)
+        val selection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val condition = if (baseSelection != null) "$baseSelection AND " else ""
+            "${condition}${MediaStore.Images.Media.IS_TRASHED} = 0"
+        } else {
+            baseSelection
+        }
+
         val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
 
         val items = mutableListOf<MediaEntry>()
@@ -131,8 +140,8 @@ class MediaRepository @Inject constructor(
             contentResolver.query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 projection,
-                selection.first,
-                selection.second,
+                selection,
+                baseArgs,
                 sortOrder
             )?.use { cursor ->
                 val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
@@ -189,7 +198,16 @@ class MediaRepository @Inject constructor(
             MediaStore.Video.Media.DURATION
         )
 
-        val selection = buildSelection(minSize, fromSec, toSec, cursor)
+        val (baseSelection, baseArgs) = buildSelection(minSize, fromSec, toSec, cursor)
+
+        // Exclude trashed items on Android 10+ (Android R/API 30+)
+        val selection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val condition = if (baseSelection != null) "$baseSelection AND " else ""
+            "${condition}${MediaStore.Video.Media.IS_TRASHED} = 0"
+        } else {
+            baseSelection
+        }
+
         val sortOrder = "${MediaStore.Video.Media.DATE_ADDED} DESC"
 
         val items = mutableListOf<MediaEntry>()
@@ -198,8 +216,8 @@ class MediaRepository @Inject constructor(
             contentResolver.query(
                 MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
                 projection,
-                selection.first,
-                selection.second,
+                selection,
+                baseArgs,
                 sortOrder
             )?.use { cursor ->
                 val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
@@ -257,7 +275,16 @@ class MediaRepository @Inject constructor(
             MediaStore.Audio.Media.DURATION
         )
 
-        val selection = buildSelection(minSize, fromSec, toSec, cursor)
+        val (baseSelection, baseArgs) = buildSelection(minSize, fromSec, toSec, cursor)
+
+        // Exclude trashed items on Android 10+ (Android R/API 30+)
+        val selection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val condition = if (baseSelection != null) "$baseSelection AND " else ""
+            "${condition}${MediaStore.Audio.Media.IS_TRASHED} = 0"
+        } else {
+            baseSelection
+        }
+
         val sortOrder = "${MediaStore.Audio.Media.DATE_ADDED} DESC"
 
         val items = mutableListOf<MediaEntry>()
@@ -266,8 +293,8 @@ class MediaRepository @Inject constructor(
             contentResolver.query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 projection,
-                selection.first,
-                selection.second,
+                selection,
+                baseArgs,
                 sortOrder
             )?.use { cursor ->
                 val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
@@ -495,11 +522,20 @@ class MediaRepository @Inject constructor(
         android.util.Log.d("MediaRepository", "Found ${unindexedFiles.size} unindexed files")
         allItems.addAll(unindexedFiles)
 
-        // Remove duplicates based on URI
-        val uniqueItems = allItems.distinctBy { it.uri }.sortedWith(
-            compareByDescending<MediaEntry> { it.dateTaken ?: it.dateAdded }
-                .thenByDescending { it.dateAdded }
-        ).take(pageSize)
+        // Remove duplicates based on actual file path (not just URI)
+        // Group by file path to handle both content:// and file:// URIs pointing to same file
+        val uniqueItems = allItems
+            .groupBy { getFilePath(it.uri) }
+            .mapValues { (_, entries) ->
+                // If multiple entries for same file, prefer content:// URI over file:// URI
+                entries.firstOrNull { it.uri.scheme == "content" } ?: entries.first()
+            }
+            .values
+            .sortedWith(
+                compareByDescending<MediaEntry> { it.dateTaken ?: it.dateAdded }
+                    .thenByDescending { it.dateAdded }
+            )
+            .take(pageSize)
 
         // Generate next cursor if we have full page
         val nextCursor = if (uniqueItems.size >= pageSize) {
@@ -1330,6 +1366,34 @@ class MediaRepository @Inject constructor(
             }
         } catch (e: Exception) {
             android.util.Log.e("MediaRepository", "Error scanning root storage for unindexed files: ${e.message}")
+        }
+    }
+
+    /**
+     * Extract file path from URI for duplicate detection
+     * Handles both content:// and file:// URIs
+     */
+    private fun getFilePath(uri: Uri): String {
+        return when (uri.scheme) {
+            "file" -> uri.path ?: uri.toString()
+            "content" -> {
+                // Try to get actual file path from MediaStore content URI
+                try {
+                    val projection = arrayOf(MediaStore.Files.FileColumns.DATA)
+                    contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+                        if (cursor.moveToFirst()) {
+                            val columnIndex = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)
+                            if (columnIndex >= 0) {
+                                return cursor.getString(columnIndex) ?: uri.toString()
+                            }
+                        }
+                    }
+                } catch (_: Exception) {
+                    // Fall back to URI string
+                }
+                uri.toString()
+            }
+            else -> uri.toString()
         }
     }
 }

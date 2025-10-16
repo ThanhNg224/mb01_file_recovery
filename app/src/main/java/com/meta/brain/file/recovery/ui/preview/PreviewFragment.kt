@@ -1,7 +1,6 @@
 package com.meta.brain.file.recovery.ui.preview
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -14,7 +13,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
@@ -28,7 +26,6 @@ import com.meta.brain.file.recovery.databinding.BottomSheetInfoBinding
 import com.meta.brain.file.recovery.databinding.FragmentPreviewBinding
 import com.meta.brain.file.recovery.ui.results.ResultsViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import java.util.Locale
 
 /**
@@ -290,7 +287,7 @@ class PreviewFragment : Fragment() {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             startActivity(Intent.createChooser(intent, "Share via"))
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Snackbar.make(binding.root, "Failed to share file", Snackbar.LENGTH_SHORT).show()
         }
     }
@@ -302,7 +299,7 @@ class PreviewFragment : Fragment() {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             startActivity(Intent.createChooser(intent, "Open with"))
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Snackbar.make(binding.root, "No app found to open this file", Snackbar.LENGTH_SHORT).show()
         }
     }
