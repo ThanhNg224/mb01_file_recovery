@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -89,6 +90,9 @@ class PreviewFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
+
+        // Set navigation icon tint to white for visibility on dark background
+        binding.toolbar.navigationIcon?.setTint(ContextCompat.getColor(requireContext(), R.color.white))
 
         // Hide restore button if opened from Archive
         if (args.fromArchive) {

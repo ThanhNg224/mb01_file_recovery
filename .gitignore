@@ -20,3 +20,4 @@ google-services.json
 gradle.properties
 PREVIEW_FEATURE_IMPLEMENTATION.md
 REFACTORING_SUMMARY.md
+*.md

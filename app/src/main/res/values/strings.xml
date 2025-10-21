@@ -71,6 +71,18 @@
     <string name="select">Select</string>
     <string name="filter">Filter</string>
 
+    <!-- New strings for folder groups and detail -->
+    <string name="selection_count">%1$d selected</string>
+    <string name="no_items_selected">No items selected</string>
+    <string name="restore_confirm_message">Restore %1$s (%2$s)?</string>
+    <string name="restore_destination_path">To: Downloads/RELive/Restored</string>
+    <string name="progress_count">%1$d / %2$d</string>
+
+    <plurals name="files">
+        <item quantity="one">%d file</item>
+        <item quantity="other">%d files</item>
+    </plurals>
+
     <!-- Home Fragment strings -->
     <string name="home_brand">RELive</string>
     <string name="home_ads">ADS</string>

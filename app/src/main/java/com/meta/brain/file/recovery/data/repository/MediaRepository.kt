@@ -9,6 +9,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Size
 import com.meta.brain.file.recovery.data.model.MediaEntry
+import com.meta.brain.file.recovery.data.model.MediaKind
 import com.meta.brain.file.recovery.data.model.MediaType
 import com.meta.brain.file.recovery.data.model.ScanCursor
 import com.meta.brain.file.recovery.data.model.ScanResult
@@ -24,71 +25,6 @@ class MediaRepository @Inject constructor(
 ) {
     private val contentResolver: ContentResolver = context.contentResolver
 
-    /**
-     * Performs quick scan of media files with pagination and filtering
-     */
-//    suspend fun quickScan(
-//        types: Set<MediaType>,
-//        minSize: Long? = null,
-//        fromSec: Long? = null,
-//        toSec: Long? = null,
-//        pageSize: Int = 300,
-//        cursor: ScanCursor? = null
-//    ): ScanResult = withContext(Dispatchers.IO) {
-//        android.util.Log.d("MediaRepository", "Starting quickScan with types: $types, minSize: $minSize")
-//
-//        val allItems = mutableListOf<MediaEntry>()
-//
-//        // Scan images
-//        if (types.contains(MediaType.IMAGES) || types.contains(MediaType.ALL)) {
-//            android.util.Log.d("MediaRepository", "Scanning images...")
-//            val images = queryImages(minSize, fromSec, toSec, pageSize, cursor)
-//            android.util.Log.d("MediaRepository", "Found ${images.size} images")
-//            allItems.addAll(images)
-//        }
-//
-//        // Scan videos
-//        if (types.contains(MediaType.VIDEOS) || types.contains(MediaType.ALL)) {
-//            android.util.Log.d("MediaRepository", "Scanning videos...")
-//            val videos = queryVideos(minSize, fromSec, toSec, pageSize, cursor)
-//            android.util.Log.d("MediaRepository", "Found ${videos.size} videos")
-//            allItems.addAll(videos)
-//        }
-//
-//        // Scan audio
-//        if (types.contains(MediaType.AUDIO) || types.contains(MediaType.ALL)) {
-//            android.util.Log.d("MediaRepository", "Scanning audio...")
-//            val audio = queryAudio(minSize, fromSec, toSec, pageSize, cursor)
-//            android.util.Log.d("MediaRepository", "Found ${audio.size} audio files")
-//            allItems.addAll(audio)
-//        }
-//
-//        // Scan documents if requested
-//        if (types.contains(MediaType.DOCUMENTS) || types.contains(MediaType.ALL)) {
-//            android.util.Log.d("MediaRepository", "Scanning documents...")
-//            val documents = queryDocuments(minSize, fromSec, toSec, pageSize, cursor)
-//            android.util.Log.d("MediaRepository", "Found ${documents.size} documents")
-//            allItems.addAll(documents)
-//        }
-//
-//        // Sort by date taken (newest first), then by date added
-//        val sortedItems = allItems.sortedWith(
-//            compareByDescending<MediaEntry> { it.dateTaken ?: it.dateAdded }
-//                .thenByDescending { it.dateAdded }
-//        ).take(pageSize)
-//
-//        // Generate next cursor if we have full page
-//        val nextCursor = if (sortedItems.size >= pageSize) {
-//            val lastItem = sortedItems.last()
-//            ScanCursor(
-//                lastDate = lastItem.dateTaken ?: lastItem.dateAdded,
-//                lastId = lastItem.uri.lastPathSegment?.toLongOrNull() ?: 0L
-//            )
-//        } else null
-//
-//        android.util.Log.d("MediaRepository", "Scan complete. Total items: ${sortedItems.size}")
-//        ScanResult(sortedItems, nextCursor)
-//    }
 
     /**
      * Load thumbnail for media item (API 29+)
@@ -119,21 +55,15 @@ class MediaRepository @Inject constructor(
             MediaStore.Images.Media.MIME_TYPE,
             MediaStore.Images.Media.SIZE,
             MediaStore.Images.Media.DATE_ADDED,
-            MediaStore.Images.Media.DATE_MODIFIED
+            MediaStore.Images.Media.DATE_MODIFIED,
+            MediaStore.Images.Media.DATA // added
         )
 
         val (baseSelection, baseArgs) = buildSelection(minSize, fromSec, toSec, cursor)
+        val selection = baseSelection
 
-        // Exclude trashed items on Android 10+ (Android R/API 30+)
-        val selection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val condition = if (baseSelection != null) "$baseSelection AND " else ""
-            "${condition}${MediaStore.Images.Media.IS_TRASHED} = 0"
-        } else {
-            baseSelection
-        }
 
         val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
-
         val items = mutableListOf<MediaEntry>()
 
         try {
@@ -150,11 +80,16 @@ class MediaRepository @Inject constructor(
                 val sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
                 val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
                 val dateModifiedColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_MODIFIED)
+                val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
 
                 var count = 0
                 while (cursor.moveToNext() && count < pageSize) {
                     val id = cursor.getLong(idColumn)
                     val uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id.toString())
+                    val filePath = cursor.getString(dataColumn)
+
+                    // skip restored folder
+                    if (filePath != null && filePath.contains("/RELive/Restored", ignoreCase = true)) continue
 
                     val dateAdded = cursor.getLong(dateAddedColumn)
                     val dateModified = cursor.getLong(dateModifiedColumn)
@@ -168,7 +103,8 @@ class MediaRepository @Inject constructor(
                             dateAdded = dateAdded,
                             dateTaken = if (dateModified > 0) dateModified else dateAdded,
                             durationMs = null,
-                            isVideo = false
+                            isVideo = false,
+                            filePath = filePath
                         )
                     )
                     count++
@@ -177,9 +113,9 @@ class MediaRepository @Inject constructor(
         } catch (e: Exception) {
             android.util.Log.e("MediaRepository", "Error querying images: ${e.message}")
         }
-
         return items
     }
+
 
     private fun queryVideos(
         minSize: Long?,
@@ -195,21 +131,16 @@ class MediaRepository @Inject constructor(
             MediaStore.Video.Media.SIZE,
             MediaStore.Video.Media.DATE_ADDED,
             MediaStore.Video.Media.DATE_MODIFIED,
-            MediaStore.Video.Media.DURATION
+            MediaStore.Video.Media.DURATION,
+            MediaStore.Video.Media.DATA // added
         )
 
         val (baseSelection, baseArgs) = buildSelection(minSize, fromSec, toSec, cursor)
 
-        // Exclude trashed items on Android 10+ (Android R/API 30+)
-        val selection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val condition = if (baseSelection != null) "$baseSelection AND " else ""
-            "${condition}${MediaStore.Video.Media.IS_TRASHED} = 0"
-        } else {
-            baseSelection
-        }
+        // REMOVED: IS_TRASHED = 0 filter - we want to INCLUDE trashed items
+        val selection = baseSelection
 
         val sortOrder = "${MediaStore.Video.Media.DATE_ADDED} DESC"
-
         val items = mutableListOf<MediaEntry>()
 
         try {
@@ -227,11 +158,16 @@ class MediaRepository @Inject constructor(
                 val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
                 val dateModifiedColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_MODIFIED)
                 val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
+                val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA)
 
                 var count = 0
                 while (cursor.moveToNext() && count < pageSize) {
                     val id = cursor.getLong(idColumn)
                     val uri = Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id.toString())
+                    val filePath = cursor.getString(dataColumn)
+
+                    // ONLY skip our own restored folder
+                    if (filePath != null && filePath.contains("/RELive/Restored", ignoreCase = true)) continue
 
                     val dateAdded = cursor.getLong(dateAddedColumn)
                     val dateModified = cursor.getLong(dateModifiedColumn)
@@ -245,7 +181,8 @@ class MediaRepository @Inject constructor(
                             dateAdded = dateAdded,
                             dateTaken = if (dateModified > 0) dateModified else dateAdded,
                             durationMs = cursor.getLong(durationColumn),
-                            isVideo = true
+                            isVideo = true,
+                            filePath = filePath
                         )
                     )
                     count++
@@ -254,9 +191,9 @@ class MediaRepository @Inject constructor(
         } catch (e: Exception) {
             android.util.Log.e("MediaRepository", "Error querying videos: ${e.message}")
         }
-
         return items
     }
+
 
     private fun queryAudio(
         minSize: Long?,
@@ -272,21 +209,14 @@ class MediaRepository @Inject constructor(
             MediaStore.Audio.Media.SIZE,
             MediaStore.Audio.Media.DATE_ADDED,
             MediaStore.Audio.Media.DATE_MODIFIED,
-            MediaStore.Audio.Media.DURATION
+            MediaStore.Audio.Media.DURATION,
+            MediaStore.Audio.Media.DATA // added
         )
 
         val (baseSelection, baseArgs) = buildSelection(minSize, fromSec, toSec, cursor)
-
-        // Exclude trashed items on Android 10+ (Android R/API 30+)
-        val selection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val condition = if (baseSelection != null) "$baseSelection AND " else ""
-            "${condition}${MediaStore.Audio.Media.IS_TRASHED} = 0"
-        } else {
-            baseSelection
-        }
+        val selection = baseSelection
 
         val sortOrder = "${MediaStore.Audio.Media.DATE_ADDED} DESC"
-
         val items = mutableListOf<MediaEntry>()
 
         try {
@@ -304,11 +234,16 @@ class MediaRepository @Inject constructor(
                 val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
                 val dateModifiedColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
                 val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+                val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
 
                 var count = 0
                 while (cursor.moveToNext() && count < pageSize) {
                     val id = cursor.getLong(idColumn)
                     val uri = Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id.toString())
+                    val filePath = cursor.getString(dataColumn)
+
+                    // skip restored folder
+                    if (filePath != null && filePath.contains("/RELive/Restored", ignoreCase = true)) continue
 
                     val dateAdded = cursor.getLong(dateAddedColumn)
                     val dateModified = cursor.getLong(dateModifiedColumn)
@@ -322,7 +257,8 @@ class MediaRepository @Inject constructor(
                             dateAdded = dateAdded,
                             dateTaken = if (dateModified > 0) dateModified else dateAdded,
                             durationMs = cursor.getLong(durationColumn),
-                            isVideo = false
+                            isVideo = false,
+                            filePath = filePath
                         )
                     )
                     count++
@@ -331,9 +267,9 @@ class MediaRepository @Inject constructor(
         } catch (e: Exception) {
             android.util.Log.e("MediaRepository", "Error querying audio: ${e.message}")
         }
-
         return items
     }
+
 
     private fun queryDocuments(
         minSize: Long?,
@@ -348,10 +284,10 @@ class MediaRepository @Inject constructor(
             MediaStore.Files.FileColumns.MIME_TYPE,
             MediaStore.Files.FileColumns.SIZE,
             MediaStore.Files.FileColumns.DATE_ADDED,
-            MediaStore.Files.FileColumns.DATE_MODIFIED
+            MediaStore.Files.FileColumns.DATE_MODIFIED,
+            MediaStore.Files.FileColumns.DATA // added
         )
 
-        // Document MIME types to scan for
         val documentMimeTypes = listOf(
             "application/pdf",
             "application/msword",
@@ -367,24 +303,20 @@ class MediaRepository @Inject constructor(
         val conditions = mutableListOf<String>()
         val args = mutableListOf<String>()
 
-        // MIME type filter for documents
         conditions.add("${MediaStore.Files.FileColumns.MIME_TYPE} IN (${documentMimeTypes.joinToString { "?" }})")
         args.addAll(documentMimeTypes)
 
-        // Size filter
         minSize?.let {
             conditions.add("${MediaStore.Files.FileColumns.SIZE} >= ?")
             args.add(it.toString())
         }
 
-        // Time range filter
         if (fromSec != null && toSec != null) {
             conditions.add("${MediaStore.Files.FileColumns.DATE_ADDED} BETWEEN ? AND ?")
             args.add(fromSec.toString())
             args.add(toSec.toString())
         }
 
-        // Pagination cursor
         cursor?.let {
             conditions.add("(${MediaStore.Files.FileColumns.DATE_ADDED} < ? OR (${MediaStore.Files.FileColumns.DATE_ADDED} = ? AND ${MediaStore.Files.FileColumns._ID} < ?))")
             args.add(it.lastDate.toString())
@@ -394,7 +326,6 @@ class MediaRepository @Inject constructor(
 
         val selection = conditions.joinToString(" AND ")
         val sortOrder = "${MediaStore.Files.FileColumns.DATE_ADDED} DESC"
-
         val items = mutableListOf<MediaEntry>()
 
         try {
@@ -411,21 +342,24 @@ class MediaRepository @Inject constructor(
                 val sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)
                 val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)
                 val dateModifiedColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_MODIFIED)
+                val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)
 
                 var count = 0
                 while (cursor.moveToNext() && count < pageSize) {
                     val id = cursor.getLong(idColumn)
                     val uri = Uri.withAppendedPath(MediaStore.Files.getContentUri("external"), id.toString())
                     val mimeType = cursor.getString(mimeColumn)
+                    val filePath = cursor.getString(dataColumn)
+
+                    // skip restored folder
+                    if (filePath != null && filePath.contains("/RELive/Restored", ignoreCase = true)) continue
 
                     val dateAdded = cursor.getLong(dateAddedColumn)
                     val dateModified = cursor.getLong(dateModifiedColumn)
 
-                    // Determine MediaKind based on MIME type
                     val mediaKind = when {
-                        mimeType?.startsWith("application/") == true ->
-                            com.meta.brain.file.recovery.data.model.MediaKind.DOCUMENT
-                        else -> com.meta.brain.file.recovery.data.model.MediaKind.OTHER
+                        mimeType?.startsWith("application/") == true -> MediaKind.DOCUMENT
+                        else -> MediaKind.OTHER
                     }
 
                     items.add(
@@ -438,7 +372,8 @@ class MediaRepository @Inject constructor(
                             dateTaken = if (dateModified > 0) dateModified else dateAdded,
                             durationMs = null,
                             isVideo = false,
-                            mediaKind = mediaKind
+                            mediaKind = mediaKind,
+                            filePath = filePath
                         )
                     )
                     count++
@@ -447,9 +382,9 @@ class MediaRepository @Inject constructor(
         } catch (e: Exception) {
             android.util.Log.e("MediaRepository", "Error querying documents: ${e.message}")
         }
-
         return items
     }
+
 
     /**
      * Performs comprehensive deep scan including hidden files, archive files, trash, and unindexed files
@@ -1064,7 +999,8 @@ class MediaRepository @Inject constructor(
         types: Set<MediaType>,
         minSize: Long?,
         fromSec: Long?,
-        toSec: Long?
+        toSec: Long?,
+        isTrashed: Boolean = false
     ): MediaEntry? {
         try {
             // Apply size filter
@@ -1090,6 +1026,9 @@ class MediaRepository @Inject constructor(
             // Create file URI
             val uri = Uri.fromFile(file)
 
+            // Auto-detect if file is in trash directory (in case isTrashed not explicitly set)
+            val isInTrash = isTrashed || isFileInTrashDirectory(file)
+
             return MediaEntry(
                 uri = uri,
                 displayName = file.name,
@@ -1099,12 +1038,29 @@ class MediaRepository @Inject constructor(
                 dateTaken = fileTime,
                 durationMs = null,
                 isVideo = mediaKind == com.meta.brain.file.recovery.data.model.MediaKind.VIDEO,
+                isTrashed = isInTrash,
                 mediaKind = mediaKind
             )
         } catch (e: Exception) {
             android.util.Log.e("MediaRepository", "Error creating MediaEntry from file ${file.path}: ${e.message}")
             return null
         }
+    }
+
+    /**
+     * Check if a file is in a trash/recycle bin directory
+     */
+    private fun isFileInTrashDirectory(file: java.io.File): Boolean {
+        val path = file.absolutePath.lowercase()
+        return path.contains("trash") ||
+                path.contains("recycle") ||
+                path.contains(".trash-") ||
+                path.contains("/.trash/") ||
+                path.contains("/trash/") ||
+                path.contains("/.trashed/") ||
+                path.contains("/trashed/") ||
+                path.contains("/.recyclebin/") ||
+                path.contains("/recyclebin/")
     }
 
     private fun createMediaEntryFromCursor(

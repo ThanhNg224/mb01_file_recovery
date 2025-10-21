@@ -24,7 +24,9 @@ data class MediaEntry(
     val dateTaken: Long?,
     val durationMs: Long? = null,
     val isVideo: Boolean,
-    val mediaKind: MediaKind = determineMediaKind(mimeType, isVideo)
+    val isTrashed: Boolean = false,
+    val mediaKind: MediaKind = determineMediaKind(mimeType, isVideo),
+    val filePath: String? = null // Physical file path on device storage
 ) : Parcelable {
     /**
      * Returns formatted file size (e.g., "2.5 MB")
