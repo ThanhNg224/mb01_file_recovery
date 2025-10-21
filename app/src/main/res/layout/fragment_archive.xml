@@ -16,6 +16,8 @@
         android:elevation="0dp"
         app:title="Restored Files"
         app:titleTextColor="@color/home_text_primary"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationIconTint="@color/home_text_primary"
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Filter Chips -->
@@ -168,4 +170,3 @@
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

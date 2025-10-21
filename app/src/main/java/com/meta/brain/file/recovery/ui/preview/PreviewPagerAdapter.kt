@@ -10,14 +10,13 @@ import com.meta.brain.file.recovery.data.model.MediaKind
  */
 class PreviewPagerAdapter(
     fragment: Fragment,
-    private val mediaItems: List<MediaEntry>
+    private val mediaItems: MutableList<MediaEntry>
 ) : FragmentStateAdapter(fragment) {
 
     override fun getItemCount(): Int = mediaItems.size
 
     override fun createFragment(position: Int): Fragment {
         val mediaEntry = mediaItems[position]
-
         return when (mediaEntry.mediaKind) {
             MediaKind.IMAGE -> PreviewImageFragment.newInstance(mediaEntry)
             MediaKind.VIDEO -> PreviewVideoFragment.newInstance(mediaEntry)
@@ -26,8 +25,22 @@ class PreviewPagerAdapter(
         }
     }
 
-    fun getMediaEntry(position: Int): MediaEntry? {
-        return mediaItems.getOrNull(position)
+    fun getMediaEntry(position: Int): MediaEntry? = mediaItems.getOrNull(position)
+
+    //Thêm hàm update an toàn khi xóa
+    fun removeItemAt(position: Int) {
+        if (position in mediaItems.indices) {
+            mediaItems.removeAt(position)
+            notifyItemRemoved(position)
+            notifyItemRangeChanged(position, mediaItems.size)
+        }
+    }
+
+    fun updateData(newItems: List<MediaEntry>) {
+        mediaItems.clear()
+        mediaItems.addAll(newItems)
+        notifyDataSetChanged()
     }
 }
+
 

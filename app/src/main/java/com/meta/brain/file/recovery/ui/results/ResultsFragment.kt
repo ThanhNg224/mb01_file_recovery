@@ -81,25 +81,17 @@ class ResultsFragment : Fragment() {
         observeFilterViewModel()
         observeSelectionViewModel()
         observeRestoreState()
+        observeNavigationResult()
 
-        // Fetch results if scanConfig is provided
+        // Fetch results if scanConfig is provided - always use deep scan
         args.scanConfig.let { config ->
             val types = config.toMediaTypes()
-            if (config.depth == com.meta.brain.file.recovery.data.model.ScanDepth.QUICK) {
-                sharedViewModel.quickScan(
-                    types = types,
-                    minSize = config.minSize,
-                    fromSec = config.fromSec,
-                    toSec = config.toSec
-                )
-            } else {
-                sharedViewModel.deepScan(
-                    types = types,
-                    minSize = config.minSize,
-                    fromSec = config.fromSec,
-                    toSec = config.toSec
-                )
-            }
+            sharedViewModel.deepScan(
+                types = types,
+                minSize = config.minSize,
+                fromSec = config.fromSec,
+                toSec = config.toSec
+            )
         }
     }
 
@@ -271,6 +263,28 @@ class ResultsFragment : Fragment() {
                 handleRestoreState(state)
             }
         }
+    }
+
+    private fun observeNavigationResult() {
+        // Listen for changes from PreviewFragment
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>("results_files_changed")
+            ?.observe(viewLifecycleOwner) { filesChanged ->
+                if (filesChanged == true) {
+                    // Refresh the list when files are deleted from preview
+                    // Re-run the scan to update the list
+                    args.scanConfig.let { config ->
+                        val types = config.toMediaTypes()
+                        sharedViewModel.deepScan(
+                            types = types,
+                            minSize = config.minSize,
+                            fromSec = config.fromSec,
+                            toSec = config.toSec
+                        )
+                    }
+                    // Clear the result
+                    findNavController().currentBackStackEntry?.savedStateHandle?.remove<Boolean>("results_files_changed")
+                }
+            }
     }
 
     private fun startSelectionMode() {

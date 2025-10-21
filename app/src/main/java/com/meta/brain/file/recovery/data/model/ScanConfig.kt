@@ -18,8 +18,11 @@ enum class ScanTarget {
  * Scan depth mode
  */
 enum class ScanDepth {
-    QUICK,
-    DEEP
+    DEEP,
+    NORMAL, // for photo scan
+    VIDEO,
+    AUDIO,
+    OTHER
 }
 
 /**
@@ -28,8 +31,8 @@ enum class ScanDepth {
 @Parcelize
 data class ScanConfig(
     val target: ScanTarget = ScanTarget.PHOTOS,
-    val depth: ScanDepth = ScanDepth.QUICK,
-    val minDurationMs: Long = 1500L,
+    val depth: ScanDepth = ScanDepth.DEEP,
+    val minDurationMs: Long = 4000L,
     val minSize: Long? = null,
     val fromSec: Long? = null,
     val toSec: Long? = null
@@ -61,4 +64,3 @@ data class ScanConfig(
         }
     }
 }
-

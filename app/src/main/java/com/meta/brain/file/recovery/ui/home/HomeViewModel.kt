@@ -42,103 +42,6 @@ class HomeViewModel @Inject constructor(
     private var isLoading = false
 
     /**
-     * Start quick scan with filters
-     */
-    fun quickScan(
-        types: Set<MediaType>,
-        minSize: Long? = null,
-        fromSec: Long? = null,
-        toSec: Long? = null
-    ) {
-        if (isLoading) return
-
-        viewModelScope.launch {
-            try {
-                isLoading = true
-                _uiState.value = MediaUiState.Loading
-
-                // Reset state for new scan
-                mediaBuffer.clear()
-                currentCursor = null
-
-                val result = mediaRepository.quickScan(
-                    types = types,
-                    minSize = minSize,
-                    fromSec = fromSec,
-                    toSec = toSec,
-                    pageSize = PAGE_SIZE,
-                    cursor = null
-                )
-
-                mediaBuffer.addAll(result.items)
-                currentCursor = result.nextCursor
-
-                _uiState.value = if (result.items.isEmpty()) {
-                    MediaUiState.Empty
-                } else {
-                    MediaUiState.Items(
-                        list = mediaBuffer.toList(),
-                        canLoadMore = result.nextCursor != null,
-                        appending = false
-                    )
-                }
-            } catch (e: Exception) {
-                _uiState.value = MediaUiState.Error(
-                    e.message ?: "Unknown error occurred during scan"
-                )
-            } finally {
-                isLoading = false
-            }
-        }
-    }
-
-    /**
-     * Load next page of media items
-     */
-    fun loadMore() {
-        val currentState = _uiState.value
-        if (isLoading || currentCursor == null || currentState !is MediaUiState.Items) return
-
-        viewModelScope.launch {
-            try {
-                isLoading = true
-
-                // Show appending indicator
-                _uiState.value = currentState.copy(appending = true)
-
-                val result = mediaRepository.quickScan(
-                    types = setOf(MediaType.ALL),
-                    pageSize = PAGE_SIZE,
-                    cursor = currentCursor
-                )
-
-                mediaBuffer.addAll(result.items)
-                currentCursor = result.nextCursor
-
-                _uiState.value = MediaUiState.Items(
-                    list = mediaBuffer.toList(),
-                    canLoadMore = result.nextCursor != null,
-                    appending = false
-                )
-            } catch (_: Exception) {
-                // Revert to previous state on error
-                _uiState.value = currentState.copy(appending = false)
-            } finally {
-                isLoading = false
-            }
-        }
-    }
-
-    /**
-     * Clear scan results and reset to idle
-     */
-    fun clearResults() {
-        mediaBuffer.clear()
-        currentCursor = null
-        _uiState.value = MediaUiState.Idle
-    }
-
-    /**
      * Start deep scan with comprehensive file system scanning
      * Includes hidden files, archive files, trash, and unindexed files
      */
@@ -188,6 +91,52 @@ class HomeViewModel @Inject constructor(
                 isLoading = false
             }
         }
+    }
+
+    /**
+     * Load next page of media items
+     */
+    fun loadMore() {
+        val currentState = _uiState.value
+        if (isLoading || currentCursor == null || currentState !is MediaUiState.Items) return
+
+        viewModelScope.launch {
+            try {
+                isLoading = true
+
+                // Show appending indicator
+                _uiState.value = currentState.copy(appending = true)
+
+                val result = mediaRepository.deepScan(
+                    types = setOf(MediaType.ALL),
+                    pageSize = PAGE_SIZE,
+                    cursor = currentCursor
+                )
+
+                mediaBuffer.addAll(result.items)
+                currentCursor = result.nextCursor
+
+                _uiState.value = MediaUiState.Items(
+                    list = mediaBuffer.toList(),
+                    canLoadMore = result.nextCursor != null,
+                    appending = false
+                )
+            } catch (_: Exception) {
+                // Revert to previous state on error
+                _uiState.value = currentState.copy(appending = false)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    /**
+     * Clear scan results and reset to idle
+     */
+    fun clearResults() {
+        mediaBuffer.clear()
+        currentCursor = null
+        _uiState.value = MediaUiState.Idle
     }
 
     companion object {

@@ -66,28 +66,15 @@ class ScanLoadingViewModel @Inject constructor(
             try {
                 val types = config.toMediaTypes()
 
-                val result = when (config.depth) {
-                    com.meta.brain.file.recovery.data.model.ScanDepth.QUICK -> {
-                        mediaRepository.quickScan(
-                            types = types,
-                            minSize = config.minSize,
-                            fromSec = config.fromSec,
-                            toSec = config.toSec,
-                            pageSize = 300,
-                            cursor = null
-                        )
-                    }
-                    com.meta.brain.file.recovery.data.model.ScanDepth.DEEP -> {
-                        mediaRepository.deepScan(
-                            types = types,
-                            minSize = config.minSize,
-                            fromSec = config.fromSec,
-                            toSec = config.toSec,
-                            pageSize = 300,
-                            cursor = null
-                        )
-                    }
-                }
+                // Always use deep scan
+                val result = mediaRepository.deepScan(
+                    types = types,
+                    minSize = config.minSize,
+                    fromSec = config.fromSec,
+                    toSec = config.toSec,
+                    pageSize = 300,
+                    cursor = null
+                )
 
                 resultCount = result.items.size
                 scanComplete = true

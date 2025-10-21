@@ -33,33 +33,12 @@ class ArchiveRepository @Inject constructor(
     suspend fun loadRestoredFiles(): List<MediaEntry> = withContext(Dispatchers.IO) {
         val restoredFiles = mutableListOf<MediaEntry>()
 
-        // Query different MediaStore collections for files in our restored folder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             // Android 10+ - use scoped storage with RELATIVE_PATH
+            // Use Downloads collection only to avoid duplicates
+            // (files in Downloads are indexed in Downloads collection regardless of type)
             val relativePath = "${Environment.DIRECTORY_DOWNLOADS}/$RESTORED_FOLDER_PATH/"
 
-            // Query Images
-            restoredFiles.addAll(queryMediaCollection(
-                MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
-                relativePath,
-                isVideo = false
-            ))
-
-            // Query Videos
-            restoredFiles.addAll(queryMediaCollection(
-                MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
-                relativePath,
-                isVideo = true
-            ))
-
-            // Query Audio
-            restoredFiles.addAll(queryMediaCollection(
-                MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
-                relativePath,
-                isVideo = false
-            ))
-
-            // Query Downloads (for documents and other files)
             restoredFiles.addAll(queryMediaCollection(
                 MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
                 relativePath,
@@ -81,8 +60,11 @@ class ArchiveRepository @Inject constructor(
             ))
         }
 
+        // Deduplicate by URI (just in case)
+        val uniqueFiles = restoredFiles.distinctBy { it.uri.toString() }
+
         // Sort by date added (newest first)
-        restoredFiles.sortedByDescending { it.dateAdded }
+        uniqueFiles.sortedByDescending { it.dateAdded }
     }
 
     /**
@@ -272,4 +254,3 @@ class ArchiveRepository @Inject constructor(
         loadRestoredFiles().filter { it.mediaKind == kind }
     }
 }
-

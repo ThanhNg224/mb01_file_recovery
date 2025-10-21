@@ -90,6 +90,11 @@ class PreviewFragment : Fragment() {
             findNavController().navigateUp()
         }
 
+        // Hide restore button if opened from Archive
+        if (args.fromArchive) {
+            binding.toolbar.menu.findItem(R.id.action_restore)?.isVisible = false
+        }
+
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             handleMenuItemClick(menuItem)
         }
@@ -258,19 +263,20 @@ class PreviewFragment : Fragment() {
         try {
             val deleted = requireContext().contentResolver.delete(entry.uri, null, null)
             if (deleted > 0) {
-                visibleItems.remove(entry)
-
-                if (visibleItems.isEmpty()) {
-                    findNavController().navigateUp()
+                // Set result for ArchiveFragment or ResultsFragment to refresh
+                if (args.fromArchive) {
+                    findNavController().previousBackStackEntry?.savedStateHandle?.set("files_changed", true)
                 } else {
-                    pagerAdapter.notifyItemRemoved(currentPosition)
-                    if (currentPosition >= visibleItems.size) {
-                        currentPosition = visibleItems.size - 1
-                        binding.viewPager.setCurrentItem(currentPosition, false)
-                    }
+                    // From Results fragment
+                    findNavController().previousBackStackEntry?.savedStateHandle?.set("results_files_changed", true)
                 }
 
                 Snackbar.make(binding.root, "File deleted", Snackbar.LENGTH_SHORT).show()
+
+                // Always navigate back after deletion to refresh the list
+                binding.viewPager.postDelayed({
+                    findNavController().navigateUp()
+                }, 500) // Small delay to show the snackbar message
             } else {
                 Snackbar.make(binding.root, "Failed to delete file", Snackbar.LENGTH_SHORT).show()
             }

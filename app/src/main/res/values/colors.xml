@@ -12,6 +12,8 @@
     <color name="home_accent_blue">#1976D2</color>
     <color name="tile_orange">#FF9800</color>
     <color name="tile_yellow">#FFEB3B</color>
+    <color name="tile_blue">#2196F3</color>
+    <color name="tile_green">#4CAF50</color>
     <color name="home_divider">#BDBDBD</color>
     <color name="app_bg_surface">#F4F6F8</color>
 </resources>

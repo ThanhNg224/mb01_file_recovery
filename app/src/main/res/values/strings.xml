@@ -19,7 +19,7 @@
 
     <!-- Onboarding page 1 -->
     <string name="onboarding_title_1">Recover Delete Files</string>
-    <string name="onboarding_desc_1">Quickly recover images, videos, audios and documents</string>
+    <string name="onboarding_desc_1">Recover images, videos, audios and documents</string>
 
     <!-- Onboarding page 2 -->
     <string name="onboarding_title_2">Absolute security</string>
@@ -70,4 +70,20 @@
     <string name="custom_size_range">%1$s – %2$s</string>
     <string name="select">Select</string>
     <string name="filter">Filter</string>
+
+    <!-- Home Fragment strings -->
+    <string name="home_brand">RELive</string>
+    <string name="home_ads">ADS</string>
+    <string name="home_help">Help</string>
+    <string name="home_settings">Settings</string>
+    <string name="home_deep_scan_title">Quét sâu</string>
+    <string name="home_deep_scan_desc">Quét toàn bộ hệ thống, bao gồm file ẩn, file đã xóa, thùng rác và file không được lập chỉ mục</string>
+    <string name="home_deep_scan_btn">Deep Scan</string>
+    <string name="home_archive_title">Archive</string>
+    <string name="home_archive_desc">Xem các file đã được khôi phục trước đó</string>
+    <string name="home_archive_btn">View Archive</string>
+    <string name="home_photo_btn">Khôi phục ảnh</string>
+    <string name="home_video_btn">Khôi phục video</string>
+    <string name="home_audio_btn">Audio Scan</string>
+    <string name="home_other_btn">Other Scan</string>
 </resources>

@@ -27,68 +27,68 @@ class MediaRepository @Inject constructor(
     /**
      * Performs quick scan of media files with pagination and filtering
      */
-    suspend fun quickScan(
-        types: Set<MediaType>,
-        minSize: Long? = null,
-        fromSec: Long? = null,
-        toSec: Long? = null,
-        pageSize: Int = 300,
-        cursor: ScanCursor? = null
-    ): ScanResult = withContext(Dispatchers.IO) {
-        android.util.Log.d("MediaRepository", "Starting quickScan with types: $types, minSize: $minSize")
-
-        val allItems = mutableListOf<MediaEntry>()
-
-        // Scan images
-        if (types.contains(MediaType.IMAGES) || types.contains(MediaType.ALL)) {
-            android.util.Log.d("MediaRepository", "Scanning images...")
-            val images = queryImages(minSize, fromSec, toSec, pageSize, cursor)
-            android.util.Log.d("MediaRepository", "Found ${images.size} images")
-            allItems.addAll(images)
-        }
-
-        // Scan videos
-        if (types.contains(MediaType.VIDEOS) || types.contains(MediaType.ALL)) {
-            android.util.Log.d("MediaRepository", "Scanning videos...")
-            val videos = queryVideos(minSize, fromSec, toSec, pageSize, cursor)
-            android.util.Log.d("MediaRepository", "Found ${videos.size} videos")
-            allItems.addAll(videos)
-        }
-
-        // Scan audio
-        if (types.contains(MediaType.AUDIO) || types.contains(MediaType.ALL)) {
-            android.util.Log.d("MediaRepository", "Scanning audio...")
-            val audio = queryAudio(minSize, fromSec, toSec, pageSize, cursor)
-            android.util.Log.d("MediaRepository", "Found ${audio.size} audio files")
-            allItems.addAll(audio)
-        }
-
-        // Scan documents if requested
-        if (types.contains(MediaType.DOCUMENTS) || types.contains(MediaType.ALL)) {
-            android.util.Log.d("MediaRepository", "Scanning documents...")
-            val documents = queryDocuments(minSize, fromSec, toSec, pageSize, cursor)
-            android.util.Log.d("MediaRepository", "Found ${documents.size} documents")
-            allItems.addAll(documents)
-        }
-
-        // Sort by date taken (newest first), then by date added
-        val sortedItems = allItems.sortedWith(
-            compareByDescending<MediaEntry> { it.dateTaken ?: it.dateAdded }
-                .thenByDescending { it.dateAdded }
-        ).take(pageSize)
-
-        // Generate next cursor if we have full page
-        val nextCursor = if (sortedItems.size >= pageSize) {
-            val lastItem = sortedItems.last()
-            ScanCursor(
-                lastDate = lastItem.dateTaken ?: lastItem.dateAdded,
-                lastId = lastItem.uri.lastPathSegment?.toLongOrNull() ?: 0L
-            )
-        } else null
-
-        android.util.Log.d("MediaRepository", "Scan complete. Total items: ${sortedItems.size}")
-        ScanResult(sortedItems, nextCursor)
-    }
+//    suspend fun quickScan(
+//        types: Set<MediaType>,
+//        minSize: Long? = null,
+//        fromSec: Long? = null,
+//        toSec: Long? = null,
+//        pageSize: Int = 300,
+//        cursor: ScanCursor? = null
+//    ): ScanResult = withContext(Dispatchers.IO) {
+//        android.util.Log.d("MediaRepository", "Starting quickScan with types: $types, minSize: $minSize")
+//
+//        val allItems = mutableListOf<MediaEntry>()
+//
+//        // Scan images
+//        if (types.contains(MediaType.IMAGES) || types.contains(MediaType.ALL)) {
+//            android.util.Log.d("MediaRepository", "Scanning images...")
+//            val images = queryImages(minSize, fromSec, toSec, pageSize, cursor)
+//            android.util.Log.d("MediaRepository", "Found ${images.size} images")
+//            allItems.addAll(images)
+//        }
+//
+//        // Scan videos
+//        if (types.contains(MediaType.VIDEOS) || types.contains(MediaType.ALL)) {
+//            android.util.Log.d("MediaRepository", "Scanning videos...")
+//            val videos = queryVideos(minSize, fromSec, toSec, pageSize, cursor)
+//            android.util.Log.d("MediaRepository", "Found ${videos.size} videos")
+//            allItems.addAll(videos)
+//        }
+//
+//        // Scan audio
+//        if (types.contains(MediaType.AUDIO) || types.contains(MediaType.ALL)) {
+//            android.util.Log.d("MediaRepository", "Scanning audio...")
+//            val audio = queryAudio(minSize, fromSec, toSec, pageSize, cursor)
+//            android.util.Log.d("MediaRepository", "Found ${audio.size} audio files")
+//            allItems.addAll(audio)
+//        }
+//
+//        // Scan documents if requested
+//        if (types.contains(MediaType.DOCUMENTS) || types.contains(MediaType.ALL)) {
+//            android.util.Log.d("MediaRepository", "Scanning documents...")
+//            val documents = queryDocuments(minSize, fromSec, toSec, pageSize, cursor)
+//            android.util.Log.d("MediaRepository", "Found ${documents.size} documents")
+//            allItems.addAll(documents)
+//        }
+//
+//        // Sort by date taken (newest first), then by date added
+//        val sortedItems = allItems.sortedWith(
+//            compareByDescending<MediaEntry> { it.dateTaken ?: it.dateAdded }
+//                .thenByDescending { it.dateAdded }
+//        ).take(pageSize)
+//
+//        // Generate next cursor if we have full page
+//        val nextCursor = if (sortedItems.size >= pageSize) {
+//            val lastItem = sortedItems.last()
+//            ScanCursor(
+//                lastDate = lastItem.dateTaken ?: lastItem.dateAdded,
+//                lastId = lastItem.uri.lastPathSegment?.toLongOrNull() ?: 0L
+//            )
+//        } else null
+//
+//        android.util.Log.d("MediaRepository", "Scan complete. Total items: ${sortedItems.size}")
+//        ScanResult(sortedItems, nextCursor)
+//    }
 
     /**
      * Load thumbnail for media item (API 29+)
@@ -1286,11 +1286,14 @@ class MediaRepository @Inject constructor(
                 projection,
                 null,
                 null,
-                "${MediaStore.Files.FileColumns.DATE_MODIFIED} DESC LIMIT 1000"
+                "${MediaStore.Files.FileColumns.DATE_MODIFIED} DESC"
             )?.use { cursor ->
                 val dataColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)
+                var count = 0
+                val maxCount = 1000
 
                 while (cursor.moveToNext()) {
+                    if (count >= maxCount) break
                     try {
                         if (dataColumn >= 0) {
                             val filePath = cursor.getString(dataColumn)
@@ -1311,6 +1314,7 @@ class MediaRepository @Inject constructor(
                     } catch (_: Exception) {
                         // Continue with next file
                     }
+                    count++
                 }
             }
         } catch (e: Exception) {

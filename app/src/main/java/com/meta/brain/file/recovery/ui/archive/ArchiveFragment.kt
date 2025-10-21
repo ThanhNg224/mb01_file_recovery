@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.meta.brain.file.recovery.R
@@ -48,6 +49,7 @@ class ArchiveFragment : Fragment() {
         setupRecyclerView()
         setupFilterChips()
         observeViewModel()
+        observeNavigationResult()
     }
 
     private fun setupToolbar() {
@@ -63,8 +65,8 @@ class ArchiveFragment : Fragment() {
                 if (viewModel.isSelectionMode.value) {
                     viewModel.toggleItemSelection(item)
                 } else {
-                    // TODO: Open file viewer or share
-                    Snackbar.make(binding.root, "Open: ${item.displayName}", Snackbar.LENGTH_SHORT).show()
+                    // Open media preview
+                    openMediaPreview(item)
                 }
             },
             onItemLongClick = { item ->
@@ -122,6 +124,19 @@ class ArchiveFragment : Fragment() {
         }
     }
 
+    private fun observeNavigationResult() {
+        // Listen for changes from PreviewFragment
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>("files_changed")
+            ?.observe(viewLifecycleOwner) { filesChanged ->
+                if (filesChanged == true) {
+                    // Refresh the list when files are deleted from preview
+                    viewModel.loadRestoredFiles()
+                    // Clear the result
+                    findNavController().currentBackStackEntry?.savedStateHandle?.remove<Boolean>("files_changed")
+                }
+            }
+    }
+
     private fun updateUiState(state: ArchiveUiState) {
         when (state) {
             is ArchiveUiState.Loading -> {
@@ -176,6 +191,23 @@ class ArchiveFragment : Fragment() {
             binding.toolbar.title = "$selectedCount selected"
         } else {
             binding.toolbar.title = "Restored Files"
+        }
+    }
+
+    private fun openMediaPreview(mediaEntry: MediaEntry) {
+        // Get the current visible items from the adapter
+        val visibleItems = mediaAdapter.currentList.toTypedArray()
+        val startIndex = visibleItems.indexOf(mediaEntry)
+
+        if (startIndex >= 0) {
+            val action = ArchiveFragmentDirections.actionArchiveToPreview(
+                visibleItems = visibleItems,
+                startIndex = startIndex,
+                fromArchive = true
+            )
+            findNavController().navigate(action)
+        } else {
+            Snackbar.make(binding.root, "Unable to open preview", Snackbar.LENGTH_SHORT).show()
         }
     }
 
