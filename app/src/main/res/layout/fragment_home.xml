@@ -17,7 +17,6 @@
             android:padding="16dp"
             android:paddingBottom="80dp">
 
-            <!-- HEADER: logo text + ADS + help -->
             <LinearLayout
                 android:id="@+id/header"
                 android:layout_width="0dp"
@@ -35,8 +34,12 @@
                     android:layout_weight="1"
                     android:text="@string/home_brand"
                     android:textStyle="bold"
-                    android:textSize="32sp"
-                    android:textColor="@color/home_text_primary" />
+                    android:textSize="30sp"
+                    android:textColor="#1565C0"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.01"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAds"
@@ -73,7 +76,6 @@
                     app:srcCompat="@drawable/settings" />
             </LinearLayout>
 
-            <!-- BANNER: Deep Scan -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardDeepScan"
                 android:layout_width="0dp"
@@ -91,7 +93,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal">
 
                     <TextView
                         android:id="@+id/tvDeepTitle"
@@ -108,9 +111,9 @@
                         android:layout_marginTop="6dp"
                         android:text="@string/home_deep_scan_desc"
                         android:textSize="12sp"
-                        android:textColor="@color/home_text_secondary" />
+                        android:textColor="@color/home_text_secondary"
+                        android:gravity="center_horizontal"/>
 
-                    <!-- Deep Scan Button -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnDeepScan"
                         android:layout_width="match_parent"
@@ -122,125 +125,143 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- BANNER: Archive -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardArchive"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:layout_constraintTop_toBottomOf="@id/cardDeepScan"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="@color/home_banner_bg"
-                app:strokeColor="@color/home_banner_border"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/home_archive_title"
-                        android:textStyle="bold"
-                        android:textSize="20sp"
-                        android:textColor="@color/home_accent_blue" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="@string/home_archive_desc"
-                        android:textSize="12sp"
-                        android:textColor="@color/home_text_secondary" />
-
-                    <!-- Archive Button -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnArchive"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="@string/home_archive_btn"
-                        android:textAllCaps="false"
-                        style="@style/Widget.Material3.Button.TonalButton" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- 2 Ô lớn: Ảnh / Video -->
             <LinearLayout
                 android:id="@+id/rowBigTiles"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:orientation="horizontal"
-                app:layout_constraintTop_toBottomOf="@+id/cardArchive"
+                app:layout_constraintTop_toBottomOf="@id/cardDeepScan"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/tilePhoto"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="140dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardBackgroundColor="@color/tile_orange">
-                    <LinearLayout
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="1dp"
+                    app:cardUseCompatPadding="false"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:strokeWidth="0dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:foreground="?attr/selectableItemBackgroundBorderless">
+
+
+                    <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical">
-                        <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            app:srcCompat="@android:drawable/ic_menu_gallery"
-                            android:contentDescription="@string/home_photo_btn"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="@string/home_photo_btn"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/white"/>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                        android:background="@android:color/transparent">
 
+
+                        <ImageView
+                            android:id="@+id/bgFolderIcon"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="8dp"
+                            android:src="@drawable/ic_folder_image2"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="@string/home_photo_btn" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:layout_gravity="center">
+
+                            <TextView
+                                android:id="@+id/tvScanPhoto"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/home_photo_btn"
+                                android:textColor="@android:color/white"
+                                android:textStyle="bold"
+                                android:textSize="16sp"
+                                android:gravity="center"
+                                android:shadowColor="#80000000"
+                                android:shadowDx="0"
+                                android:shadowDy="2"
+                                android:shadowRadius="3" />
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginTop="4dp"
+                                android:src="@android:drawable/ic_menu_gallery"
+                                android:contentDescription="Gallery icon"
+                                app:tint="@android:color/white" />
+                        </LinearLayout>
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/tileVideo"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="140dp"
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardBackgroundColor="@color/tile_yellow">
-                    <LinearLayout
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="1dp"
+                    app:cardUseCompatPadding="false"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:strokeWidth="0dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:foreground="?attr/selectableItemBackgroundBorderless">
+                <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                        android:background="@android:color/transparent">
+
                         <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            app:srcCompat="@android:drawable/ic_menu_slideshow"
-                            android:contentDescription="@string/home_video_btn"/>
-                        <TextView
-                            android:layout_width="wrap_content"
+                            android:id="@+id/bgFolderIconVideo"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="8dp"
+                            android:src="@drawable/ic_folder_image2"
+                            android:tintMode="src_in"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="@string/home_video_btn"
+                            app:tint="#7D73FF" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="@string/home_video_btn"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/white"/>
-                    </LinearLayout>
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:layout_gravity="center">
+
+                            <TextView
+                                android:id="@+id/tvScanVideo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/home_video_btn"
+                                android:textColor="@android:color/white"
+                                android:textStyle="bold"
+                                android:textSize="16sp"
+                                android:gravity="center"
+                                android:shadowColor="#80000000"
+                                android:shadowDx="0"
+                                android:shadowDy="2"
+                                android:shadowRadius="3" />
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginTop="4dp"
+                                android:src="@android:drawable/ic_menu_slideshow"
+                                android:contentDescription="Video icon"
+                                app:tint="@android:color/white" />
+                        </LinearLayout>
+                    </FrameLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <!-- NEW: Audio Scan and Other Scan buttons below image/video -->
             <LinearLayout
-                android:id="@+id/rowAudioOtherTiles"
+                android:id="@+id/rowSmallTiles"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -252,57 +273,85 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/tileAudio"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="64dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardBackgroundColor="@color/tile_blue">
-                    <LinearLayout
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:strokeWidth="0dp"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                        android:layout_height="match_parent">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_gradient_orange" />
+
                         <ImageView
                             android:layout_width="28dp"
                             android:layout_height="28dp"
-                            app:srcCompat="@android:drawable/ic_btn_speak_now"
-                            android:contentDescription="@string/home_audio_btn"/>
+                            android:layout_gravity="center_vertical|start"
+                            android:layout_marginStart="16dp"
+                            android:src="@android:drawable/ic_btn_speak_now"
+                            android:contentDescription="@string/home_audio_btn"
+                            app:tint="@android:color/white" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="52dp"
                             android:text="@string/home_audio_btn"
                             android:textStyle="bold"
-                            android:textColor="@android:color/white"/>
-                    </LinearLayout>
+                            android:textSize="16sp"
+                            android:textColor="@android:color/white" />
+                    </FrameLayout>
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/tileOther"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="64dp"
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardBackgroundColor="@color/tile_green">
-                    <LinearLayout
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:strokeWidth="0dp"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                        android:layout_height="match_parent">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_gradient_cyan" />
+
                         <ImageView
                             android:layout_width="28dp"
                             android:layout_height="28dp"
-                            app:srcCompat="@android:drawable/ic_menu_agenda"
-                            android:contentDescription="@string/home_other_btn"/>
+                            android:layout_gravity="center_vertical|start"
+                            android:layout_marginStart="16dp"
+                            android:src="@android:drawable/ic_menu_agenda"
+                            android:contentDescription="@string/home_other_btn"
+                            app:tint="@android:color/white" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="52dp"
                             android:text="@string/home_other_btn"
                             android:textStyle="bold"
-                            android:textColor="@android:color/white"/>
-                    </LinearLayout>
+                            android:textSize="16sp"
+                            android:textColor="@android:color/white" />
+                    </FrameLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
@@ -313,9 +362,66 @@
                 android:layout_height="72dp"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_ads_placeholder"
-                app:layout_constraintTop_toBottomOf="@+id/rowAudioOtherTiles"
+                app:layout_constraintTop_toBottomOf="@+id/rowSmallTiles"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardArchive"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/adsBanner"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:strokeWidth="0dp"
+                android:foreground="?attr/selectableItemBackground">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#EBF5FF">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center_vertical|start"
+                        android:layout_marginStart="16dp"
+                        android:src="@drawable/ic_folder_image2"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="@string/home_archive_title" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="70dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/btnArchive"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/home_archive_title"
+                            android:textStyle="bold"
+                            android:textSize="20sp"
+                            android:textColor="#1976D2" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/home_archive_desc"
+                            android:textSize="12sp"
+                            android:textColor="#616161"
+                            android:maxLines="2"
+                            android:ellipsize="end" />
+                    </LinearLayout>
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
