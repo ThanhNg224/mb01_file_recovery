@@ -356,6 +356,20 @@ class PreviewFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        // Restore normal window insets behavior when leaving preview
+        val window = requireActivity().window
+        val decorView = window.decorView
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        val insetsController = WindowCompat.getInsetsController(window, decorView)
+
+        // Show system bars again
+        insetsController.show(WindowInsetsCompat.Type.systemBars())
+
+        // Restore normal behavior
+        insetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+
         currentVideoFragment = null
         _binding = null
     }

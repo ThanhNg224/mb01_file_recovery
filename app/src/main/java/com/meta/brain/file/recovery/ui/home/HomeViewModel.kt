@@ -41,6 +41,12 @@ class HomeViewModel @Inject constructor(
     private val mediaBuffer = mutableListOf<MediaEntry>()
     private var isLoading = false
 
+    // Persist scan parameters for pagination
+    private var lastTypes: Set<MediaType> = setOf(MediaType.ALL)
+    private var lastMinSize: Long? = null
+    private var lastFromSec: Long? = null
+    private var lastToSec: Long? = null
+
     /**
      * Start deep scan with comprehensive file system scanning
      * Includes hidden files, archive files, trash, and unindexed files
@@ -52,6 +58,12 @@ class HomeViewModel @Inject constructor(
         toSec: Long? = null
     ) {
         if (isLoading) return
+
+        // Store parameters for pagination
+        lastTypes = types
+        lastMinSize = minSize
+        lastFromSec = fromSec
+        lastToSec = toSec
 
         viewModelScope.launch {
             try {
@@ -108,7 +120,10 @@ class HomeViewModel @Inject constructor(
                 _uiState.value = currentState.copy(appending = true)
 
                 val result = mediaRepository.deepScan(
-                    types = setOf(MediaType.ALL),
+                    types = lastTypes,
+                    minSize = lastMinSize,
+                    fromSec = lastFromSec,
+                    toSec = lastToSec,
                     pageSize = PAGE_SIZE,
                     cursor = currentCursor
                 )

@@ -1016,10 +1016,10 @@ class MediaRepository @Inject constructor(
 
             // Apply type filter
             when {
-                types.contains(MediaType.IMAGES) && mediaKind != com.meta.brain.file.recovery.data.model.MediaKind.IMAGE -> return null
-                types.contains(MediaType.VIDEOS) && mediaKind != com.meta.brain.file.recovery.data.model.MediaKind.VIDEO -> return null
-                types.contains(MediaType.AUDIO) && mediaKind != com.meta.brain.file.recovery.data.model.MediaKind.AUDIO -> return null
-                types.contains(MediaType.DOCUMENTS) && mediaKind != com.meta.brain.file.recovery.data.model.MediaKind.DOCUMENT -> return null
+                types.contains(MediaType.IMAGES) && mediaKind != MediaKind.IMAGE -> return null
+                types.contains(MediaType.VIDEOS) && mediaKind != MediaKind.VIDEO -> return null
+                types.contains(MediaType.AUDIO) && mediaKind != MediaKind.AUDIO -> return null
+                types.contains(MediaType.DOCUMENTS) && mediaKind != MediaKind.DOCUMENT -> return null
                 !types.contains(MediaType.ALL) && !types.contains(MediaType.IMAGES) && !types.contains(MediaType.VIDEOS) && !types.contains(MediaType.AUDIO) && !types.contains(MediaType.DOCUMENTS) -> return null
             }
 
@@ -1037,7 +1037,7 @@ class MediaRepository @Inject constructor(
                 dateAdded = fileTime,
                 dateTaken = fileTime,
                 durationMs = null,
-                isVideo = mediaKind == com.meta.brain.file.recovery.data.model.MediaKind.VIDEO,
+                isVideo = mediaKind == MediaKind.VIDEO,
                 isTrashed = isInTrash,
                 mediaKind = mediaKind
             )
@@ -1084,10 +1084,10 @@ class MediaRepository @Inject constructor(
 
             // Apply type filter
             when {
-                types.contains(MediaType.IMAGES) && mediaKind != com.meta.brain.file.recovery.data.model.MediaKind.IMAGE -> return null
-                types.contains(MediaType.VIDEOS) && mediaKind != com.meta.brain.file.recovery.data.model.MediaKind.VIDEO -> return null
-                types.contains(MediaType.AUDIO) && mediaKind != com.meta.brain.file.recovery.data.model.MediaKind.AUDIO -> return null
-                types.contains(MediaType.DOCUMENTS) && mediaKind != com.meta.brain.file.recovery.data.model.MediaKind.DOCUMENT -> return null
+                types.contains(MediaType.IMAGES) && mediaKind != MediaKind.IMAGE -> return null
+                types.contains(MediaType.VIDEOS) && mediaKind != MediaKind.VIDEO -> return null
+                types.contains(MediaType.AUDIO) && mediaKind != MediaKind.AUDIO -> return null
+                types.contains(MediaType.DOCUMENTS) && mediaKind != MediaKind.DOCUMENT -> return null
                 !types.contains(MediaType.ALL) && !types.contains(MediaType.IMAGES) && !types.contains(MediaType.VIDEOS) && !types.contains(MediaType.AUDIO) && !types.contains(MediaType.DOCUMENTS) -> return null
             }
 
@@ -1099,7 +1099,7 @@ class MediaRepository @Inject constructor(
                 dateAdded = dateAdded,
                 dateTaken = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_MODIFIED)),
                 durationMs = null,
-                isVideo = mediaKind == com.meta.brain.file.recovery.data.model.MediaKind.VIDEO,
+                isVideo = mediaKind == MediaKind.VIDEO,
                 mediaKind = mediaKind
             )
         } catch (_: Exception) {
@@ -1170,14 +1170,14 @@ class MediaRepository @Inject constructor(
         }
     }
 
-    private fun determineMediaKind(mimeType: String?): com.meta.brain.file.recovery.data.model.MediaKind {
+    private fun determineMediaKind(mimeType: String?): MediaKind {
         return when {
-            mimeType == null -> com.meta.brain.file.recovery.data.model.MediaKind.OTHER
-            mimeType.startsWith("image/") -> com.meta.brain.file.recovery.data.model.MediaKind.IMAGE
-            mimeType.startsWith("video/") -> com.meta.brain.file.recovery.data.model.MediaKind.VIDEO
-            mimeType.startsWith("audio/") -> com.meta.brain.file.recovery.data.model.MediaKind.AUDIO
-            mimeType.startsWith("application/") -> com.meta.brain.file.recovery.data.model.MediaKind.DOCUMENT
-            else -> com.meta.brain.file.recovery.data.model.MediaKind.OTHER
+            mimeType == null -> MediaKind.OTHER
+            mimeType.startsWith("image/") -> MediaKind.IMAGE
+            mimeType.startsWith("video/") -> MediaKind.VIDEO
+            mimeType.startsWith("audio/") -> MediaKind.AUDIO
+            mimeType.startsWith("application/") -> MediaKind.DOCUMENT
+            else -> MediaKind.OTHER
         }
     }
 

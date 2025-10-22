@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import com.meta.brain.file.recovery.data.model.MediaEntry
-import com.meta.brain.file.recovery.data.model.MediaKind
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -240,17 +239,4 @@ class ArchiveRepository @Inject constructor(
         return mediaList
     }
 
-    /**
-     * Get count of restored files
-     */
-    suspend fun getRestoredFilesCount(): Int = withContext(Dispatchers.IO) {
-        loadRestoredFiles().size
-    }
-
-    /**
-     * Filter restored files by MediaKind
-     */
-    suspend fun filterByKind(kind: MediaKind): List<MediaEntry> = withContext(Dispatchers.IO) {
-        loadRestoredFiles().filter { it.mediaKind == kind }
-    }
 }

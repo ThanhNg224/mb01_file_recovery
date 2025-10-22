@@ -30,15 +30,6 @@ data class RestoreProgress(
 )
 
 /**
- * Result of a restore operation
- */
-data class RestoreResult(
-    val successCount: Int,
-    val failCount: Int,
-    val destinationPath: String
-)
-
-/**
  * Repository for restoring media files to public storage
  */
 @Singleton
