@@ -45,14 +45,56 @@
                 app:layout_constraintBottom_toTopOf="@+id/adBannerContainer"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <!-- Ripple Animation using ImageView -->
-                <ImageView
-                    android:id="@+id/animationView"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/animation_scanning"
-                    android:contentDescription="@string/scanning" />
+                <!-- Animation Container -->
+                <FrameLayout
+                    android:layout_width="320dp"
+                    android:layout_height="320dp"
+                    android:layout_gravity="center">
+
+                    <!-- Lottie Ripple Animation with Gallery Icon -->
+                    <FrameLayout
+                        android:id="@+id/scanningAnimationContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center">
+
+                        <!-- Lottie Ripple Animation  -->
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/scanAnimationView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:contentDescription="@string/scanning_animation"
+                            app:lottie_rawRes="@raw/scan_in_progress"
+                            app:lottie_autoPlay="false"
+                            app:lottie_loop="true"
+                            app:lottie_speed="1.0"
+                            app:lottie_renderMode="hardware" />
+
+                        <!-- Gallery Icon in Center -->
+                        <ImageView
+                            android:id="@+id/ivGalleryIcon"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_gravity="center"
+                            android:src="@android:drawable/ic_menu_gallery"
+                            android:contentDescription="@string/scanning"
+                            app:tint="?attr/colorPrimary" />
+
+                    </FrameLayout>
+
+                    <!-- Done Icon (shown at 100%) -->
+                    <ImageView
+                        android:id="@+id/ivDoneIcon"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/done"
+                        android:contentDescription="@string/completed"
+                        android:visibility="gone"
+                        android:alpha="0" />
+
+                </FrameLayout>
 
                 <!-- Percentage Text -->
                 <TextView
@@ -128,13 +170,13 @@
                 app:layout_constraintBottom_toTopOf="@+id/adBannerContainer"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <!-- Checkmark Icon -->
+                <!-- Done Icon -->
                 <ImageView
                     android:id="@+id/completedAnimationView"
                     android:layout_width="150dp"
                     android:layout_height="150dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_checkmark"
+                    android:src="@drawable/done"
                     android:contentDescription="@string/completed" />
 
                 <!-- 100% Text -->

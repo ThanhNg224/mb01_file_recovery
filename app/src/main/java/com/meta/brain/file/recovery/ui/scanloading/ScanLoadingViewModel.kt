@@ -160,8 +160,8 @@ class ScanLoadingViewModel @Inject constructor(
             hint = "Finalizing..."
         )
 
-        // Brief pause at 100%
-        delay(200)
+        // Pause at 100% to show the done icon (1.5 seconds)
+        delay(1500)
 
         // Emit completed state
         _uiState.value = ScanLoadingState.Completed(resultCount)

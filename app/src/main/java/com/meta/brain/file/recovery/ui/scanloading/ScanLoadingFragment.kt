@@ -1,7 +1,8 @@
 package com.meta.brain.file.recovery.ui.scanloading
 
-import android.graphics.drawable.AnimatedVectorDrawable
-import android.graphics.drawable.AnimationDrawable
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.model.KeyPath
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.meta.brain.file.recovery.R
 import com.meta.brain.file.recovery.databinding.FragmentScanLoadingBinding
@@ -45,11 +48,41 @@ class ScanLoadingFragment : Fragment() {
         setupBackPressHandler()
         observeViewModel()
         setupClickListeners()
+        setupAnimationColorFilter()
 
         // Start scan if not already started
         if (savedInstanceState == null) {
             viewModel.startScan(args.scanConfig)
         }
+    }
+
+    /**
+     * Setup color filter for Lottie animation to make ripples more vivid
+     */
+    private fun setupAnimationColorFilter() {
+        binding.scanAnimationView.addValueCallback(
+            KeyPath("**"),
+            LottieProperty.COLOR_FILTER
+        ) {
+            PorterDuffColorFilter(
+                Color.parseColor("#0099FF"),
+                PorterDuff.Mode.SRC_ATOP
+            )
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Resume animation if scanning is active
+        if (isScanning && binding.scanningContainer.visibility == View.VISIBLE) {
+            binding.scanAnimationView.resumeAnimation()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Pause animation to save resources
+        binding.scanAnimationView.pauseAnimation()
     }
 
     private fun setupToolbar() {
@@ -100,8 +133,24 @@ class ScanLoadingFragment : Fragment() {
 
         binding.btnRetry.setOnClickListener {
             isScanning = true
+            resetScanningUI()
             viewModel.retry(args.scanConfig)
         }
+    }
+
+    /**
+     * Reset the scanning UI to initial state
+     */
+    private fun resetScanningUI() {
+        // Reset animation container visibility and alpha
+        binding.scanningAnimationContainer.visibility = View.VISIBLE
+        binding.scanningAnimationContainer.alpha = 1f
+
+        // Hide done icon
+        binding.ivDoneIcon.visibility = View.GONE
+        binding.ivDoneIcon.alpha = 0f
+        binding.ivDoneIcon.scaleX = 1f
+        binding.ivDoneIcon.scaleY = 1f
     }
 
     private fun updateUI(state: ScanLoadingState) {
@@ -131,21 +180,79 @@ class ScanLoadingFragment : Fragment() {
         binding.tvHint.text = state.hint ?: ""
         binding.tvHint.visibility = if (state.hint != null) View.VISIBLE else View.GONE
 
-        // Start the rotation animation
-        startScanningAnimation()
+        // Check if we've reached 100%
+        if (state.percent >= 100) {
+            // Transition to done icon
+            transitionToDoneIcon()
+        } else {
+            // Ensure animation is playing and done icon is hidden
+            bindLoadingState(LoadingAnimationState.SCANNING)
+            binding.ivDoneIcon.visibility = View.GONE
+            binding.scanningAnimationContainer.visibility = View.VISIBLE
+        }
     }
 
-    private fun startScanningAnimation() {
-        // Start the animated drawable rotation
-        binding.animationView.drawable?.let { drawable ->
-            when (drawable) {
-                is AnimationDrawable -> drawable.start()
-                is AnimatedVectorDrawable -> drawable.start()
+    /**
+     * Smoothly transition from scanning animation to done icon
+     */
+    private fun transitionToDoneIcon() {
+        // Fade out the scanning animation container
+        binding.scanningAnimationContainer.animate()
+            .alpha(0f)
+            .setDuration(300)
+            .withEndAction {
+                binding.scanningAnimationContainer.visibility = View.GONE
+                binding.scanAnimationView.cancelAnimation()
+
+                // Fade in the done icon
+                binding.ivDoneIcon.visibility = View.VISIBLE
+                binding.ivDoneIcon.alpha = 0f
+                binding.ivDoneIcon.scaleX = 0.5f
+                binding.ivDoneIcon.scaleY = 0.5f
+
+                binding.ivDoneIcon.animate()
+                    .alpha(1f)
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(400)
+                    .start()
+            }
+            .start()
+    }
+
+    /**
+     * Manage Lottie animation state
+     */
+    private fun bindLoadingState(state: LoadingAnimationState) {
+        when (state) {
+            LoadingAnimationState.SCANNING -> {
+                if (!binding.scanAnimationView.isAnimating) {
+                    binding.scanAnimationView.playAnimation()
+                }
+            }
+            LoadingAnimationState.COMPLETE -> {
+                binding.scanAnimationView.cancelAnimation()
+                binding.scanAnimationView.progress = 1f // Freeze on last frame
+            }
+            LoadingAnimationState.STOPPED -> {
+                binding.scanAnimationView.cancelAnimation()
             }
         }
     }
 
+    /**
+     * Animation states for the Lottie animation
+     */
+    private enum class LoadingAnimationState {
+        SCANNING,
+        COMPLETE,
+        STOPPED
+    }
+
     private fun handleScanCompleted(foundCount: Int) {
+        // Stop the animation gracefully
+        bindLoadingState(LoadingAnimationState.COMPLETE)
+
         if (foundCount > 0) {
             // Navigate to results screen
             try {
@@ -165,6 +272,9 @@ class ScanLoadingFragment : Fragment() {
         binding.emptyResultContainer.visibility = View.VISIBLE
         binding.errorContainer.visibility = View.GONE
 
+        // Stop the animation
+        bindLoadingState(LoadingAnimationState.STOPPED)
+
         val targetName = args.scanConfig.getTargetDisplayName()
         binding.tvEmptyMessage.text = "Completed! No $targetName found on your device!"
         binding.toolbar.title = "Scan Complete"
@@ -175,12 +285,17 @@ class ScanLoadingFragment : Fragment() {
         binding.emptyResultContainer.visibility = View.GONE
         binding.errorContainer.visibility = View.VISIBLE
 
+        // Stop the animation
+        bindLoadingState(LoadingAnimationState.STOPPED)
+
         binding.tvErrorMessage.text = message
         binding.toolbar.title = "Scan Failed"
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // Cancel animation and release resources
+        binding.scanAnimationView.cancelAnimation()
         _binding = null
     }
 }

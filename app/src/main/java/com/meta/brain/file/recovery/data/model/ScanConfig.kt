@@ -26,13 +26,25 @@ enum class ScanDepth {
 }
 
 /**
+ * Media scan kind - determines which media types to scan
+ */
+enum class MediaScanKind {
+    IMAGE,   // Only scan image files
+    VIDEO,   // Only scan video files
+    AUDIO,   // Only scan audio files
+    OTHER,   // Only scan document and other files
+    ALL      // Scan all media types (Deep Scan)
+}
+
+/**
  * Configuration for scan operation
  */
 @Parcelize
 data class ScanConfig(
     val target: ScanTarget = ScanTarget.PHOTOS,
     val depth: ScanDepth = ScanDepth.DEEP,
-    val minDurationMs: Long = 4000L,
+    val mediaKind: MediaScanKind = MediaScanKind.ALL, // New field for specific media type filtering
+    val minDurationMs: Long = 1500L,
     val minSize: Long? = null,
     val fromSec: Long? = null,
     val toSec: Long? = null
@@ -42,12 +54,19 @@ data class ScanConfig(
      * Convert ScanTarget to MediaType set
      */
     fun toMediaTypes(): Set<MediaType> {
-        return when (target) {
-            ScanTarget.PHOTOS -> setOf(MediaType.IMAGES)
-            ScanTarget.VIDEOS -> setOf(MediaType.VIDEOS)
-            ScanTarget.AUDIO -> setOf(MediaType.AUDIO)
-            ScanTarget.DOCUMENTS -> setOf(MediaType.DOCUMENTS)
-            ScanTarget.ALL -> setOf(MediaType.ALL)
+        // Use mediaKind if specified, otherwise fall back to target
+        return when (mediaKind) {
+            MediaScanKind.IMAGE -> setOf(MediaType.IMAGES)
+            MediaScanKind.VIDEO -> setOf(MediaType.VIDEOS)
+            MediaScanKind.AUDIO -> setOf(MediaType.AUDIO)
+            MediaScanKind.OTHER -> setOf(MediaType.DOCUMENTS)
+            MediaScanKind.ALL -> when (target) {
+                ScanTarget.PHOTOS -> setOf(MediaType.IMAGES)
+                ScanTarget.VIDEOS -> setOf(MediaType.VIDEOS)
+                ScanTarget.AUDIO -> setOf(MediaType.AUDIO)
+                ScanTarget.DOCUMENTS -> setOf(MediaType.DOCUMENTS)
+                ScanTarget.ALL -> setOf(MediaType.ALL)
+            }
         }
     }
 

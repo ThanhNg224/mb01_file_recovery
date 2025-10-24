@@ -16,6 +16,7 @@ import com.meta.brain.file.recovery.R
 import com.meta.brain.file.recovery.data.model.ScanConfig
 import com.meta.brain.file.recovery.data.model.ScanDepth
 import com.meta.brain.file.recovery.data.model.ScanTarget
+import com.meta.brain.file.recovery.data.model.MediaScanKind
 import com.meta.brain.file.recovery.data.repository.MediaRepository
 import com.meta.brain.file.recovery.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -71,10 +72,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupDeepScan() {
-        // Setup Deep Scan button
+        // Setup Deep Scan button - scans all media types
         binding.btnDeepScan.setOnClickListener {
             if (hasPermissions) {
-                navigateToScanLoading(ScanDepth.DEEP)
+                navigateToScanLoading(ScanDepth.DEEP, MediaScanKind.ALL)
             } else {
                 requestPermissions()
             }
@@ -86,7 +87,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun navigateToScanLoading(depth: ScanDepth) {
+    private fun navigateToScanLoading(depth: ScanDepth, mediaKind: MediaScanKind = MediaScanKind.ALL) {
         val selectedTarget = ScanTarget.ALL
 
         // Check for MANAGE_EXTERNAL_STORAGE permission if scanning documents on Android 11+
@@ -100,6 +101,7 @@ class HomeFragment : Fragment() {
         val scanConfig = ScanConfig(
             target = selectedTarget,
             depth = depth,
+            mediaKind = mediaKind,
             minDurationMs = minDurationMs,
             fromSec = null,
             toSec = null
@@ -116,10 +118,35 @@ class HomeFragment : Fragment() {
 
     private fun setupExistingViews() {
         // Set up click handlers for the four main scan tiles
-        binding.tilePhoto.setOnClickListener { navigateToScanLoading(ScanDepth.NORMAL) }
-        binding.tileVideo.setOnClickListener { navigateToScanLoading(ScanDepth.VIDEO) }
-        binding.tileAudio.setOnClickListener { navigateToScanLoading(ScanDepth.AUDIO) }
-        binding.tileOther.setOnClickListener { navigateToScanLoading(ScanDepth.OTHER) }
+        // Each tile now scans only its specific media type
+        binding.tilePhoto.setOnClickListener {
+            if (hasPermissions) {
+                navigateToScanLoading(ScanDepth.NORMAL, MediaScanKind.IMAGE)
+            } else {
+                requestPermissions()
+            }
+        }
+        binding.tileVideo.setOnClickListener {
+            if (hasPermissions) {
+                navigateToScanLoading(ScanDepth.VIDEO, MediaScanKind.VIDEO)
+            } else {
+                requestPermissions()
+            }
+        }
+        binding.tileAudio.setOnClickListener {
+            if (hasPermissions) {
+                navigateToScanLoading(ScanDepth.AUDIO, MediaScanKind.AUDIO)
+            } else {
+                requestPermissions()
+            }
+        }
+        binding.tileOther.setOnClickListener {
+            if (hasPermissions) {
+                navigateToScanLoading(ScanDepth.OTHER, MediaScanKind.OTHER)
+            } else {
+                requestPermissions()
+            }
+        }
 
         // Ads button and banner
         binding.btnAds.setOnClickListener { toast(getString(R.string.home_ads)) }
@@ -231,3 +258,4 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 }
+
