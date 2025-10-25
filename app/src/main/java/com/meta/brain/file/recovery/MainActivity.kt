@@ -7,11 +7,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import com.meta.brain.module.loading.LoadingActivity
 import com.meta.brain.file.recovery.data.repository.MetricsRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -72,13 +74,15 @@ class MainActivity : AppCompatActivity() {
 
         // Set dynamic start destination based on onboarding status
         if (savedInstanceState == null) {
-            // Synchronously get onboarding status before setting the graph
-            val onboardingDone = kotlinx.coroutines.runBlocking { metricsRepository.onboardingDone.first() }
-            val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
-            navGraph.setStartDestination(
-                if (onboardingDone) R.id.homeFragment else R.id.introFragment
-            )
-            navController.graph = navGraph
+            // Asynchronously get onboarding status without blocking the main thread
+            lifecycleScope.launch {
+                val onboardingDone = metricsRepository.onboardingDone.first()
+                val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
+                navGraph.setStartDestination(
+                    if (onboardingDone) R.id.homeFragment else R.id.introFragment
+                )
+                navController.graph = navGraph
+            }
         }
     }
 }

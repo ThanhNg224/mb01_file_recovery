@@ -68,6 +68,13 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_home_to_instruction"
+            app:destination="@id/instructionFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
     <!-- Scan Loading Fragment -->
@@ -166,5 +173,12 @@
         android:name="com.meta.brain.file.recovery.ui.settings.SettingsFragment"
         android:label="Settings"
         tools:layout="@layout/fragment_settings" />
+
+    <!-- Instruction Fragment -->
+    <fragment
+        android:id="@+id/instructionFragment"
+        android:name="com.meta.brain.file.recovery.ui.instruction.RecoveryInstructionFragment"
+        android:label="Recovery Instructions"
+        tools:layout="@layout/fragment_recovery_instruction" />
 
 </navigation>

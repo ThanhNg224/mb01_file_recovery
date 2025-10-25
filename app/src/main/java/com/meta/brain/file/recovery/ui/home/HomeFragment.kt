@@ -61,9 +61,9 @@ class HomeFragment : Fragment() {
         setupExistingViews()
         checkPermissions()
 
-        // Help button shows help
+        // Help button navigates to recovery instructions
         binding.btnHelp.setOnClickListener {
-            android.widget.Toast.makeText(requireContext(), "Help coming soon!", android.widget.Toast.LENGTH_SHORT).show()
+            findNavController().navigate(R.id.action_home_to_instruction)
         }
         // Setting button navigates to settings
         binding.btnSetting.setOnClickListener {

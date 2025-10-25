@@ -99,4 +99,38 @@
     <string name="home_video_btn">Recover Videos</string>
     <string name="home_audio_btn">Audio Scan</string>
     <string name="home_other_btn">Other Scan</string>
+
+    <!-- Settings strings -->
+    <string name="setting_title">Setting</string>
+    <string name="setting_app_section">App</string>
+    <string name="setting_others_section">Others</string>
+    <string name="setting_theme">Theme</string>
+    <string name="setting_theme_auto">Auto mode</string>
+    <string name="setting_theme_light">Light mode</string>
+    <string name="setting_theme_dark">Dark mode</string>
+    <string name="setting_reminder">Reminder</string>
+    <string name="setting_language">Language</string>
+    <string name="setting_language_english">English</string>
+    <string name="setting_date_format">Date format</string>
+    <string name="setting_feedback">Feedback</string>
+    <string name="setting_rate_us">Rate Us</string>
+    <string name="setting_privacy_policy">Privacy Policy</string>
+    <string name="setting_version">Version %1$s</string>
+
+    <!-- Recovery Instruction strings -->
+    <string name="instruction_title">How to Recover Files</string>
+    <string name="instruction_subtitle">Follow these simple steps to recover your deleted files</string>
+    <string name="instruction_steps_header">Recovery Steps</string>
+    <string name="instruction_step1_title">Step 1: Scan</string>
+    <string name="instruction_step1_desc">Start scanning your device to find deleted files</string>
+    <string name="instruction_step2_title">Step 2: Select</string>
+    <string name="instruction_step2_desc">Choose the files you want to recover from the scan results</string>
+    <string name="instruction_step3_title">Step 3: Recover</string>
+    <string name="instruction_step3_desc">Tap the recover button to restore your selected files</string>
+    <string name="instruction_step4_title">Step 4: Access</string>
+    <string name="instruction_step4_desc">Find your recovered files in the Archive section</string>
+    <string name="instruction_faq1_title">How long does scanning take?</string>
+    <string name="instruction_faq1_desc">Scanning time depends on your storage size. Please wait patiently and don\'t close the app.</string>
+    <string name="instruction_faq2_title">Can I recover all deleted files?</string>
+    <string name="instruction_faq2_desc">Recovery success depends on how long ago files were deleted and if they\'ve been overwritten.</string>
 </resources>
