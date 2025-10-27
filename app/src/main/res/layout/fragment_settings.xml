@@ -84,40 +84,49 @@
 
                         <TextView
                             android:id="@+id/tvTheme"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:layout_marginEnd="8dp"
                             android:text="@string/setting_theme"
                             android:textColor="@color/home_text_primary"
                             android:textSize="16sp"
                             app:layout_constraintStart_toEndOf="@id/ivThemeIcon"
-                            app:layout_constraintEnd_toStartOf="@id/tvThemeValue"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent" />
 
-                        <TextView
-                            android:id="@+id/tvThemeValue"
-                            android:layout_width="wrap_content"
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/themeInputLayout"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="@string/setting_theme_auto"
-                            android:textColor="@color/home_text_secondary"
-                            android:textSize="14sp"
-                            android:layout_marginEnd="4dp"
-                            app:layout_constraintEnd_toStartOf="@id/ivThemeArrow"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent" />
-
-                        <ImageView
-                            android:id="@+id/ivThemeArrow"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:contentDescription="@string/setting_theme"
-                            android:src="@drawable/ic_arrow_forward"
-                            app:tint="@color/home_text_secondary"
+                            android:layout_marginStart="8dp"
+                            android:hint="@string/setting_theme"
+                            app:boxCornerRadiusBottomEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusTopStart="8dp"
+                            app:boxStrokeWidth="1dp"
                             app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/tvTheme"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent" />
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintWidth_max="160dp">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/themeDropdown"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="none"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:paddingTop="12dp"
+                                android:paddingBottom="12dp"
+                                android:textSize="14sp"
+                                android:maxLines="2"
+                                android:ellipsize="end"
+                                android:textColor="@color/home_text_primary" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -205,8 +214,8 @@
 
                         <TextView
                             android:id="@+id/tvLanguage"
-                            android:layout_width="66dp"
-                            android:layout_height="19dp"
+                            android:layout_width="100dp"
+                            android:layout_height="25dp"
                             android:layout_marginStart="16dp"
                             android:text="@string/setting_language"
                             android:textColor="@color/home_text_primary"
@@ -221,6 +230,7 @@
                             android:layout_width="140dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
+                            android:hint="@string/setting_language"
                             app:boxCornerRadiusBottomEnd="8dp"
                             app:boxCornerRadiusBottomStart="8dp"
                             app:boxCornerRadiusTopEnd="8dp"
@@ -277,28 +287,49 @@
 
                         <TextView
                             android:id="@+id/tvDateFormat"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:layout_marginEnd="8dp"
                             android:text="@string/setting_date_format"
                             android:textColor="@color/home_text_primary"
                             android:textSize="16sp"
                             app:layout_constraintStart_toEndOf="@id/ivDateFormatIcon"
-                            app:layout_constraintEnd_toStartOf="@id/ivDateFormatArrow"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent" />
 
-                        <ImageView
-                            android:id="@+id/ivDateFormatArrow"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:contentDescription="@string/setting_date_format"
-                            android:src="@drawable/ic_arrow_forward"
-                            app:tint="@color/home_text_secondary"
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/dateFormatInputLayout"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:hint="@string/setting_date_format"
+                            app:boxCornerRadiusBottomEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusTopStart="8dp"
+                            app:boxStrokeWidth="1dp"
                             app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/tvDateFormat"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent" />
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintWidth_max="160dp">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/dateFormatDropdown"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="none"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:paddingTop="12dp"
+                                android:paddingBottom="12dp"
+                                android:textSize="14sp"
+                                android:maxLines="2"
+                                android:ellipsize="end"
+                                android:textColor="@color/home_text_primary" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -15,7 +15,7 @@ class App : MetaBrainApp() {
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
-        // Keep DataManager initialization for MetaBrain module compatibility
+        // Keep DataManager initialization for MetaBrain module
         DataManager.setStartActivity(MainActivity::class.java)
     }
 }
