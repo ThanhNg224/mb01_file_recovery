@@ -58,7 +58,6 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupDeepScan()
         setupExistingViews()
         checkPermissions()
 
@@ -69,22 +68,6 @@ class HomeFragment : Fragment() {
         // Setting button navigates to settings
         binding.btnSetting.setOnClickListener {
             findNavController().navigate(R.id.action_home_to_setting)
-        }
-    }
-
-    private fun setupDeepScan() {
-        // Setup Deep Scan button - scans all media types
-        binding.btnDeepScan.setOnClickListener {
-            if (hasPermissions) {
-                navigateToScanLoading(ScanDepth.DEEP, MediaScanKind.ALL)
-            } else {
-                requestPermissions()
-            }
-        }
-
-        // Setup Archive button
-        binding.btnArchive.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_archive)
         }
     }
 
@@ -147,6 +130,11 @@ class HomeFragment : Fragment() {
             } else {
                 requestPermissions()
             }
+        }
+
+        // Archive button
+        binding.btnArchive.setOnClickListener {
+            findNavController().navigate(R.id.action_home_to_archive)
         }
 
         // Ads button and banner
