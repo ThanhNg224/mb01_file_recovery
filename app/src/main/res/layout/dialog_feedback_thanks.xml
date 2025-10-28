@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog_rounded"
+    android:padding="32dp">
+
+    <!-- Star Icon with decorative stars -->
+    <ImageView
+        android:id="@+id/ivStar"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@string/feedback_star"
+        android:src="@drawable/star"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Thanks Text -->
+    <TextView
+        android:id="@+id/tvThanks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/feedback_thanks_title"
+        android:textColor="@color/home_accent_blue"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivStar" />
+
+    <!-- Subtitle -->
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="@string/feedback_thanks_subtitle"
+        android:textColor="@color/home_text_secondary"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvThanks" />
+
+    <!-- Rating Stars -->
+    <LinearLayout
+        android:id="@+id/llRatingStars"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
+
+        <ImageView
+            android:id="@+id/star1"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="4dp"
+            android:contentDescription="@string/feedback_star_rating"
+            android:src="@drawable/ic_star_outline" />
+
+        <ImageView
+            android:id="@+id/star2"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="4dp"
+            android:contentDescription="@string/feedback_star_rating"
+            android:src="@drawable/ic_star_outline" />
+
+        <ImageView
+            android:id="@+id/star3"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="4dp"
+            android:contentDescription="@string/feedback_star_rating"
+            android:src="@drawable/ic_star_outline" />
+
+        <ImageView
+            android:id="@+id/star4"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="4dp"
+            android:contentDescription="@string/feedback_star_rating"
+            android:src="@drawable/ic_star_outline" />
+
+        <ImageView
+            android:id="@+id/star5"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="4dp"
+            android:contentDescription="@string/feedback_star_rating"
+            android:src="@drawable/ic_star_outline" />
+
+    </LinearLayout>
+
+    <!-- Rate on Google Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnRateOnGoogle"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/feedback_rate_google"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        app:cornerRadius="12dp"
+        app:layout_constraintTop_toBottomOf="@id/llRatingStars" />
+
+    <!-- No Thanks Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnNoThanks"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="@string/feedback_no_thanks"
+        android:textAllCaps="false"
+        android:textColor="@color/home_text_secondary"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/btnRateOnGoogle" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

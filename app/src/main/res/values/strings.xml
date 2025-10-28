@@ -141,4 +141,26 @@
     <string name="instruction_faq2_title">What data is eligible for recovery?</string>
     <string name="instruction_faq2_desc">• The files have not been completely overwritten by other data.\n• The source file is not corrupted.\n• Some files that have been deleted for a long time may not be recoverable.</string>
 
+    <!-- Feedback strings -->
+    <string name="feedback_title">Feedback and Reviews</string>
+    <string name="feedback_star">Star icon</string>
+    <string name="feedback_question">What are you satisfied with?</string>
+    <string name="feedback_tag_good_scan">Good scan</string>
+    <string name="feedback_tag_good_quality">Good quality</string>
+    <string name="feedback_tag_bugs">Bugs</string>
+    <string name="feedback_tag_suggestions">Suggestions</string>
+    <string name="feedback_tag_quick_recovery">Quick recovery</string>
+    <string name="feedback_tag_easy_interface">Easy to use interface</string>
+    <string name="feedback_tag_others">Others</string>
+    <string name="feedback_input_label">We would appreciate if you could help us send detailed feedback (at least 8 characters)</string>
+    <string name="feedback_input_hint">Enter your feedback here…</string>
+    <string name="feedback_send_button">Send feedback</string>
+    <string name="feedback_thanks_title">Thanks!</string>
+    <string name="feedback_thanks_subtitle">We will work harder to make\nyou more satisfied.</string>
+    <string name="feedback_star_rating">Rating star</string>
+    <string name="feedback_rate_google">Rate on Google</string>
+    <string name="feedback_no_thanks">No, thanks!</string>
+    <string name="feedback_error_min_length">Please enter at least 8 characters</string>
+    <string name="feedback_error_select_tag">Please select at least one tag</string>
+
 </resources>

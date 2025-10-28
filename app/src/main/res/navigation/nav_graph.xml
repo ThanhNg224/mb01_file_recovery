@@ -172,7 +172,22 @@
         android:id="@+id/settingFragment"
         android:name="com.meta.brain.file.recovery.ui.settings.SettingsFragment"
         android:label="Settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_settings">
+        <action
+            android:id="@+id/action_setting_to_feedback"
+            app:destination="@id/feedbackFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <!-- Feedback Fragment -->
+    <fragment
+        android:id="@+id/feedbackFragment"
+        android:name="com.meta.brain.file.recovery.ui.feedback.FeedbackFragment"
+        android:label="Feedback"
+        tools:layout="@layout/fragment_feedback" />
 
     <!-- Instruction Fragment -->
     <fragment

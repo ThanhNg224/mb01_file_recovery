@@ -1,21 +1,32 @@
 package com.meta.brain.file.recovery.ui.settings
 
+import android.app.Dialog
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.meta.brain.file.recovery.R
 import com.meta.brain.file.recovery.data.model.DateFormat
 import com.meta.brain.file.recovery.data.model.Language
 import com.meta.brain.file.recovery.data.model.Theme
+import com.meta.brain.file.recovery.databinding.DialogFeedbackThanksBinding
 import com.meta.brain.file.recovery.databinding.FragmentSettingsBinding
 import com.meta.brain.module.data.DataManager
 import com.meta.brain.module.utils.Utility
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.core.content.edit
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.net.toUri
 
 @AndroidEntryPoint
 class SettingsFragment : Fragment() {
@@ -67,7 +78,7 @@ class SettingsFragment : Fragment() {
     private fun setupVersionText() {
         val versionName = try {
             requireContext().packageManager.getPackageInfo(requireContext().packageName, 0).versionName
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             "1.0"
         }
         binding.tvVersion.text = getString(R.string.setting_version, versionName)
@@ -75,7 +86,7 @@ class SettingsFragment : Fragment() {
 
     private fun setupLanguageDropdown() {
         // Get current language from DataManager
-        val currentLanguageCode = DataManager.user.language ?: "en"
+        val currentLanguageCode = DataManager.user.language
         val currentLanguage = Language.getLanguageByCode(currentLanguageCode)
 
         // Create adapter with language display names
@@ -216,7 +227,7 @@ class SettingsFragment : Fragment() {
     private fun onThemeSelected(theme: Theme) {
         // Save theme to SharedPreferences
         val prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(KEY_THEME, theme.id).apply()
+        prefs.edit { putString(KEY_THEME, theme.id) }
 
         // Apply theme change
         when (theme.id) {
@@ -229,22 +240,93 @@ class SettingsFragment : Fragment() {
     private fun onDateFormatSelected(dateFormat: DateFormat) {
         // Save date format to SharedPreferences
         val prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(KEY_DATE_FORMAT, dateFormat.id).apply()
+        prefs.edit { putString(KEY_DATE_FORMAT, dateFormat.id) }
 
         // Date format change doesn't require activity recreation
         // The change will be applied when dates are formatted in the app
     }
 
     private fun onFeedbackClicked() {
-        // TODO: Implement feedback functionality
+        findNavController().navigate(R.id.action_setting_to_feedback)
     }
 
     private fun onRateUsClicked() {
-        // TODO: Implement rate us functionality
+        showThankYouDialog()
     }
 
     private fun onPrivacyPolicyClicked() {
         // TODO: Implement privacy policy
+    }
+
+    private fun showThankYouDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+
+        val dialogBinding = DialogFeedbackThanksBinding.inflate(layoutInflater)
+        dialog.setContentView(dialogBinding.root)
+
+        // Set up star rating
+        val stars = listOf(
+            dialogBinding.star1,
+            dialogBinding.star2,
+            dialogBinding.star3,
+            dialogBinding.star4,
+            dialogBinding.star5
+        )
+
+        var selectedRating: Int
+
+        stars.forEachIndexed { index, star ->
+            star.setOnClickListener {
+                selectedRating = index + 1
+                updateStarRating(stars, selectedRating)
+            }
+        }
+
+        // Rate on Google button
+        dialogBinding.btnRateOnGoogle.setOnClickListener {
+            openGooglePlayStore()
+            dialog.dismiss()
+        }
+
+        // No thanks button
+        dialogBinding.btnNoThanks.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.setCancelable(true)
+        dialog.show()
+
+        // Set dialog width to match parent with margin
+        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
+        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+    }
+
+    private fun updateStarRating(stars: List<ImageView>, rating: Int) {
+        stars.forEachIndexed { index, star ->
+            if (index < rating) {
+                star.setImageResource(R.drawable.ic_star_filled)
+            } else {
+                star.setImageResource(R.drawable.ic_star_outline)
+            }
+        }
+    }
+
+    private fun openGooglePlayStore() {
+        val packageName = requireContext().packageName
+        try {
+            // Try to open Play Store app
+            val intent = Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri())
+            startActivity(intent)
+        } catch (_: ActivityNotFoundException) {
+            // If Play Store app is not available, open in browser
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                "https://play.google.com/store/apps/details?id=$packageName".toUri()
+            )
+            startActivity(intent)
+        }
     }
 
     override fun onDestroyView() {
@@ -252,4 +334,3 @@ class SettingsFragment : Fragment() {
         _binding = null
     }
 }
-
