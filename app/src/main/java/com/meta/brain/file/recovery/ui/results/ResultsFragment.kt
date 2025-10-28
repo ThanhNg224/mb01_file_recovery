@@ -16,6 +16,7 @@ import com.meta.brain.file.recovery.R
 import com.meta.brain.file.recovery.data.model.MediaEntry
 import com.meta.brain.file.recovery.data.model.MediaGroup
 import com.meta.brain.file.recovery.databinding.FragmentResultsBinding
+import com.meta.brain.file.recovery.ui.common.showExitDialog
 import com.meta.brain.file.recovery.ui.home.HomeViewModel
 import com.meta.brain.file.recovery.ui.home.MediaUiState
 import com.meta.brain.file.recovery.ui.results.adapter.FolderGroupAdapter
@@ -77,6 +78,19 @@ class ResultsFragment : Fragment() {
     }
 
     private fun handleBackPressed() {
+        // Show exit dialog if there are results to prevent accidental loss
+        if (allMediaItems.isNotEmpty()) {
+            showExitDialog {
+                // User confirmed exit
+                navigateBack()
+            }
+        } else {
+            // No results, just navigate back
+            navigateBack()
+        }
+    }
+
+    private fun navigateBack() {
         try {
             if (!findNavController().popBackStack()) {
                 findNavController().navigateUp()

@@ -22,6 +22,7 @@ import com.meta.brain.file.recovery.data.repository.MediaRepository
 import com.meta.brain.file.recovery.databinding.DialogRestoreConfirmBinding
 import com.meta.brain.file.recovery.databinding.DialogRestoreProgressBinding
 import com.meta.brain.file.recovery.databinding.FragmentResultGroupDetailBinding
+import com.meta.brain.file.recovery.ui.common.showDeleteDialog
 import com.meta.brain.file.recovery.ui.results.adapter.DateSectionAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -257,20 +258,22 @@ class ResultGroupDetailFragment : Fragment() {
         }
 
         val count = selectedItems.size
-        val totalSize = resultsViewModel.getFormattedSelectedSize()
 
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Delete Files")
-            .setMessage("Are you sure you want to delete $count ${if (count == 1) "file" else "files"} ($totalSize)? This action cannot be undone.")
-            .setPositiveButton("Delete") { dialog, _ ->
-                deleteSelectedFiles()
-                dialog.dismiss()
-            }
-            .setNegativeButton("Cancel") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .setCancelable(true)
-            .show()
+        // Determine item type based on media type
+        val itemType = when {
+            selectedItems.all { it.mimeType?.startsWith("image/") == true } -> "photos"
+            selectedItems.all { it.mimeType?.startsWith("video/") == true } -> "videos"
+            else -> "files"
+        }
+
+        // Use the custom dialog with modern design
+        showDeleteDialog(
+            itemCount = count,
+            itemType = itemType
+        ) {
+            // User confirmed delete
+            deleteSelectedFiles()
+        }
     }
 
     private fun deleteSelectedFiles() {

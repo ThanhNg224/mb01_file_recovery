@@ -19,6 +19,7 @@ import com.meta.brain.file.recovery.data.model.ScanTarget
 import com.meta.brain.file.recovery.data.model.MediaScanKind
 import com.meta.brain.file.recovery.data.repository.MediaRepository
 import com.meta.brain.file.recovery.databinding.FragmentHomeBinding
+import com.meta.brain.file.recovery.ui.common.showPermissionDialog
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import androidx.core.net.toUri
@@ -218,11 +219,7 @@ class HomeFragment : Fragment() {
 
     private fun showManageStoragePermissionDialog() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Snackbar.make(
-                binding.root,
-                "To scan documents, please enable 'All files access' permission",
-                Snackbar.LENGTH_LONG
-            ).setAction("Settings") {
+            showPermissionDialog {
                 try {
                     val intent = android.content.Intent(android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
                     intent.data = "package:${requireContext().packageName}".toUri()
@@ -232,21 +229,17 @@ class HomeFragment : Fragment() {
                     val intent = android.content.Intent(android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
                     startActivity(intent)
                 }
-            }.show()
+            }
         }
     }
 
     private fun showPermissionRationale() {
-        Snackbar.make(
-            binding.root,
-            "Media permissions are required to scan for images and videos",
-            Snackbar.LENGTH_LONG
-        ).setAction("Settings") {
+        showPermissionDialog {
             // Open app settings
             val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             intent.data = android.net.Uri.fromParts("package", requireContext().packageName, null)
             startActivity(intent)
-        }.show()
+        }
     }
 
     private fun toast(msg: String) {

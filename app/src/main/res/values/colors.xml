@@ -18,4 +18,14 @@
     <color name="app_bg_surface">#F4F6F8</color>
     <color name="home_accent">#1976D2</color>
     <color name="white">#FFFFFF</color>
+
+    <!-- Dialog Colors -->
+    <color name="dialog_bg">#FFFFFF</color>
+    <color name="dialog_overlay">#80000000</color>
+    <color name="dialog_primary_blue">#2196F3</color>
+    <color name="dialog_primary_blue_light">#42A5F5</color>
+    <color name="dialog_secondary_bg">#E3F2FD</color>
+    <color name="dialog_text_primary">#212121</color>
+    <color name="dialog_text_secondary">#757575</color>
+    <color name="dialog_highlight_blue">#2196F3</color>
 </resources>
