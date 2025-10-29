@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingHorizontal="16dp"
-    android:paddingVertical="12dp"
-    android:gravity="center_vertical"
-    android:background="@color/home_bg">
+    android:paddingStart="16dp"
+    android:paddingTop="12dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="8dp"
+    android:gravity="center_vertical">
 
     <!-- Date and Size -->
     <TextView
@@ -15,21 +16,21 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Oct 20, 2025 · 12.5 MB"
         android:textColor="@color/home_text_primary"
         android:textSize="14sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:text="2025-10-3 · 23 MB" />
 
     <!-- Select All Button -->
     <TextView
         android:id="@+id/tvSelectAll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select All"
-        android:textColor="@color/home_accent"
+        android:text="@string/select_all_label"
+        android:textColor="@color/dialog_primary_blue"
         android:textSize="14sp"
+        android:visibility="gone"
         android:padding="8dp"
-        android:background="?attr/selectableItemBackground" />
+        tools:visibility="visible" />
 
 </LinearLayout>
-

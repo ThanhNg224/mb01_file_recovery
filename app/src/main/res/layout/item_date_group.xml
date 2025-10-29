@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="12dp">
+
+    <!-- Sticky Date Header with Select All -->
+    <LinearLayout
+        android:id="@+id/layoutDateHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/app_bg_surface"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <!-- Date Label -->
+        <TextView
+            android:id="@+id/tvDateLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/home_text_primary"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="2025-10-3" />
+
+        <!-- Item Count -->
+        <TextView
+            android:id="@+id/tvDateItemCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:textColor="@color/home_text_secondary"
+            android:textSize="12sp"
+            tools:text="(12)" />
+
+        <!-- Select All for this Date Group -->
+        <CheckBox
+            android:id="@+id/cbSelectDateGroup"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/checkbox_circle_selector"
+            android:button="@null"
+            android:contentDescription="@string/select_all_in_date_group" />
+    </LinearLayout>
+
+    <!-- Grid Layout for Media Items (3-4 columns) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMediaItems"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:nestedScrollingEnabled="false"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="3"
+        tools:itemCount="9"
+        tools:listitem="@layout/item_media_thumbnail" />
+
+</LinearLayout>
+

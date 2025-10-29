@@ -58,6 +58,10 @@
     <string name="sort_size">Size</string>
     <string name="sort_name">Name</string>
     <string name="sort_direction">Sort direction</string>
+    <string name="size_small_to_large">From small to large</string>
+    <string name="size_large_to_small">From large to small</string>
+    <string name="date_old_to_new">Old to new</string>
+    <string name="date_new_to_old">New to old</string>
     <string name="grid_columns">Grid Columns</string>
     <string name="grid_2_cols">2 cols</string>
     <string name="grid_3_cols">3 cols</string>
@@ -149,6 +153,20 @@
     <string name="feedback_tag_good_quality">Good quality</string>
     <string name="feedback_tag_bugs">Bugs</string>
     <string name="feedback_tag_suggestions">Suggestions</string>
+
+    <!-- Results Fragment strings -->
+    <string name="scan_photos">Scan photos</string>
+    <string name="completion_details">%1$d items · %2$d folders</string>
+    <string name="item_count_format">(%d)</string>
+    <string name="restore">Restore</string>
+    <string name="restore_with_count">Restore (%d)</string>
+    <string name="delete">Delete</string>
+    <string name="delete_with_count">Delete (%d)</string>
+    <string name="select_all_label">Select all</string>
+    <string name="media_thumbnail">Media thumbnail</string>
+    <string name="select_item">Select item</string>
+    <string name="select_all_in_date_group">Select all in this date group</string>
+
     <string name="feedback_tag_quick_recovery">Quick recovery</string>
     <string name="feedback_tag_easy_interface">Easy to use interface</string>
     <string name="feedback_tag_others">Others</string>

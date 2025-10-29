@@ -107,25 +107,7 @@
             android:name="scanConfig"
             app:argType="com.meta.brain.file.recovery.data.model.ScanConfig" />
         <action
-            android:id="@+id/action_results_to_group_detail"
-            app:destination="@id/resultGroupDetailFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
-    </fragment>
-
-    <!-- Result Group Detail Fragment for showing files in a folder group -->
-    <fragment
-        android:id="@+id/resultGroupDetailFragment"
-        android:name="com.meta.brain.file.recovery.ui.results.ResultGroupDetailFragment"
-        android:label="Group Detail"
-        tools:layout="@layout/fragment_result_group_detail">
-        <argument
-            android:name="mediaGroup"
-            app:argType="com.meta.brain.file.recovery.data.model.MediaGroup" />
-        <action
-            android:id="@+id/action_result_group_detail_to_preview"
+            android:id="@+id/action_results_to_preview"
             app:destination="@id/previewFragment"
             app:enterAnim="@android:anim/fade_in"
             app:exitAnim="@android:anim/fade_out"
