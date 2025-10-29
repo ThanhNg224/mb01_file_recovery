@@ -17,6 +17,8 @@ import com.meta.brain.file.recovery.R
 import com.meta.brain.file.recovery.data.model.MediaEntry
 import com.meta.brain.file.recovery.databinding.DialogSortFilterBinding
 import com.meta.brain.file.recovery.databinding.FragmentResultsBinding
+import com.meta.brain.file.recovery.ui.common.AppToastBottom
+import com.meta.brain.file.recovery.ui.common.showDeleteDialog
 import com.meta.brain.file.recovery.ui.common.showExitDialog
 import com.meta.brain.file.recovery.ui.home.HomeViewModel
 import com.meta.brain.file.recovery.ui.home.MediaUiState
@@ -83,6 +85,7 @@ class ResultsFragment : Fragment() {
     }
 
     private fun setupToolbar() {
+        binding.tvToolbarTitle.text = args.scanConfig.getResultsTitle()
         binding.toolbar.setNavigationOnClickListener {
             handleBackPressed()
         }
@@ -187,8 +190,22 @@ class ResultsFragment : Fragment() {
 
         binding.btnDelete.setOnClickListener {
             if (selectedItems.isNotEmpty()) {
-                // TODO: Show delete confirmation dialog
-                Snackbar.make(binding.root, "${selectedItems.size} items selected for deletion", Snackbar.LENGTH_SHORT).show()
+                showDeleteDialog(
+                    itemCount = selectedItems.size,
+                    itemType = "files",
+                    onConfirmDelete = {
+                        // TODO: Implement actual delete logic
+                        val deletedCount = selectedItems.size
+                        exitSelectionMode()
+
+                        // Show custom bottom toast
+                        AppToastBottom.show(
+                            activity = requireActivity(),
+                            message = "Deleted successfully",
+                            duration = 2000L
+                        )
+                    }
+                )
             }
         }
     }
@@ -234,7 +251,9 @@ class ResultsFragment : Fragment() {
 
                 // Update completion card
                 val folderCount = state.list.mapNotNull { it.filePath?.substringBeforeLast("/") }.distinct().size
-                binding.tvCompletionDetails.text = getString(R.string.completion_details, state.list.size, folderCount)
+                binding.tvCompletionItems.text = getString(R.string.item_count, state.list.size)
+                binding.tvCompletionFolders.text = getString(R.string.folder_count, folderCount)
+
             }
 
             is MediaUiState.Empty -> {

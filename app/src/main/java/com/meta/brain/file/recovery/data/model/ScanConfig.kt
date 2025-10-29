@@ -82,4 +82,30 @@ data class ScanConfig(
             ScanTarget.ALL -> "files"
         }
     }
+
+    /**
+     * Get scanning title based on media kind
+     */
+    fun getScanningTitle(): String {
+        return when (mediaKind) {
+            MediaScanKind.IMAGE -> "Scanning Photos..."
+            MediaScanKind.VIDEO -> "Scanning Videos..."
+            MediaScanKind.AUDIO -> "Scanning Audio..."
+            MediaScanKind.OTHER -> "Scanning Documents..."
+            MediaScanKind.ALL -> "Scanning..."
+        }
+    }
+
+    /**
+     * Get results screen title based on media kind
+     */
+    fun getResultsTitle(): String {
+        return when (mediaKind) {
+            MediaScanKind.IMAGE -> "Scan Photos"
+            MediaScanKind.VIDEO -> "Scan Videos"
+            MediaScanKind.AUDIO -> "Scan Audio"
+            MediaScanKind.OTHER -> "Scan Documents"
+            MediaScanKind.ALL -> "Scan Results"
+        }
+    }
 }

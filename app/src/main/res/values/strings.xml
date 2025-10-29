@@ -32,7 +32,7 @@
     <!-- Scan Loading strings -->
     <string name="scanning">Scanning</string>
     <string name="scanning_animation">Scanning animation</string>
-    <string name="completed">Completed</string>
+    <string name="completed">Completed!</string>
     <string name="error">Error</string>
     <string name="info">Info</string>
     <string name="one_hundred_percent">100%</string>
@@ -156,7 +156,8 @@
 
     <!-- Results Fragment strings -->
     <string name="scan_photos">Scan photos</string>
-    <string name="completion_details">%1$d items · %2$d folders</string>
+    <string name="item_count">%1$d Items</string>
+    <string name="folder_count">%1$d Folders</string>
     <string name="item_count_format">(%d)</string>
     <string name="restore">Restore</string>
     <string name="restore_with_count">Restore (%d)</string>

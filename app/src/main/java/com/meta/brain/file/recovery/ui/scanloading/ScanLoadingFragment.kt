@@ -86,6 +86,7 @@ class ScanLoadingFragment : Fragment() {
     }
 
     private fun setupToolbar() {
+        binding.toolbar.title = args.scanConfig.getScanningTitle()
         binding.toolbar.setNavigationOnClickListener {
             handleBackPress()
         }

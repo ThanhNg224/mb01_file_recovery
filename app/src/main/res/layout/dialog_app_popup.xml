@@ -12,8 +12,8 @@
     <!-- Icon -->
     <ImageView
         android:id="@+id/ivDialogIcon"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="74dp"
+        android:layout_height="74dp"
         android:contentDescription="@string/app_name"
         android:src="@drawable/ic_attention"
         app:layout_constraintEnd_toEndOf="parent"
@@ -74,10 +74,10 @@
             android:background="@drawable/bg_button_secondary"
             android:text="Cancel"
             android:textAllCaps="false"
-            android:textColor="@color/dialog_primary_blue"
-            android:textSize="16sp"
+            android:textColor="#2199FF"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="sans-serif-light"
             app:backgroundTint="@null"
             app:cornerRadius="28dp" />
 
@@ -93,9 +93,9 @@
             android:text="Confirm"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:textSize="16sp"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="sans-serif-light"
             app:backgroundTint="@null"
             app:cornerRadius="28dp" />
 

@@ -76,15 +76,24 @@
                     app:srcCompat="@drawable/settings" />
             </LinearLayout>
 
+            <!-- Content container: vertically centered below header -->
             <LinearLayout
-                android:id="@+id/rowBigTiles"
+                android:id="@+id/contentContainer"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:gravity="center"
                 app:layout_constraintTop_toBottomOf="@id/header"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:id="@+id/rowBigTiles"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/tilePhoto"
@@ -213,13 +222,10 @@
 
             <LinearLayout
                 android:id="@+id/rowSmallTiles"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:orientation="horizontal"
-                app:layout_constraintTop_toBottomOf="@+id/rowBigTiles"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/tileAudio"
@@ -309,22 +315,16 @@
             <!-- ADS banner -->
             <FrameLayout
                 android:id="@+id/adsBanner"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="72dp"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/bg_ads_placeholder"
-                app:layout_constraintTop_toBottomOf="@+id/rowSmallTiles"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                android:background="@drawable/bg_ads_placeholder" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnArchive"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:layout_marginTop="16dp"
-                app:layout_constraintTop_toBottomOf="@id/adsBanner"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:cardBackgroundColor="@android:color/transparent"
@@ -372,6 +372,9 @@
                     </LinearLayout>
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+            <!-- End of contentContainer -->
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

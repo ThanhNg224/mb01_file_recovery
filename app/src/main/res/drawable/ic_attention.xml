@@ -1,26 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="64dp"
-    android:height="64dp"
-    android:viewportWidth="64"
-    android:viewportHeight="64">
-
-    <!-- Blue circle background -->
-    <path
-        android:fillColor="#E3F2FD"
-        android:pathData="M32,32m-30,0a30,30 0,1 1,60 0a30,30 0,1 1,-60 0" />
-
-    <path
-        android:fillColor="#2196F3"
-        android:pathData="M32,32m-26,0a26,26 0,1 1,52 0a26,26 0,1 1,-52 0" />
-
-    <!-- Exclamation mark -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M30,20h4v18h-4z" />
-
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M30,42h4v4h-4z" />
+    android:width="44dp"
+    android:height="44dp"
+    android:viewportWidth="44"
+    android:viewportHeight="44">
+  <path
+      android:pathData="M6,0L38,0A6,6 0,0 1,44 6L44,38A6,6 0,0 1,38 44L6,44A6,6 0,0 1,0 38L0,6A6,6 0,0 1,6 0z"
+      android:fillColor="#E9F5FF"/>
+  <path
+      android:pathData="M22,11.333C27.882,11.333 32.667,16.119 32.667,22C32.667,27.881 27.882,32.667 22,32.667C16.119,32.667 11.333,27.881 11.333,22C11.333,16.119 16.119,11.333 22,11.333ZM22,8.667C14.636,8.667 8.667,14.636 8.667,22C8.667,29.364 14.636,35.333 22,35.333C29.364,35.333 35.333,29.364 35.333,22C35.333,14.636 29.364,8.667 22,8.667ZM23.333,26H20.667V28.667H23.333V26ZM20.667,23.333H23.333L24,15.333H20L20.667,23.333Z"
+      android:fillColor="#2199FF"/>
 </vector>
-

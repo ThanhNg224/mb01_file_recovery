@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="@drawable/ic_arrow_back"
-            app:title="Scanning..." />
+            tools:title="Scanning..." />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -59,26 +59,28 @@
                         android:layout_gravity="center">
 
                         <!-- Lottie Ripple Animation  -->
+
+                        <!--  Icon in Center -->
+
                         <com.airbnb.lottie.LottieAnimationView
                             android:id="@+id/scanAnimationView"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
                             android:contentDescription="@string/scanning_animation"
-                            app:lottie_rawRes="@raw/scan_in_progress"
                             app:lottie_autoPlay="false"
                             app:lottie_loop="true"
-                            app:lottie_speed="1.0"
-                            app:lottie_renderMode="hardware" />
+                            app:lottie_rawRes="@raw/scan_in_progress"
+                            app:lottie_renderMode="hardware"
+                            app:lottie_speed="1.0" />
 
-                        <!-- Gallery Icon in Center -->
                         <ImageView
                             android:id="@+id/ivGalleryIcon"
-                            android:layout_width="48dp"
+                            android:layout_width="51dp"
                             android:layout_height="48dp"
                             android:layout_gravity="center"
-                            android:src="@android:drawable/ic_menu_gallery"
                             android:contentDescription="@string/scanning"
+                            android:src="@drawable/icon_photo"
                             app:tint="?attr/colorPrimary" />
 
                     </FrameLayout>
@@ -102,7 +104,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:textColor="?attr/colorPrimary"
+                    android:textColor="#2199FF"
                     android:textSize="48sp"
                     android:textStyle="bold"
                     tools:text="23%" />
@@ -120,41 +122,19 @@
                     tools:text="Scanning media files..." />
 
                 <!-- Tip Text -->
-                <com.google.android.material.card.MaterialCardView
+                <TextView
+                    android:id="@+id/tvTip"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
-                    app:cardBackgroundColor="?attr/colorSecondaryContainer"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp">
+                    android:paddingHorizontal="16dp"
+                    android:text="@string/scan_tip"
+                    android:textColor="?attr/colorOnBackground"
+                    android:alpha="0.6"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="16dp">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="center_vertical"
-                            android:src="@android:drawable/ic_dialog_info"
-                            android:contentDescription="@string/info"
-                            app:tint="?attr/colorOnSecondaryContainer" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:text="@string/scan_tip"
-                            android:textColor="?attr/colorOnSecondaryContainer"
-                            android:textSize="14sp" />
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
 
