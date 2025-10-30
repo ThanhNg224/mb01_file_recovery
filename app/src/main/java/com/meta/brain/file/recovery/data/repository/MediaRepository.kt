@@ -56,7 +56,9 @@ class MediaRepository @Inject constructor(
             MediaStore.Images.Media.SIZE,
             MediaStore.Images.Media.DATE_ADDED,
             MediaStore.Images.Media.DATE_MODIFIED,
-            MediaStore.Images.Media.DATA // added
+            MediaStore.Images.Media.DATA, // added
+            MediaStore.Images.Media.WIDTH,
+            MediaStore.Images.Media.HEIGHT
         )
 
         val (baseSelection, baseArgs) = buildSelection(minSize, fromSec, toSec, cursor)
@@ -81,6 +83,8 @@ class MediaRepository @Inject constructor(
                 val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
                 val dateModifiedColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_MODIFIED)
                 val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                val widthColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.WIDTH)
+                val heightColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.HEIGHT)
 
                 var count = 0
                 while (cursor.moveToNext() && count < pageSize) {
@@ -104,7 +108,9 @@ class MediaRepository @Inject constructor(
                             dateTaken = if (dateModified > 0) dateModified else dateAdded,
                             durationMs = null,
                             isVideo = false,
-                            filePath = filePath
+                            filePath = filePath,
+                            width = cursor.getInt(widthColumn),
+                            height = cursor.getInt(heightColumn)
                         )
                     )
                     count++
@@ -132,7 +138,9 @@ class MediaRepository @Inject constructor(
             MediaStore.Video.Media.DATE_ADDED,
             MediaStore.Video.Media.DATE_MODIFIED,
             MediaStore.Video.Media.DURATION,
-            MediaStore.Video.Media.DATA // added
+            MediaStore.Video.Media.DATA, // added
+            MediaStore.Video.Media.WIDTH,
+            MediaStore.Video.Media.HEIGHT
         )
 
         val (baseSelection, baseArgs) = buildSelection(minSize, fromSec, toSec, cursor)
@@ -159,6 +167,8 @@ class MediaRepository @Inject constructor(
                 val dateModifiedColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_MODIFIED)
                 val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
                 val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA)
+                val widthColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.WIDTH)
+                val heightColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.HEIGHT)
 
                 var count = 0
                 while (cursor.moveToNext() && count < pageSize) {
@@ -182,7 +192,9 @@ class MediaRepository @Inject constructor(
                             dateTaken = if (dateModified > 0) dateModified else dateAdded,
                             durationMs = cursor.getLong(durationColumn),
                             isVideo = true,
-                            filePath = filePath
+                            filePath = filePath,
+                            width = cursor.getInt(widthColumn),
+                            height = cursor.getInt(heightColumn)
                         )
                     )
                     count++

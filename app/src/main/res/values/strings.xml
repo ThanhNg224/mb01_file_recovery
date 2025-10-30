@@ -159,7 +159,7 @@
     <string name="item_count">%1$d Items</string>
     <string name="folder_count">%1$d Folders</string>
     <string name="item_count_format">(%d)</string>
-    <string name="restore">Restore</string>
+    <string name="recover">Recover</string>
     <string name="restore_with_count">Restore (%d)</string>
     <string name="delete">Delete</string>
     <string name="delete_with_count">Delete (%d)</string>

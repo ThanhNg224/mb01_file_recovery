@@ -26,7 +26,9 @@ data class MediaEntry(
     val isVideo: Boolean,
     val isTrashed: Boolean = false,
     val mediaKind: MediaKind = determineMediaKind(mimeType, isVideo),
-    val filePath: String? = null // Physical file path on device storage
+    val filePath: String? = null, // Physical file path on device storage
+    val width: Int? = null, // Image/Video width in pixels
+    val height: Int? = null // Image/Video height in pixels
 ) : Parcelable {
     /**
      * Returns formatted file size (e.g., "2.5 MB")
@@ -46,6 +48,18 @@ data class MediaEntry(
     fun getFormattedDate(): String {
         val date = dateTaken ?: dateAdded
         return android.text.format.DateFormat.format("MMM dd, yyyy", date * 1000).toString()
+    }
+
+    /**
+     * Returns formatted resolution (e.g., "1920×1080")
+     * Returns null if width or height is not available
+     */
+    fun getFormattedResolution(): String? {
+        return if (width != null && height != null && width > 0 && height > 0) {
+            "${width}×${height}"
+        } else {
+            null
+        }
     }
 
     companion object {

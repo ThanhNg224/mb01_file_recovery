@@ -170,7 +170,7 @@ class ResultsFragment : Fragment() {
         }
 
         // Floating action buttons
-        binding.btnRestore.setOnClickListener {
+        binding.btnRecover.setOnClickListener {
             if (resultsViewModel.selectedItems.value.isNotEmpty()) {
                 showRestoreDialog()
             }
@@ -314,11 +314,11 @@ class ResultsFragment : Fragment() {
         val allItems = resultsViewModel.allItems.value
 
         if (selectedItems.isNotEmpty()) {
-            binding.btnRestore.text = getString(R.string.restore_with_count, selectedItems.size)
+            binding.btnRecover.text = getString(R.string.restore_with_count, selectedItems.size)
             binding.btnDelete.text = getString(R.string.delete_with_count, selectedItems.size)
             binding.cbSelectAll.isChecked = selectedItems.size == allItems.size
         } else {
-            binding.btnRestore.text = getString(R.string.restore)
+            binding.btnRecover.text = getString(R.string.recover)
             binding.btnDelete.text = getString(R.string.delete)
             binding.cbSelectAll.isChecked = false
         }

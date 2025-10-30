@@ -61,8 +61,20 @@ class MediaThumbnailAdapter(
                 .placeholder(R.drawable.ic_video_placeholder)
                 .into(binding.ivThumbnail)
 
-            // Show file size
+            // Show file name in overlay
+            binding.tvFileName.text = item.displayName ?: "Unknown"
+
+            // Show file size in overlay
             binding.tvFileSize.text = item.getFormattedSize()
+
+            // Show resolution if available
+            val resolution = item.getFormattedResolution()
+            if (resolution != null) {
+                binding.tvResolution.text = resolution
+                binding.tvResolution.visibility = View.VISIBLE
+            } else {
+                binding.tvResolution.visibility = View.GONE
+            }
 
             // Show video duration if applicable
             if (item.isVideo && item.durationMs != null) {

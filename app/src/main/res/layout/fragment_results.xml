@@ -132,6 +132,14 @@
             android:gravity="center_vertical"
             android:paddingBottom="4dp">
 
+            <ImageView
+                android:id="@+id/ivFolder"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_folder"
+                android:contentDescription="@string/filter"
+                android:layout_marginEnd="8dp" />
+
             <TextView
                 android:id="@+id/tvAllLabel"
                 android:layout_width="wrap_content"
@@ -307,34 +315,34 @@
             android:layout_height="46dp"
             android:layout_marginEnd="10dp"
             android:layout_weight="1"
-            android:backgroundTint="#FFEBEE"
+            android:backgroundTint="#E9F5FF"
             android:text="@string/delete"
             android:textAllCaps="false"
-            android:textColor="#D32F2F"
+            android:textColor="#2199FF"
             android:textSize="16sp"
             android:textStyle="bold"
             app:cornerRadius="28dp"
             app:icon="@drawable/ic_delete"
             app:iconGravity="textStart"
             app:iconSize="20dp"
-            app:iconTint="#D32F2F" />
+            app:iconTint="#2199FF" />
 
-        <!-- Restore Button -->
+        <!-- Recover Button -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRestore"
+            android:id="@+id/btnRecover"
             style="@style/Widget.Material3.Button"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/dialog_primary_blue"
-            android:text="@string/restore"
+            android:backgroundTint="#2199FF"
+            android:text="@string/recover"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold"
             app:cornerRadius="28dp"
-            app:icon="@drawable/ic_restore"
+            app:icon="@drawable/ic_recovery"
             app:iconGravity="textStart"
             app:iconSize="20dp"
             app:iconTint="@color/white" />

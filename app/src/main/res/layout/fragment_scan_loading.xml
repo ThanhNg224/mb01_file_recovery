@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="14dp"
+                android:padding="0dp"
                 android:visibility="visible"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -80,8 +80,8 @@
 
                         <ImageView
                             android:id="@+id/ivGalleryIcon"
-                            android:layout_width="51dp"
-                            android:layout_height="48dp"
+                            android:layout_width="45dp"
+                            android:layout_height="40dp"
                             android:layout_gravity="center"
                             android:contentDescription="@string/scanning"
                             android:src="@drawable/icon_photo"

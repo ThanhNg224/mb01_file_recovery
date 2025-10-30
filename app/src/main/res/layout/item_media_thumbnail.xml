@@ -37,7 +37,7 @@
             android:id="@+id/tvDuration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
+            android:layout_gravity="top|end"
             android:layout_margin="6dp"
             android:background="#CC000000"
             android:paddingStart="6dp"
@@ -49,6 +49,61 @@
             android:visibility="gone"
             tools:text="02:34"
             tools:visibility="visible" />
+
+        <!-- Info Overlay Container (Bottom with Gradient) -->
+        <LinearLayout
+            android:id="@+id/layoutInfoOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@drawable/bg_thumbnail_overlay_gradient"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <!-- File Name (Line 1: Centered, Bold, Larger) -->
+            <TextView
+                android:id="@+id/tvFileName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                tools:text="IMG_20231015_143022.jpg" />
+
+            <!-- Line 2: Size (Left) and Resolution (Right) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <!-- File Size (Left) -->
+                <TextView
+                    android:id="@+id/tvFileSize"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    tools:text="2.5 MB" />
+
+                <!-- Resolution (Right) -->
+                <TextView
+                    android:id="@+id/tvResolution"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="gone"
+                    tools:text="1920×1080"
+                    tools:visibility="visible" />
+            </LinearLayout>
+        </LinearLayout>
 
         <!-- Selection Overlay -->
         <View
@@ -70,22 +125,6 @@
             android:clickable="true"
             android:focusable="true"
             android:contentDescription="@string/select_item" />
-
-        <!-- File Size Label (Bottom Left) -->
-        <TextView
-            android:id="@+id/tvFileSize"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|start"
-            android:layout_margin="6dp"
-            android:background="#CC000000"
-            android:paddingStart="6dp"
-            android:paddingTop="2dp"
-            android:paddingEnd="6dp"
-            android:paddingBottom="2dp"
-            android:textColor="@color/white"
-            android:textSize="10sp"
-            tools:text="2.5 MB" />
     </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
