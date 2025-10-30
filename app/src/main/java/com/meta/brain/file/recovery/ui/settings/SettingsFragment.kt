@@ -2,7 +2,6 @@ package com.meta.brain.file.recovery.ui.settings
 
 import android.app.Dialog
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -14,35 +13,24 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.meta.brain.file.recovery.R
-import com.meta.brain.file.recovery.data.model.DateFormat
-import com.meta.brain.file.recovery.data.model.Language
-import com.meta.brain.file.recovery.data.model.Theme
 import com.meta.brain.file.recovery.databinding.DialogFeedbackThanksBinding
 import com.meta.brain.file.recovery.databinding.FragmentSettingsBinding
-import com.meta.brain.module.data.DataManager
-import com.meta.brain.module.utils.Utility
 import dagger.hilt.android.AndroidEntryPoint
-import androidx.core.content.edit
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.net.toUri
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SettingsFragment : Fragment() {
 
-    companion object {
-        private const val PREFS_NAME = "app_settings"
-        private const val KEY_THEME = "theme"
-        private const val KEY_DATE_FORMAT = "date_format"
-    }
-
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
 
-    private val availableLanguages = Language.getAvailableLanguages()
-    private val availableThemes = Theme.getAvailableThemes()
-    private val availableDateFormats = DateFormat.getAvailableDateFormats()
+    private val viewModel: SettingsViewModel by viewModels()
 
     private var isLanguageChanging = false
 
@@ -62,35 +50,85 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupToolbar()
-        setupVersionText()
-        setupLanguageDropdown()
-        setupThemeDropdown()
-        setupDateFormatDropdown()
+        observeViewModel()
         setupClickListeners()
+    }
+
+    private fun observeViewModel() {
+        // Observe UI state
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.uiState.collect { state ->
+                handleUiState(state)
+            }
+        }
+
+        // Observe one-time events
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.uiEvent.collect { event ->
+                handleUiEvent(event)
+            }
+        }
+    }
+
+    private fun handleUiState(state: SettingsUiState) {
+        // Setup version text
+        binding.tvVersion.text = getString(R.string.setting_version, state.appVersion)
+
+        // Setup dropdowns with current state
+        setupLanguageDropdown(state)
+        setupThemeDropdown(state)
+        setupDateFormatDropdown(state)
+
+        // Update reminder switch
+        binding.switchReminder.isChecked = state.isReminderEnabled
+    }
+
+    private fun handleUiEvent(event: SettingsUiEvent) {
+        when (event) {
+            is SettingsUiEvent.ApplyTheme -> {
+                applyTheme(event.themeId)
+            }
+            is SettingsUiEvent.RecreateActivity -> {
+                requireActivity().recreate()
+            }
+            is SettingsUiEvent.NavigateToFeedback -> {
+                findNavController().navigate(R.id.action_setting_to_feedback)
+            }
+            is SettingsUiEvent.ShowRatingDialog -> {
+                showThankYouDialog()
+            }
+            is SettingsUiEvent.OpenPlayStore -> {
+                openGooglePlayStore(event.packageName)
+            }
+            is SettingsUiEvent.OpenPrivacyPolicy -> {
+                // TODO: Implement privacy policy
+            }
+            is SettingsUiEvent.NavigateBack -> {
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
+            is SettingsUiEvent.ShowToast -> {
+                android.widget.Toast.makeText(requireContext(), event.message, android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun applyTheme(themeId: String) {
+        when (themeId) {
+            "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            "auto" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        }
     }
 
     private fun setupToolbar() {
         binding.toolbar.setNavigationOnClickListener {
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+            viewModel.onBackPressed()
         }
     }
 
-    private fun setupVersionText() {
-        val versionName = try {
-            requireContext().packageManager.getPackageInfo(requireContext().packageName, 0).versionName
-        } catch (_: Exception) {
-            "1.0"
-        }
-        binding.tvVersion.text = getString(R.string.setting_version, versionName)
-    }
-
-    private fun setupLanguageDropdown() {
-        // Get current language from DataManager
-        val currentLanguageCode = DataManager.user.language
-        val currentLanguage = Language.getLanguageByCode(currentLanguageCode)
-
+    private fun setupLanguageDropdown(state: SettingsUiState) {
         // Create adapter with language display names
-        val languageNames = availableLanguages.map { it.displayName }
+        val languageNames = state.availableLanguages.map { it.displayName }
         languageAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_dropdown_item_1line,
@@ -104,28 +142,23 @@ class SettingsFragment : Fragment() {
         binding.languageDropdown.setAdapter(languageAdapter)
 
         // Set current language as default
-        binding.languageDropdown.setText(currentLanguage.displayName, false)
+        binding.languageDropdown.setText(state.currentLanguage.displayName, false)
 
         // Handle language selection
         binding.languageDropdown.setOnItemClickListener { _, _, position, _ ->
             if (isLanguageChanging) return@setOnItemClickListener
 
-            val selectedLanguage = availableLanguages[position]
-            if (selectedLanguage.code != currentLanguageCode) {
+            val selectedLanguage = state.availableLanguages[position]
+            if (selectedLanguage.code != state.currentLanguage.code) {
                 isLanguageChanging = true
-                onLanguageSelected(selectedLanguage)
+                viewModel.onLanguageSelected(selectedLanguage)
             }
         }
     }
 
-    private fun setupThemeDropdown() {
-        // Get current theme from SharedPreferences
-        val prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val currentThemeId = prefs.getString(KEY_THEME, "auto") ?: "auto"
-        val currentTheme = Theme.getThemeById(currentThemeId)
-
+    private fun setupThemeDropdown(state: SettingsUiState) {
         // Create adapter with theme display names
-        val themeNames = availableThemes.map { it.displayName }
+        val themeNames = state.availableThemes.map { it.displayName }
         themeAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_dropdown_item_1line,
@@ -139,25 +172,20 @@ class SettingsFragment : Fragment() {
         binding.themeDropdown.setAdapter(themeAdapter)
 
         // Set current theme as default
-        binding.themeDropdown.setText(currentTheme.displayName, false)
+        binding.themeDropdown.setText(state.currentTheme.displayName, false)
 
         // Handle theme selection
         binding.themeDropdown.setOnItemClickListener { _, _, position, _ ->
-            val selectedTheme = availableThemes[position]
-            onThemeSelected(selectedTheme)
+            val selectedTheme = state.availableThemes[position]
+            viewModel.onThemeSelected(selectedTheme)
             // Update display
             binding.themeDropdown.setText(selectedTheme.displayName, false)
         }
     }
 
-    private fun setupDateFormatDropdown() {
-        // Get current date format from SharedPreferences
-        val prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val currentFormatId = prefs.getString(KEY_DATE_FORMAT, DateFormat.DEFAULT_FORMAT_ID) ?: DateFormat.DEFAULT_FORMAT_ID
-        val currentFormat = DateFormat.getDateFormatById(currentFormatId)
-
+    private fun setupDateFormatDropdown(state: SettingsUiState) {
         // Create adapter with date format display names
-        val formatNames = availableDateFormats.map { it.displayName }
+        val formatNames = state.availableDateFormats.map { it.displayName }
         dateFormatAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_dropdown_item_1line,
@@ -171,12 +199,12 @@ class SettingsFragment : Fragment() {
         binding.dateFormatDropdown.setAdapter(dateFormatAdapter)
 
         // Set current format as default
-        binding.dateFormatDropdown.setText(currentFormat.displayName, false)
+        binding.dateFormatDropdown.setText(state.currentDateFormat.displayName, false)
 
         // Handle date format selection
         binding.dateFormatDropdown.setOnItemClickListener { _, _, position, _ ->
-            val selectedFormat = availableDateFormats[position]
-            onDateFormatSelected(selectedFormat)
+            val selectedFormat = state.availableDateFormats[position]
+            viewModel.onDateFormatSelected(selectedFormat)
             // Update display
             binding.dateFormatDropdown.setText(selectedFormat.displayName, false)
         }
@@ -185,77 +213,23 @@ class SettingsFragment : Fragment() {
     private fun setupClickListeners() {
         // Reminder
         binding.switchReminder.setOnCheckedChangeListener { _, isChecked ->
-            onReminderToggled(isChecked)
+            viewModel.onReminderToggled(isChecked)
         }
-
 
         // Feedback
         binding.cardFeedback.setOnClickListener {
-            onFeedbackClicked()
+            viewModel.onFeedbackClicked()
         }
 
         // Rate Us
         binding.cardRateUs.setOnClickListener {
-            onRateUsClicked()
+            viewModel.onRateUsClicked()
         }
 
         // Privacy Policy
         binding.cardPrivacyPolicy.setOnClickListener {
-            onPrivacyPolicyClicked()
+            viewModel.onPrivacyPolicyClicked()
         }
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    private fun onReminderToggled(isChecked: Boolean) {
-        // TODO: Implement reminder toggle logic
-    }
-
-    private fun onLanguageSelected(language: Language) {
-        // Update DataManager with new language code
-        DataManager.user.language = language.code
-
-        // Save to persistent storage
-        DataManager.saveData(requireContext())
-
-        // Apply locale change using Utility from MetaBrain module
-        Utility.setLocale(requireContext())
-
-        // Recreate activity to apply language change
-        requireActivity().recreate()
-    }
-
-    private fun onThemeSelected(theme: Theme) {
-        // Save theme to SharedPreferences
-        val prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit { putString(KEY_THEME, theme.id) }
-
-        // Apply theme change
-        when (theme.id) {
-            "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            "auto" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-        }
-    }
-
-    private fun onDateFormatSelected(dateFormat: DateFormat) {
-        // Save date format to SharedPreferences
-        val prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit { putString(KEY_DATE_FORMAT, dateFormat.id) }
-
-        // Date format change doesn't require activity recreation
-        // The change will be applied when dates are formatted in the app
-    }
-
-    private fun onFeedbackClicked() {
-        findNavController().navigate(R.id.action_setting_to_feedback)
-    }
-
-    private fun onRateUsClicked() {
-        showThankYouDialog()
-    }
-
-    private fun onPrivacyPolicyClicked() {
-        // TODO: Implement privacy policy
     }
 
     private fun showThankYouDialog() {
@@ -281,12 +255,13 @@ class SettingsFragment : Fragment() {
             star.setOnClickListener {
                 selectedRating = index + 1
                 updateStarRating(stars, selectedRating)
+                viewModel.onRatingSubmitted(selectedRating)
             }
         }
 
         // Rate on Google button
         dialogBinding.btnRateOnGoogle.setOnClickListener {
-            openGooglePlayStore()
+            viewModel.onRateOnGooglePlayClicked()
             dialog.dismiss()
         }
 
@@ -313,8 +288,7 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    private fun openGooglePlayStore() {
-        val packageName = requireContext().packageName
+    private fun openGooglePlayStore(packageName: String) {
         try {
             // Try to open Play Store app
             val intent = Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri())

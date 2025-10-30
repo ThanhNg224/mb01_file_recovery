@@ -39,17 +39,20 @@
             <LinearLayout
                 android:id="@+id/scanningContainer"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="24dp"
+                android:padding="14dp"
                 android:visibility="visible"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <!-- Animation Container -->
                 <FrameLayout
-                    android:layout_width="320dp"
-                    android:layout_height="320dp"
+                    android:layout_width="220dp"
+                    android:layout_height="220dp"
                     android:layout_gravity="center">
 
                     <!-- Lottie Ripple Animation with Gallery Icon -->
@@ -159,12 +162,15 @@
             <LinearLayout
                 android:id="@+id/emptyResultContainer"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="24dp"
                 android:visibility="gone"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <!-- Done Icon -->
                 <ImageView
@@ -214,12 +220,15 @@
             <LinearLayout
                 android:id="@+id/errorContainer"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="24dp"
                 android:visibility="gone"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <ImageView
                     android:layout_width="120dp"

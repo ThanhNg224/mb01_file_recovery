@@ -1,6 +1,5 @@
 package com.meta.brain.file.recovery.ui.scanloading
 
-import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
@@ -20,6 +19,8 @@ import com.meta.brain.file.recovery.R
 import com.meta.brain.file.recovery.databinding.FragmentScanLoadingBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import androidx.core.graphics.toColorInt
+import androidx.core.view.isVisible
 
 @AndroidEntryPoint
 class ScanLoadingFragment : Fragment() {
@@ -65,7 +66,7 @@ class ScanLoadingFragment : Fragment() {
             LottieProperty.COLOR_FILTER
         ) {
             PorterDuffColorFilter(
-                Color.parseColor("#0099FF"),
+                "#0099FF".toColorInt(),
                 PorterDuff.Mode.SRC_ATOP
             )
         }
@@ -74,7 +75,7 @@ class ScanLoadingFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         // Resume animation if scanning is active
-        if (isScanning && binding.scanningContainer.visibility == View.VISIBLE) {
+        if (isScanning && binding.scanningContainer.isVisible) {
             binding.scanAnimationView.resumeAnimation()
         }
     }

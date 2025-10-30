@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,11 +14,16 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.chip.Chip
 import com.meta.brain.file.recovery.R
 import com.meta.brain.file.recovery.databinding.DialogFeedbackThanksBinding
 import com.meta.brain.file.recovery.databinding.FragmentFeedbackBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.net.toUri
 
 @AndroidEntryPoint
 class FeedbackFragment : Fragment() {
@@ -27,8 +31,7 @@ class FeedbackFragment : Fragment() {
     private var _binding: FragmentFeedbackBinding? = null
     private val binding get() = _binding!!
 
-    private val selectedTags = mutableSetOf<String>()
-    private var feedbackText = ""
+    private val viewModel: FeedbackViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,11 +48,47 @@ class FeedbackFragment : Fragment() {
         setupChipGroup()
         setupFeedbackInput()
         setupSendButton()
+        observeViewModel()
+    }
+
+    private fun observeViewModel() {
+        // Observe UI state
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.uiState.collect { state ->
+                handleUiState(state)
+            }
+        }
+
+        // Observe one-time events
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.uiEvent.collect { event ->
+                handleUiEvent(event)
+            }
+        }
+    }
+
+    private fun handleUiState(state: FeedbackUiState) {
+        // Update error message if present
+        binding.tilFeedback.error = state.errorMessage
+    }
+
+    private fun handleUiEvent(event: FeedbackUiEvent) {
+        when (event) {
+            is FeedbackUiEvent.ShowThankYouDialog -> {
+                showThankYouDialog()
+            }
+            is FeedbackUiEvent.ShowError -> {
+                Toast.makeText(requireContext(), event.message, Toast.LENGTH_SHORT).show()
+            }
+            is FeedbackUiEvent.NavigateBack -> {
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
+        }
     }
 
     private fun setupToolbar() {
         binding.toolbar.setNavigationOnClickListener {
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+            viewModel.onBackPressed()
         }
     }
 
@@ -69,68 +108,27 @@ class FeedbackFragment : Fragment() {
             val chip = binding.root.findViewById<Chip>(chipId)
             chip.setOnCheckedChangeListener { buttonView, isChecked ->
                 val tag = buttonView.text.toString()
-                if (isChecked) {
-                    selectedTags.add(tag)
-                } else {
-                    selectedTags.remove(tag)
-                }
+                viewModel.toggleTag(tag, isChecked)
             }
         }
     }
 
     private fun setupFeedbackInput() {
         binding.etFeedback.doAfterTextChanged { text ->
-            feedbackText = text?.toString() ?: ""
+            viewModel.updateFeedbackText(text?.toString() ?: "")
         }
     }
 
     private fun setupSendButton() {
         binding.btnSendFeedback.setOnClickListener {
-            if (validateFeedback()) {
-                sendFeedback()
-            }
+            viewModel.sendFeedback()
         }
-    }
-
-    private fun validateFeedback(): Boolean {
-        // Check if at least one tag is selected
-        if (selectedTags.isEmpty()) {
-            Toast.makeText(
-                requireContext(),
-                getString(R.string.feedback_error_select_tag),
-                Toast.LENGTH_SHORT
-            ).show()
-            return false
-        }
-
-        // Check if feedback text has at least 8 characters
-        if (feedbackText.trim().length < 8) {
-            binding.tilFeedback.error = getString(R.string.feedback_error_min_length)
-            return false
-        }
-
-        binding.tilFeedback.error = null
-        return true
-    }
-
-    private fun sendFeedback() {
-        // In a real app, you would send this to your backend server
-        // For now, we'll just show the thank you dialog
-
-        // TODO: Send feedback to backend
-        // val feedback = Feedback(
-        //     tags = selectedTags.toList(),
-        //     message = feedbackText,
-        //     timestamp = System.currentTimeMillis()
-        // )
-
-        showThankYouDialog()
     }
 
     private fun showThankYouDialog() {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
 
         val dialogBinding = DialogFeedbackThanksBinding.inflate(layoutInflater)
         dialog.setContentView(dialogBinding.root)
@@ -144,12 +142,13 @@ class FeedbackFragment : Fragment() {
             dialogBinding.star5
         )
 
-        var selectedRating = 0
+        var selectedRating: Int
 
         stars.forEachIndexed { index, star ->
             star.setOnClickListener {
                 selectedRating = index + 1
                 updateStarRating(stars, selectedRating)
+                viewModel.onRatingSubmitted(selectedRating)
             }
         }
 
@@ -157,13 +156,13 @@ class FeedbackFragment : Fragment() {
         dialogBinding.btnRateOnGoogle.setOnClickListener {
             openGooglePlayStore()
             dialog.dismiss()
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+            viewModel.onBackPressed()
         }
 
         // No thanks button
         dialogBinding.btnNoThanks.setOnClickListener {
             dialog.dismiss()
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+            viewModel.onBackPressed()
         }
 
         dialog.setCancelable(true)
@@ -188,13 +187,13 @@ class FeedbackFragment : Fragment() {
         val packageName = requireContext().packageName
         try {
             // Try to open Play Store app
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName"))
+            val intent = Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri())
             startActivity(intent)
         } catch (_: ActivityNotFoundException) {
             // If Play Store app is not available, open in browser
             val intent = Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
+                "https://play.google.com/store/apps/details?id=$packageName".toUri()
             )
             startActivity(intent)
         }

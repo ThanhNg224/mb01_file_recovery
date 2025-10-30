@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.meta.brain.file.recovery.data.model.MediaEntry
 import com.meta.brain.file.recovery.data.repository.RestoreRepository
-import com.meta.brain.file.recovery.data.repository.RestoreProgress
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,6 +11,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+/**
+ * Sort type enumeration
+ */
+enum class SortType {
+    SIZE_SMALL_TO_LARGE,
+    SIZE_LARGE_TO_SMALL,
+    DATE_OLD_TO_NEW,
+    DATE_NEW_TO_OLD
+}
 
 /**
  * State for restore operation
@@ -30,12 +39,34 @@ sealed class RestoreState {
 }
 
 /**
- * ViewModel for managing selection and restore operations in ResultsFragment
+ * State for delete operation
+ */
+sealed class DeleteState {
+    object Idle : DeleteState()
+    data class Done(val successCount: Int, val failCount: Int) : DeleteState()
+    data class Error(val message: String) : DeleteState()
+}
+
+/**
+ * ViewModel for managing selection, sorting, restore and delete operations in ResultsFragment
+ * Follows Clean Architecture - keeps business logic separate from UI
  */
 @HiltViewModel
 class ResultsViewModel @Inject constructor(
     private val restoreRepository: RestoreRepository
 ) : ViewModel() {
+
+    // Media items state
+    private val _allItems = MutableStateFlow<List<MediaEntry>>(emptyList())
+    val allItems: StateFlow<List<MediaEntry>> = _allItems.asStateFlow()
+
+    // Sorted items state
+    private val _sortedItems = MutableStateFlow<List<MediaEntry>>(emptyList())
+    val sortedItems: StateFlow<List<MediaEntry>> = _sortedItems.asStateFlow()
+
+    // Current sort type
+    private val _currentSortType = MutableStateFlow(SortType.DATE_OLD_TO_NEW)
+    val currentSortType: StateFlow<SortType> = _currentSortType.asStateFlow()
 
     // Selection state
     private val _selectedItems = MutableStateFlow<Set<MediaEntry>>(emptySet())
@@ -45,11 +76,83 @@ class ResultsViewModel @Inject constructor(
     private val _restoreState = MutableStateFlow<RestoreState>(RestoreState.Idle)
     val restoreState: StateFlow<RestoreState> = _restoreState.asStateFlow()
 
+    // Delete state
+    private val _deleteState = MutableStateFlow<DeleteState>(DeleteState.Idle)
+    val deleteState: StateFlow<DeleteState> = _deleteState.asStateFlow()
+
     // Selection mode
     private val _isSelectionMode = MutableStateFlow(false)
     val isSelectionMode: StateFlow<Boolean> = _isSelectionMode.asStateFlow()
 
+    // Folder count (derived data)
+    private val _folderCount = MutableStateFlow(0)
+    val folderCount: StateFlow<Int> = _folderCount.asStateFlow()
+
     private var restoreJob: Job? = null
+
+    /**
+     * Initialize items from scan results
+     */
+    fun setItems(items: List<MediaEntry>) {
+        _allItems.value = items
+        applySorting(_currentSortType.value)
+        updateFolderCount()
+    }
+
+    /**
+     * Apply sorting to items
+     */
+    fun applySorting(sortType: SortType) {
+        _currentSortType.value = sortType
+        val sorted = sortItems(_allItems.value, sortType)
+        _sortedItems.value = sorted
+    }
+
+    /**
+     * Internal sorting logic - Pure function for testability
+     */
+    private fun sortItems(items: List<MediaEntry>, sortType: SortType): List<MediaEntry> {
+        return when (sortType) {
+            SortType.SIZE_SMALL_TO_LARGE -> items.sortedBy { it.size }
+            SortType.SIZE_LARGE_TO_SMALL -> items.sortedByDescending { it.size }
+            SortType.DATE_OLD_TO_NEW -> items.sortedBy { it.dateTaken ?: it.dateAdded }
+            SortType.DATE_NEW_TO_OLD -> items.sortedByDescending { it.dateTaken ?: it.dateAdded }
+        }
+    }
+
+    /**
+     * Calculate folder count from items
+     */
+    private fun updateFolderCount() {
+        _folderCount.value = _allItems.value
+            .mapNotNull { it.filePath?.substringBeforeLast("/") }
+            .distinct()
+            .size
+    }
+
+    /**
+     * Remove deleted items from the list
+     */
+    fun removeDeletedItems(deletedItems: List<MediaEntry>) {
+        val updatedItems = _allItems.value.filterNot { deletedItems.contains(it) }
+        _allItems.value = updatedItems
+        applySorting(_currentSortType.value)
+        updateFolderCount()
+    }
+
+    /**
+     * Notify delete completion with results
+     */
+    fun notifyDeleteComplete(successCount: Int, failCount: Int) {
+        _deleteState.value = DeleteState.Done(successCount, failCount)
+    }
+
+    /**
+     * Reset delete state
+     */
+    fun resetDeleteState() {
+        _deleteState.value = DeleteState.Idle
+    }
 
     /**
      * Toggle selection for an item
