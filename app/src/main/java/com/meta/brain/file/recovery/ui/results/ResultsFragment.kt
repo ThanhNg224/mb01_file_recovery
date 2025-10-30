@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -34,6 +35,7 @@ class ResultsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val sharedViewModel: HomeViewModel by activityViewModels()
+    private val resultsViewModel: ResultsViewModel by viewModels()
     private val args: ResultsFragmentArgs by navArgs()
 
     private lateinit var dateGroupAdapter: DateGroupAdapter
@@ -183,8 +185,7 @@ class ResultsFragment : Fragment() {
         // Floating action buttons
         binding.btnRestore.setOnClickListener {
             if (selectedItems.isNotEmpty()) {
-                // TODO: Show restore dialog
-                Snackbar.make(binding.root, "${selectedItems.size} items selected for restore", Snackbar.LENGTH_SHORT).show()
+                showRestoreDialog()
             }
         }
 
@@ -194,16 +195,7 @@ class ResultsFragment : Fragment() {
                     itemCount = selectedItems.size,
                     itemType = "files",
                     onConfirmDelete = {
-                        // TODO: Implement actual delete logic
-                        val deletedCount = selectedItems.size
-                        exitSelectionMode()
-
-                        // Show custom bottom toast
-                        AppToastBottom.show(
-                            activity = requireActivity(),
-                            message = "Deleted successfully",
-                            duration = 2000L
-                        )
+                        performBatchDelete()
                     }
                 )
             }
@@ -214,6 +206,13 @@ class ResultsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             sharedViewModel.uiState.collect { state ->
                 updateUI(state)
+            }
+        }
+
+        // Observe restore state
+        viewLifecycleOwner.lifecycleScope.launch {
+            resultsViewModel.restoreState.collect { state ->
+                handleRestoreState(state)
             }
         }
     }
@@ -504,7 +503,160 @@ class ResultsFragment : Fragment() {
         groupItemsByDate(sortedItems, sortDateGroupsDescending)
     }
 
+    private fun showRestoreDialog() {
+        val itemCount = selectedItems.size
+        val totalSize = resultsViewModel.getFormattedSelectedSize()
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Restore Files")
+            .setMessage("Restore $itemCount file(s) ($totalSize) to Downloads/RELive/Restored folder?")
+            .setPositiveButton("Restore") { _, _ ->
+                resultsViewModel.startRestore()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun performBatchDelete() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                var successCount = 0
+                var failCount = 0
+                val itemsToDelete = selectedItems.toList()
+
+                itemsToDelete.forEach { entry ->
+                    try {
+                        val deleted = requireContext().contentResolver.delete(entry.uri, null, null)
+                        if (deleted > 0) {
+                            successCount++
+                        } else {
+                            failCount++
+                        }
+                    } catch (e: Exception) {
+                        android.util.Log.e("ResultsFragment", "Failed to delete: ${e.message}", e)
+                        failCount++
+                    }
+                }
+
+                // Remove deleted items from the list
+                allMediaItems = allMediaItems.filterNot { itemsToDelete.contains(it) }
+
+                // Exit selection mode
+                exitSelectionMode()
+
+                // Refresh the UI
+                groupItemsByDate(allMediaItems)
+
+                // Show result
+                if (successCount > 0) {
+                    AppToastBottom.show(
+                        activity = requireActivity(),
+                        message = if (failCount > 0) {
+                            "Deleted $successCount file(s), $failCount failed"
+                        } else {
+                            "Deleted $successCount file(s) successfully"
+                        },
+                        duration = 2000L
+                    )
+                }
+
+                // Update completion card
+                if (allMediaItems.isNotEmpty()) {
+                    val folderCount = allMediaItems.mapNotNull { it.filePath?.substringBeforeLast("/") }.distinct().size
+                    binding.tvCompletionItems.text = getString(R.string.item_count, allMediaItems.size)
+                    binding.tvCompletionFolders.text = getString(R.string.folder_count, folderCount)
+                } else {
+                    // No items left, show empty state
+                    binding.progressBar.visibility = View.GONE
+                    binding.rvMediaGrid.visibility = View.GONE
+                    binding.layoutEmptyState.visibility = View.VISIBLE
+                    binding.layoutErrorState.visibility = View.GONE
+                    binding.cardCompletionStatus.visibility = View.GONE
+                    binding.layoutActionBar.visibility = View.GONE
+                }
+
+            } catch (e: Exception) {
+                Snackbar.make(binding.root, "Error deleting files: ${e.message}", Snackbar.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun handleRestoreState(state: RestoreState) {
+        when (state) {
+            is RestoreState.Idle -> {
+                // Do nothing
+            }
+            is RestoreState.Running -> {
+                showRestoreProgressDialog(state)
+            }
+            is RestoreState.Done -> {
+                dismissRestoreProgressDialog()
+
+                // Show success message
+                val message = if (state.failCount > 0) {
+                    "Restored ${state.successCount} file(s), ${state.failCount} failed"
+                } else {
+                    "Restored ${state.successCount} file(s) to ${state.destinationPath}"
+                }
+
+                AppToastBottom.show(
+                    activity = requireActivity(),
+                    message = message,
+                    duration = 3000L
+                )
+
+                // Exit selection mode
+                exitSelectionMode()
+
+                // Reset restore state
+                resultsViewModel.resetRestoreState()
+            }
+            is RestoreState.Error -> {
+                dismissRestoreProgressDialog()
+                Snackbar.make(binding.root, "Restore failed: ${state.message}", Snackbar.LENGTH_LONG).show()
+                resultsViewModel.resetRestoreState()
+            }
+        }
+    }
+
+    private var restoreProgressDialog: androidx.appcompat.app.AlertDialog? = null
+    private var restoreProgressBinding: com.meta.brain.file.recovery.databinding.DialogRestoreProgressBinding? = null
+
+    private fun showRestoreProgressDialog(state: RestoreState.Running) {
+        if (restoreProgressDialog == null) {
+            restoreProgressBinding = com.meta.brain.file.recovery.databinding.DialogRestoreProgressBinding.inflate(layoutInflater)
+
+            restoreProgressDialog = MaterialAlertDialogBuilder(requireContext())
+                .setView(restoreProgressBinding!!.root)
+                .setCancelable(false)
+                .create()
+
+            // Set up cancel button
+            restoreProgressBinding?.btnCancelRestore?.setOnClickListener {
+                resultsViewModel.cancelRestore()
+                dismissRestoreProgressDialog()
+            }
+
+            restoreProgressDialog?.show()
+        }
+
+        // Update progress
+        restoreProgressBinding?.apply {
+            progressBar.max = state.total
+            progressBar.progress = state.progress
+            tvProgressCount.text = "${state.progress} / ${state.total}"
+            tvCurrentFile.text = state.currentFileName
+        }
+    }
+
+    private fun dismissRestoreProgressDialog() {
+        restoreProgressDialog?.dismiss()
+        restoreProgressDialog = null
+        restoreProgressBinding = null
+    }
+
     override fun onDestroyView() {
+        dismissRestoreProgressDialog()
         super.onDestroyView()
         _binding = null
     }

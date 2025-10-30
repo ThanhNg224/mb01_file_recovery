@@ -34,16 +34,18 @@ fun Fragment.showDeleteDialog(
     onConfirmDelete: () -> Unit
 ) {
     val countText = "$itemCount"
-    val message = if (itemType == "photos") {
-        "Do you want to delete these $countText photos?\n${getString(R.string.dialog_delete_message)}"
+    val title = if (itemType == "photos") {
+        "Do you want to delete these $countText photos?"
     } else {
-        "Do you want to delete these $countText files?\n${getString(R.string.dialog_delete_message)}"
+        "Do you want to delete these $countText files?"
     }
+
+    val message = getString(R.string.dialog_delete_message)
 
     AppDialogFragment.newInstance(
         DialogConfig(
             iconRes = R.drawable.ic_attention,
-            title = getString(R.string.dialog_attention),
+            title = title,
             message = message,
             highlightText = countText,
             positiveText = getString(R.string.dialog_confirm),

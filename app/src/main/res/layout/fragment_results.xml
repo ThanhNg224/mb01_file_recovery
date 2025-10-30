@@ -13,7 +13,9 @@
         android:background="@color/white"
         android:elevation="4dp"
         app:navigationIcon="@drawable/ic_arrow_back"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIconTint="@color/black"
+        >
 
         <TextView
             android:id="@+id/tvToolbarTitle"
@@ -53,8 +55,8 @@
             <!-- Completion Icon -->
             <ImageView
                 android:id="@+id/ivCompletionIcon"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:src="@drawable/done"
                 android:contentDescription="@string/completed"
                 android:layout_marginEnd="16dp" />
@@ -89,7 +91,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="10 Items"
-                        android:textColor="#2199FF"
+                        android:textColor="#979797"
                         android:textSize="14sp" />
 
                     <!-- khoảng cách rõ ràng hơn -->
@@ -102,7 +104,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="4 Folders"
-                        android:textColor="#2199FF"
+                        android:textColor="#979797"
                         android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -156,8 +158,8 @@
             <!-- Filter/Sort Icon -->
             <ImageView
                 android:id="@+id/ivFilter"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:src="@drawable/ic_sort"
                 android:contentDescription="@string/filter" />
         </LinearLayout>
@@ -185,7 +187,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/select_all_label"
                 android:textColor="@color/home_text_primary"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="4dp" />
@@ -207,7 +209,7 @@
         android:paddingBottom="100dp"
         android:scrollbars="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@id/layoutAdPlaceholder"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutActionBar"
         tools:itemCount="20"
         tools:listitem="@layout/item_date_group" />
@@ -294,7 +296,7 @@
         android:gravity="center"
         android:orientation="horizontal"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/layoutAdPlaceholder"
+        app:layout_constraintBottom_toBottomOf="parent"
         tools:visibility="visible">
 
         <!-- Delete Button -->
@@ -338,22 +340,4 @@
             app:iconTint="@color/white" />
     </LinearLayout>
 
-    <!-- Ad Placeholder (Bottom) -->
-    <FrameLayout
-        android:id="@+id/layoutAdPlaceholder"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/ad_banner_placeholder"
-            android:textColor="@color/home_text_secondary"
-            android:textSize="12sp" />
-    </FrameLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
-
