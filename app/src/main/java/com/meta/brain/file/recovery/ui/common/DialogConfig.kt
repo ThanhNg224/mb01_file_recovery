@@ -11,7 +11,7 @@ import kotlinx.parcelize.RawValue
  * @property iconRes Resource ID for the dialog icon (default: attention icon)
  * @property title Dialog title text (optional)
  * @property message Dialog message text (optional)
- * @property highlightText Text within message to highlight in blue (optional)
+ * @property highlightText Text within message to highlight in bold and black (optional)
  * @property positiveText Text for the primary/positive button (default: "Confirm")
  * @property negativeText Text for the secondary/negative button (optional, hides button if null)
  * @property onPositive Callback when positive button is clicked

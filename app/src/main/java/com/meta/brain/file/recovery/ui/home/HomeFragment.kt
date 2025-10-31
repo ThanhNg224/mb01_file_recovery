@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -29,6 +30,22 @@ class HomeFragment : Fragment() {
 
     private val viewModel: HomeViewModel by viewModels()
 
+    // Permission request launcher - shows system permission dialog
+    private val permissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val allGranted = permissions.values.all { it }
+        android.util.Log.d("HomeFragment", "Permission result: $permissions")
+
+        // Check if any permission is permanently denied
+        val anyPermanentlyDenied = permissions.keys.any { permission ->
+            !permissions[permission]!! && !shouldShowRequestPermissionRationale(permission)
+        }
+
+        // Delegate to ViewModel for decision logic
+        viewModel.onPermissionResult(allGranted, anyPermanentlyDenied)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,7 +65,6 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         // Re-check permissions whenever the fragment comes back to foreground
-        // This handles the case when user returns from settings after granting permissions
         checkPermissions()
     }
 
@@ -115,10 +131,12 @@ class HomeFragment : Fragment() {
             is HomeUiEvent.NavigateToScan -> {
                 navigateToScanLoading(event.scanConfig)
             }
-            is HomeUiEvent.ShowPermissionDialog -> {
-                showPermissionRationale()
+            is HomeUiEvent.ShowBasicPermissionDialog -> {
+                // Show custom dialog, when user clicks Confirm, decide action
+                showBasicPermissionDialog(event.permissions)
             }
-            is HomeUiEvent.ShowManageStorageDialog -> {
+            is HomeUiEvent.ShowManageStoragePermissionDialog -> {
+                // Show custom dialog for MANAGE_EXTERNAL_STORAGE
                 showManageStoragePermissionDialog()
             }
             is HomeUiEvent.ShowToast -> {
@@ -157,46 +175,88 @@ class HomeFragment : Fragment() {
                 PackageManager.PERMISSION_GRANTED
         }
 
-        viewModel.updatePermissions(allGranted)
-
-        // Debug logging for basic permissions
-        permissions.forEach { permission ->
-            val granted = ContextCompat.checkSelfPermission(requireContext(), permission) ==
+        // Check if permissions are permanently denied
+        val anyPermanentlyDenied = permissions.any { permission ->
+            val isGranted = ContextCompat.checkSelfPermission(requireContext(), permission) ==
                 PackageManager.PERMISSION_GRANTED
-            android.util.Log.d("HomeFragment", "Permission $permission: $granted")
+            val shouldShow = shouldShowRequestPermissionRationale(permission)
+            !isGranted && !shouldShow
         }
-        android.util.Log.d("HomeFragment", "All basic permissions granted: $allGranted")
 
-        // Check for MANAGE_EXTERNAL_STORAGE permission on Android 11+
+        // Report state to ViewModel - no decision logic here
+        viewModel.updatePermissions(allGranted)
+        viewModel.updatePermissionsPermanentlyDenied(anyPermanentlyDenied)
+
+        // Check MANAGE_EXTERNAL_STORAGE permission on Android 11+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val managePermissionGranted = android.os.Environment.isExternalStorageManager()
+            viewModel.updateManageStoragePermission(managePermissionGranted)
             android.util.Log.d("HomeFragment", "MANAGE_EXTERNAL_STORAGE granted: $managePermissionGranted")
-            android.util.Log.d("HomeFragment", "isExternalStorageManager() = $managePermissionGranted")
+        }
+
+        // Debug logging
+        android.util.Log.d("HomeFragment", "Basic permissions granted: $allGranted, permanently denied: $anyPermanentlyDenied")
+    }
+
+    private fun showBasicPermissionDialog(permissions: List<String>) {
+        // Show custom dialog first
+        showPermissionDialog {
+            // User clicked "Confirm" - now decide what to do
+            val anyPermanentlyDenied = permissions.any { permission ->
+                val isGranted = ContextCompat.checkSelfPermission(requireContext(), permission) ==
+                    PackageManager.PERMISSION_GRANTED
+                val shouldShow = shouldShowRequestPermissionRationale(permission)
+                !isGranted && !shouldShow
+            }
+
+            if (anyPermanentlyDenied) {
+                // User previously denied with "Don't ask again" - must go to settings
+                android.util.Log.d("HomeFragment", "Permissions permanently denied - opening settings")
+                openAppSettings()
+            } else {
+                // Can still request via system dialog - launch Android native permission dialog
+                android.util.Log.d("HomeFragment", "Launching Android system permission dialog")
+                permissionLauncher.launch(permissions.toTypedArray())
+            }
         }
     }
 
     private fun showManageStoragePermissionDialog() {
+        // Show custom dialog first
+        showPermissionDialog {
+            // User clicked "Confirm" - go to MANAGE_EXTERNAL_STORAGE settings
+            requestManageStoragePermission()
+        }
+    }
+
+    private fun requestManageStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            showPermissionDialog {
+            try {
+                // Open the MANAGE_EXTERNAL_STORAGE settings directly
+                val intent = android.content.Intent(android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                intent.data = "package:${requireContext().packageName}".toUri()
+                startActivity(intent)
+            } catch (_: Exception) {
+                // Fallback to general settings
                 try {
-                    val intent = android.content.Intent(android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                    intent.data = "package:${requireContext().packageName}".toUri()
-                    startActivity(intent)
-                } catch (_: Exception) {
-                    // Fallback to general settings
                     val intent = android.content.Intent(android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
                     startActivity(intent)
+                } catch (e: Exception) {
+                    android.util.Log.e("HomeFragment", "Error opening storage settings: ${e.message}")
+                    Snackbar.make(binding.root, "Cannot open settings", Snackbar.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
-    private fun showPermissionRationale() {
-        showPermissionDialog {
-            // Open app settings
+    private fun openAppSettings() {
+        try {
             val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             intent.data = android.net.Uri.fromParts("package", requireContext().packageName, null)
             startActivity(intent)
+        } catch (e: Exception) {
+            android.util.Log.e("HomeFragment", "Error opening settings: ${e.message}")
+            Snackbar.make(binding.root, "Cannot open settings", Snackbar.LENGTH_SHORT).show()
         }
     }
 

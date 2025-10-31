@@ -48,6 +48,7 @@
                     android:id="@+id/tvAppSection"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/maven_pro"
                     android:text="@string/setting_app_section"
                     android:textSize="14sp"
                     android:textColor="@color/home_text_secondary"
@@ -86,6 +87,7 @@
                             android:id="@+id/tvTheme"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/maven_pro"
                             android:layout_marginStart="16dp"
                             android:text="@string/setting_theme"
                             android:textColor="@color/home_text_primary"
@@ -114,6 +116,7 @@
 
                             <AutoCompleteTextView
                                 android:id="@+id/themeDropdown"
+                                android:fontFamily="@font/maven_pro"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="none"
@@ -162,6 +165,7 @@
                         <TextView
                             android:id="@+id/tvReminder"
                             android:layout_width="0dp"
+                            android:fontFamily="@font/maven_pro"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_marginEnd="8dp"
@@ -215,14 +219,13 @@
                         <TextView
                             android:id="@+id/tvLanguage"
                             android:layout_width="100dp"
-                            android:layout_height="25dp"
                             android:layout_marginStart="16dp"
                             android:text="@string/setting_language"
                             android:textColor="@color/home_text_primary"
                             android:textSize="16sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toEndOf="@id/ivLanguageIcon"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"  android:layout_height="1dp"/>
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/languageInputLayout"
@@ -242,6 +245,7 @@
 
                             <AutoCompleteTextView
                                 android:id="@+id/languageDropdown"
+                                android:fontFamily="@font/maven_pro"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="none"
@@ -286,6 +290,7 @@
                             app:layout_constraintBottom_toBottomOf="parent" />
 
                         <TextView
+                            android:fontFamily="@font/maven_pro"
                             android:id="@+id/tvDateFormat"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -313,6 +318,7 @@
                             app:layout_constraintStart_toEndOf="@id/tvDateFormat"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"
+                                android:fontFamily="@font/maven_pro"
                             app:layout_constraintWidth_max="160dp">
 
                             <AutoCompleteTextView
@@ -340,6 +346,7 @@
                     android:id="@+id/tvOthersSection"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/maven_pro"
                     android:text="@string/setting_others_section"
                     android:textSize="14sp"
                     android:textColor="@color/home_text_secondary"
@@ -376,6 +383,7 @@
 
                         <TextView
                             android:id="@+id/tvFeedback"
+                            android:fontFamily="@font/maven_pro"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"

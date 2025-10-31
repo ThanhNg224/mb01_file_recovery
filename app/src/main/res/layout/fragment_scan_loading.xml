@@ -112,6 +112,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="0dp"
+                android:fontFamily="@font/maven_pro"
                 android:textColor="#2199FF"
                 android:textSize="48sp"
                 android:textStyle="bold"
@@ -137,6 +138,7 @@
                     android:id="@+id/tvHint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/maven_pro"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:textColor="?attr/colorOnSurfaceVariant"
@@ -150,6 +152,7 @@
                 android:id="@+id/tvTip"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/maven_pro"
                 android:layout_marginTop="22dp"
                 android:alpha="0.6"
                 android:gravity="center"
@@ -186,6 +189,7 @@
 
             <!-- 100% Text -->
             <TextView
+                android:fontFamily="@font/maven_pro"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"

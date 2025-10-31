@@ -22,10 +22,15 @@
         <!-- Enable edge-to-edge -->
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
+
+        <!-- App default font -->
+        <item name="android:fontFamily">@font/maven_pro</item>
+        <item name="fontFamily">@font/maven_pro</item>
+
     </style>
 
     <!-- Fallback colors for Material 3 -->
-    <color name="md_theme_light_primary">#1976D2</color>
+    <color name="md_theme_light_primary">#269AFD</color>
     <color name="md_theme_light_onPrimary">#FFFFFF</color>
     <color name="md_theme_light_primaryContainer">#D1E4FF</color>
     <color name="md_theme_light_onPrimaryContainer">#001D36</color>
@@ -45,7 +50,7 @@
     <style name="BottomNavTextActive" parent="TextAppearance.Material3.LabelSmall">
         <item name="android:textSize">12sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">#FF1976D2</item>
+        <item name="android:textColor">#269AFD</item>
         <item name="android:gravity">center</item>
     </style>
 

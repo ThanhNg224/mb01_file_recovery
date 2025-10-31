@@ -15,6 +15,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/maven_pro"
             android:text="@string/filter_results"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -24,6 +25,7 @@
         <!-- Date Filter Section -->
         <TextView
             android:layout_width="match_parent"
+            android:fontFamily="@font/maven_pro"
             android:layout_height="wrap_content"
             android:text="@string/date_filter"
             android:textSize="14sp"
@@ -72,6 +74,7 @@
         <!-- Custom Date Range Display -->
         <TextView
             android:id="@+id/tvCustomDateRange"
+            android:fontFamily="@font/maven_pro"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
@@ -80,6 +83,7 @@
             android:visibility="gone" />
 
         <!-- Size Filter Section -->
+            android:fontFamily="@font/maven_pro"
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -151,6 +155,7 @@
                 android:valueTo="100"
                 app:values="@array/default_size_range" />
 
+                android:fontFamily="@font/maven_pro"
             <TextView
                 android:id="@+id/tvCustomSizeRange"
                 android:layout_width="match_parent"
@@ -159,6 +164,7 @@
                 android:textColor="@color/home_accent_blue"
                 android:gravity="center" />
         </LinearLayout>
+            android:fontFamily="@font/maven_pro"
 
         <!-- Sort Section -->
         <TextView
@@ -214,6 +220,7 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/sort_direction"
                 app:icon="@drawable/ic_arrow_down" />
+            android:fontFamily="@font/maven_pro"
         </LinearLayout>
 
         <!-- Grid Layout Section -->

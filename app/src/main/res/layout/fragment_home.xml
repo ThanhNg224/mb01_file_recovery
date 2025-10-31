@@ -36,7 +36,7 @@
                     android:textStyle="bold"
                     android:textSize="30sp"
                     android:textColor="#1565C0"
-                    android:fontFamily="sans-serif-medium"
+                    android:fontFamily="@font/maven_pro"
                     android:letterSpacing="0.01"
                     android:paddingStart="4dp"
                     android:paddingEnd="4dp" />

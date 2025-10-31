@@ -54,6 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:background="@drawable/bg_media_badge"
+            android:fontFamily="@font/maven_pro"
             android:text="IMG"
             android:textColor="@android:color/white"
             android:textSize="10sp"
@@ -68,6 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
+            android:fontFamily="@font/maven_pro"
             android:background="@drawable/bg_media_badge"
             android:text="2:30"
             android:textColor="@android:color/white"
@@ -81,6 +83,7 @@
         <TextView
             android:id="@+id/tvSize"
             android:layout_width="wrap_content"
+            android:fontFamily="@font/maven_pro"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:text="2.5 MB"
@@ -93,6 +96,7 @@
         <!-- Date -->
         <TextView
             android:id="@+id/tvDate"
+            android:fontFamily="@font/maven_pro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"

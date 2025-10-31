@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -130,13 +131,17 @@ class AppDialogFragment : DialogFragment() {
                 binding.btnNegative.visibility = View.GONE
             }
 
-            // If only one button, center it and make it 2/3 width
+// If only one button, center it and make it 2/3 width
             if (cfg.negativeText.isNullOrEmpty()) {
                 binding.btnNegative.visibility = View.GONE
-                binding.btnPositive.apply {
-                    val parent = parent as? LinearLayout
-                    parent?.gravity = android.view.Gravity.CENTER_HORIZONTAL
 
+                // Center parent horizontally
+                val parent = binding.btnPositive.parent as? LinearLayout
+                parent?.apply {
+                    gravity = Gravity.CENTER_HORIZONTAL
+                }
+
+                binding.btnPositive.apply {
                     val params = layoutParams as LinearLayout.LayoutParams
                     params.width = 0
                     params.weight = 0.66f
@@ -144,23 +149,31 @@ class AppDialogFragment : DialogFragment() {
                     params.marginEnd = 0
                     layoutParams = params
 
-                    gravity = android.view.Gravity.CENTER
+                    // Quan trọng: reset background behavior
+                    isAllCaps = false
+                    requestLayout()
                 }
             }
         }
     }
 
     /**
-     * Creates a spannable string with highlighted text in blue color
+     * Creates a spannable string with highlighted text in bold and black
      */
     private fun createHighlightedText(fullText: String, highlightText: String): SpannableString {
         val spannable = SpannableString(fullText)
         val startIndex = fullText.indexOf(highlightText)
 
         if (startIndex >= 0) {
-            val highlightColor = ContextCompat.getColor(requireContext(), R.color.dialog_highlight_blue)
+            val blackColor = ContextCompat.getColor(requireContext(), android.R.color.black)
             spannable.setSpan(
-                ForegroundColorSpan(highlightColor),
+                ForegroundColorSpan(blackColor),
+                startIndex,
+                startIndex + highlightText.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            spannable.setSpan(
+                android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
                 startIndex,
                 startIndex + highlightText.length,
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE

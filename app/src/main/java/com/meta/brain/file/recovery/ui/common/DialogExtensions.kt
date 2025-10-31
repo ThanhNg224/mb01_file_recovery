@@ -67,6 +67,7 @@ fun Fragment.showPermissionDialog(
             iconRes = R.drawable.ic_lock,
             title = "Enable access!",
             message = message,
+            highlightText = "do not upload or collect",
             positiveText = "Confirm",
             negativeText = null,
             onPositive = onGrantPermission

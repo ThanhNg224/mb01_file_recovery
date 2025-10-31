@@ -47,6 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="24dp"
+                android:fontFamily="@font/maven_pro"
                 android:text="@string/feedback_question"
                 android:textColor="@color/home_text_primary"
                 android:textSize="18sp"

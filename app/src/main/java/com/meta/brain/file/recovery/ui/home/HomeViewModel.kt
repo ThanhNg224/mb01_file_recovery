@@ -26,8 +26,10 @@ import javax.inject.Inject
  */
 data class HomeUiState(
     val hasPermissions: Boolean = false,
+    val hasManageStoragePermission: Boolean = false,
     val isLoading: Boolean = false,
-    val lastScanKind: MediaScanKind? = null
+    val lastScanKind: MediaScanKind? = null,
+    val permissionsPermanentlyDenied: Boolean = false
 )
 
 /**
@@ -35,10 +37,8 @@ data class HomeUiState(
  */
 sealed class HomeUiEvent {
     data class NavigateToScan(val scanConfig: ScanConfig) : HomeUiEvent()
-    object ShowPermissionDialog : HomeUiEvent()
-    // Note: ShowManageStorageDialog is currently not used for basic media scans
-    // It's kept for potential future deep file system operations that might require MANAGE_EXTERNAL_STORAGE
-    data class ShowManageStorageDialog(val showDialog: Boolean) : HomeUiEvent()
+    data class ShowBasicPermissionDialog(val permissions: List<String>) : HomeUiEvent()
+    object ShowManageStoragePermissionDialog : HomeUiEvent()
     data class ShowToast(val message: String) : HomeUiEvent()
     data class ShowError(val message: String) : HomeUiEvent()
     data class NavigateToHelp(val unit: Unit = Unit) : HomeUiEvent()
@@ -98,6 +98,22 @@ class HomeViewModel @Inject constructor(
     }
 
     /**
+     * Update MANAGE_EXTERNAL_STORAGE permission state
+     */
+    fun updateManageStoragePermission(hasPermission: Boolean) {
+        android.util.Log.d("HomeViewModel", "updateManageStoragePermission: $hasPermission")
+        _homeUiState.value = _homeUiState.value.copy(hasManageStoragePermission = hasPermission)
+    }
+
+    /**
+     * Update permanently denied state
+     */
+    fun updatePermissionsPermanentlyDenied(denied: Boolean) {
+        android.util.Log.d("HomeViewModel", "updatePermissionsPermanentlyDenied: $denied")
+        _homeUiState.value = _homeUiState.value.copy(permissionsPermanentlyDenied = denied)
+    }
+
+    /**
      * Get required permissions based on Android version
      */
     fun getRequiredPermissions(): List<String> {
@@ -130,10 +146,37 @@ class HomeViewModel @Inject constructor(
         if (_homeUiState.value.hasPermissions) {
             navigateToScan(depth, mediaKind)
         } else {
-            android.util.Log.d("HomeViewModel", "Showing basic permission dialog")
-            viewModelScope.launch {
-                _uiEvent.send(HomeUiEvent.ShowPermissionDialog)
-            }
+            android.util.Log.d("HomeViewModel", "Need basic permissions")
+            requestBasicPermissions()
+        }
+    }
+
+    /**
+     * Request basic media permissions
+     * ALWAYS shows custom dialog first, then user confirms to proceed
+     */
+    private fun requestBasicPermissions() {
+        viewModelScope.launch {
+            android.util.Log.d("HomeViewModel", "Showing custom permission dialog")
+            // Always show custom dialog first with permission list
+            _uiEvent.send(HomeUiEvent.ShowBasicPermissionDialog(getRequiredPermissions()))
+        }
+    }
+
+    /**
+     * Handle permission request result
+     * Called by Fragment after user responds to permission request
+     */
+    fun onPermissionResult(allGranted: Boolean, anyPermanentlyDenied: Boolean) {
+        android.util.Log.d("HomeViewModel", "onPermissionResult - granted: $allGranted, permanentlyDenied: $anyPermanentlyDenied")
+        _homeUiState.value = _homeUiState.value.copy(
+            hasPermissions = allGranted,
+            permissionsPermanentlyDenied = anyPermanentlyDenied
+        )
+
+        if (!allGranted && anyPermanentlyDenied) {
+            // User denied with "Don't ask again" - need to go to settings next time
+            android.util.Log.d("HomeViewModel", "Permissions permanently denied by user")
         }
     }
 
@@ -147,13 +190,13 @@ class HomeViewModel @Inject constructor(
     private fun navigateToScan(depth: ScanDepth, mediaKind: MediaScanKind) {
         viewModelScope.launch {
             // Re-check MANAGE_EXTERNAL_STORAGE permission in real-time
-            // This ensures we get the current state, not cached state
             val manageStorageGranted = checkManageStoragePermission()
             android.util.Log.d("HomeViewModel", "navigateToScan - MANAGE_EXTERNAL_STORAGE granted: $manageStorageGranted")
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !manageStorageGranted) {
-                android.util.Log.d("HomeViewModel", "Showing MANAGE_EXTERNAL_STORAGE dialog")
-                _uiEvent.send(HomeUiEvent.ShowManageStorageDialog(true))
+                android.util.Log.d("HomeViewModel", "Need MANAGE_EXTERNAL_STORAGE permission - showing custom dialog")
+                // Show custom dialog first, user clicks Confirm to go to settings
+                _uiEvent.send(HomeUiEvent.ShowManageStoragePermissionDialog)
                 return@launch
             }
 
