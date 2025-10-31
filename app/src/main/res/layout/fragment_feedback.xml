@@ -88,7 +88,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/feedback_tag_good_scan"
                     android:backgroundTint="#F2F2F2"
-                    android:textColor="#B9B9B9" />
+                    android:textColor="#B9B9B9"
+                    app:chipCornerRadius="8dp" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipGoodQuality"
@@ -97,7 +98,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/feedback_tag_good_quality"
                     android:backgroundTint="#F2F2F2"
-                    android:textColor="#B9B9B9" />
+                    android:textColor="#B9B9B9"
+                    app:chipCornerRadius="8dp" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipSuggestions"
@@ -106,7 +108,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/feedback_tag_suggestions"
                     android:backgroundTint="#F2F2F2"
-                    android:textColor="#B9B9B9" />
+                    android:textColor="#B9B9B9"
+                    app:chipCornerRadius="8dp" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipBugs"
@@ -115,7 +118,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/feedback_tag_bugs"
                     android:backgroundTint="#F2F2F2"
-                    android:textColor="#B9B9B9" />
+                    android:textColor="#B9B9B9"
+                    app:chipCornerRadius="8dp" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipQuickRecovery"
@@ -124,7 +128,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/feedback_tag_quick_recovery"
                     android:backgroundTint="#F2F2F2"
-                    android:textColor="#B9B9B9" />
+                    android:textColor="#B9B9B9"
+                    app:chipCornerRadius="8dp" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipEasyInterface"
@@ -133,7 +138,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/feedback_tag_easy_interface"
                     android:backgroundTint="#F2F2F2"
-                    android:textColor="#B9B9B9" />
+                    android:textColor="#B9B9B9"
+                    app:chipCornerRadius="8dp" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipOthers"
@@ -142,7 +148,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/feedback_tag_others"
                     android:backgroundTint="#F2F2F2"
-                    android:textColor="#B9B9B9" />
+                    android:textColor="#B9B9B9"
+                    app:chipCornerRadius="8dp" />
 
             </com.google.android.material.chip.ChipGroup>
 
@@ -152,8 +159,7 @@
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:counterEnabled="true"
-                app:counterMaxLength="500">
+                app:hintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etFeedback"
@@ -161,8 +167,11 @@
                     android:layout_height="150dp"
                     android:gravity="top|start"
                     android:hint="@string/feedback_input_hint"
-                    android:inputType="textMultiLine|textCapSentences" />
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:fontFamily="@font/maven_pro"
+                    android:maxLength="500" />
             </com.google.android.material.textfield.TextInputLayout>
+
         </LinearLayout>
 
     </ScrollView>
@@ -176,8 +185,15 @@
         android:text="@string/feedback_send_button"
         android:textAllCaps="false"
         android:textSize="16sp"
-        app:cornerRadius="12dp"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:fontFamily="@font/maven_pro"
+        android:textColor="@android:color/white"
+        android:background="@drawable/gradient_blue"
+        app:cornerRadius="52dp"
+        app:icon="@drawable/ic_send"
+        app:iconTint="@android:color/white"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"
+        app:iconSize="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 

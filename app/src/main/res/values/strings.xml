@@ -35,7 +35,7 @@
     <string name="completed">Completed!</string>
     <string name="error">Error</string>
     <string name="info">Info</string>
-    <string name="one_hundred_percent">100%</string>
+    <string name="one_hundred_percent">100% Completed!</string>
     <string name="scan_other_documents">Scan other documents</string>
     <string name="retry">Retry</string>
     <string name="ad_banner_placeholder">Ad Banner Placeholder</string>
@@ -53,7 +53,7 @@
     <string name="size_1_5_mb">1–5 MB</string>
     <string name="size_gt_5_mb">&gt; 5 MB</string>
     <string name="size_custom">Custom…</string>
-    <string name="sort_by">Sort By</string>
+    <string name="sort_by">Sort By:</string>
     <string name="sort_date">Date</string>
     <string name="sort_size">Size</string>
     <string name="sort_name">Name</string>

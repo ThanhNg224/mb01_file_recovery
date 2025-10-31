@@ -195,7 +195,7 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/one_hundred_percent"
                 android:textColor="#34C759"
-                android:textSize="48sp"
+                android:textSize="38sp"
                 android:textStyle="bold" />
 
             <!-- Completed Message -->
@@ -220,7 +220,8 @@
                 android:paddingHorizontal="32dp"
                 android:text="@string/scan_other_documents"
                 android:textSize="16sp"
-                app:cornerRadius="8dp" />
+                android:background="@drawable/gradient_blue"
+                app:cornerRadius="22dp" />
 
         </LinearLayout>
 

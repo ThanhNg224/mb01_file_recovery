@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -134,7 +133,7 @@ class FeedbackFragment : Fragment() {
         dialog.setContentView(dialogBinding.root)
 
         // Set up star rating
-        val stars = listOf(
+        val stars = listOf<ImageView>(
             dialogBinding.star1,
             dialogBinding.star2,
             dialogBinding.star3,
@@ -142,7 +141,7 @@ class FeedbackFragment : Fragment() {
             dialogBinding.star5
         )
 
-        var selectedRating: Int
+        var selectedRating = 0
 
         stars.forEachIndexed { index, star ->
             star.setOnClickListener {
