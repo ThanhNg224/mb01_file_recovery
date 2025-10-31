@@ -21,17 +21,26 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@color/home_bg"
-                android:elevation="0dp"
-                app:title="@string/setting_title"
-                app:titleTextColor="@color/home_text_primary"
-                app:titleCentered="true"
-                app:titleTextAppearance="@style/TextAppearance.Material3.TitleMedium"
+                android:background="@color/white"
+                android:elevation="4dp"
                 app:navigationIcon="@drawable/ic_arrow_back"
-                app:navigationIconTint="@color/home_text_primary"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:navigationIconTint="@color/black"
+                >
+
+                <TextView
+                    android:id="@+id/tvToolbarTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/maven_pro"
+                    tools:text="@string/settings"
+                    android:textColor="@color/home_text_primary"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:layout_gravity="center" />
+            </com.google.android.material.appbar.MaterialToolbar>
+
 
             <LinearLayout
                 android:id="@+id/contentLayout"

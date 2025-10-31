@@ -50,19 +50,19 @@ class OnboardingPageFragment : Fragment() {
         when (pagePosition) {
             0 -> {
                 // TODO: Replace with actual image resource
-                binding.ivOnboardingImage.setImageResource(R.drawable.frame_5358)
+                binding.ivOnboardingImage.setImageResource(R.drawable.logo)
                 binding.tvOnboardingTitle.text = getString(R.string.onboarding_title_1)
                 binding.tvOnboardingDescription.text = getString(R.string.onboarding_desc_1)
             }
             1 -> {
                 // TODO: Replace with actual image resource
-                binding.ivOnboardingImage.setImageResource(R.drawable.frame_5358)
+                binding.ivOnboardingImage.setImageResource(R.drawable.logo)
                 binding.tvOnboardingTitle.text = getString(R.string.onboarding_title_2)
                 binding.tvOnboardingDescription.text = getString(R.string.onboarding_desc_2)
             }
             2 -> {
                 // TODO: Replace with actual image resource
-                binding.ivOnboardingImage.setImageResource(R.drawable.frame_5358)
+                binding.ivOnboardingImage.setImageResource(R.drawable.logo)
                 binding.tvOnboardingTitle.text = getString(R.string.onboarding_title_3)
                 binding.tvOnboardingDescription.text = getString(R.string.onboarding_desc_3)
             }

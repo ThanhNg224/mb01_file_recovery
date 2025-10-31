@@ -21,8 +21,10 @@
             android:id="@+id/tvToolbarTitle"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:fontFamily="@font/maven_pro"
             tools:text="@string/scan_photos"
             android:textColor="@color/home_text_primary"
+            android:gravity="center"
             android:textStyle="bold"
             android:textSize="18sp"
             android:layout_gravity="center" />

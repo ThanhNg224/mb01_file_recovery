@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/home_bg">
 
     <!-- Toolbar -->
@@ -12,10 +13,23 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/white"
         android:elevation="4dp"
-        app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_arrow_back"
-        app:title="@string/feedback_title"
-        app:titleTextColor="@color/home_text_primary" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIconTint="@color/black"
+        >
+
+        <TextView
+            android:id="@+id/tvToolbarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/maven_pro"
+            tools:text="@string/feedback_title"
+            android:textColor="@color/home_text_primary"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_gravity="center" />
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -60,6 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
+                android:backgroundTint="#F2F2F2"
                 app:chipSpacingHorizontal="8dp"
                 app:chipSpacingVertical="8dp"
                 app:selectionRequired="false"
@@ -72,7 +87,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/feedback_tag_good_scan"
-                    android:textColor="@color/home_text_primary" />
+                    android:backgroundTint="#F2F2F2"
+                    android:textColor="#B9B9B9" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipGoodQuality"
@@ -80,15 +96,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/feedback_tag_good_quality"
-                    android:textColor="@color/home_text_primary" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipBugs"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/feedback_tag_bugs"
-                    android:textColor="@color/home_text_primary" />
+                    android:backgroundTint="#F2F2F2"
+                    android:textColor="#B9B9B9" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipSuggestions"
@@ -96,7 +105,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/feedback_tag_suggestions"
-                    android:textColor="@color/home_text_primary" />
+                    android:backgroundTint="#F2F2F2"
+                    android:textColor="#B9B9B9" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipBugs"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/feedback_tag_bugs"
+                    android:backgroundTint="#F2F2F2"
+                    android:textColor="#B9B9B9" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipQuickRecovery"
@@ -104,7 +123,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/feedback_tag_quick_recovery"
-                    android:textColor="@color/home_text_primary" />
+                    android:backgroundTint="#F2F2F2"
+                    android:textColor="#B9B9B9" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipEasyInterface"
@@ -112,7 +132,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/feedback_tag_easy_interface"
-                    android:textColor="@color/home_text_primary" />
+                    android:backgroundTint="#F2F2F2"
+                    android:textColor="#B9B9B9" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipOthers"
@@ -120,26 +141,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/feedback_tag_others"
-                    android:textColor="@color/home_text_primary" />
+                    android:backgroundTint="#F2F2F2"
+                    android:textColor="#B9B9B9" />
 
             </com.google.android.material.chip.ChipGroup>
 
-            <!-- Feedback Input -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/feedback_input_label"
-                android:textColor="@color/home_text_secondary"
-                android:textSize="14sp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilFeedback"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:hint="@string/feedback_input_hint"
                 app:counterEnabled="true"
                 app:counterMaxLength="500">
 
@@ -148,11 +160,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="150dp"
                     android:gravity="top|start"
-                    android:inputType="textMultiLine|textCapSentences"
-                    android:maxLength="500" />
-
+                    android:hint="@string/feedback_input_hint"
+                    android:inputType="textMultiLine|textCapSentences" />
             </com.google.android.material.textfield.TextInputLayout>
-
         </LinearLayout>
 
     </ScrollView>

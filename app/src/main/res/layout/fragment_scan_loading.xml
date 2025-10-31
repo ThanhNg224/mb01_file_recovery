@@ -204,6 +204,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:fontFamily="@font/maven_pro"
                 android:gravity="center"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="18sp"

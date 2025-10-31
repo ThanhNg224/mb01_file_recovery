@@ -61,4 +61,10 @@
         <item name="android:gravity">center</item>
     </style>
 
+    <style name="HintMultilineText" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:singleLine">false</item>
+        <item name="android:ellipsize">none</item>
+    </style>
+
+
 </resources>
