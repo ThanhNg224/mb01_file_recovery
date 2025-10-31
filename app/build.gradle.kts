@@ -49,6 +49,7 @@ android {
     }
 }
 
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -95,6 +96,12 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.lottie)
     implementation(libs.gson)
+
+    // Preview dependencies
+    implementation(libs.androidx.viewpager2)
+    implementation(libs.photoview)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
 
     // Firebase BoM
     implementation(platform ("com.google.firebase:firebase-bom:33.2.0"))

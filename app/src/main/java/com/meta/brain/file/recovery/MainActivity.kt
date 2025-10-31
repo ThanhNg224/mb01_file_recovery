@@ -51,6 +51,22 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
+        // Enable immersive mode: hide navigation bar, allow swipe to show (API 30+)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            window.insetsController?.let { controller ->
+                controller.hide(android.view.WindowInsets.Type.navigationBars())
+                controller.systemBarsBehavior =
+                    android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        }
+
+        val navHostView = findViewById<android.view.View>(R.id.nav_host_fragment)
+        ViewCompat.setOnApplyWindowInsetsListener(navHostView) { v, insets ->
+            val sysInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = sysInsets.top)
+            insets
+        }
+
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
         bottomNav.alpha = 0f
         bottomNav.post {
@@ -71,8 +87,7 @@ class MainActivity : AppCompatActivity() {
         // Handle insets for bottom nav
         val extraTop = resources.getDimensionPixelSize(R.dimen.bottom_nav_item_offset_top)
         ViewCompat.setOnApplyWindowInsetsListener(bottomNav) { v, insets ->
-            val sys = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updatePadding(top = extraTop, bottom = sys.bottom)
+            v.updatePadding(top = extraTop, bottom = 0)
             insets
         }
         bottomNav.clipToPadding = false

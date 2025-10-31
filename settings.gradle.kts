@@ -16,6 +16,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://jitpack.io") }
         maven {
             url = uri("https://maven.pkg.github.com/quanvh/metabrain_base")
             credentials {
@@ -28,4 +29,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "File Recovery"
 include(":app")
- 
