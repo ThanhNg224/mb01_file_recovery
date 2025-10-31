@@ -18,6 +18,4 @@ app/src/test/
 app/src/androidTest/
 google-services.json
 gradle.properties
-PREVIEW_FEATURE_IMPLEMENTATION.md
-REFACTORING_SUMMARY.md
 *.md
