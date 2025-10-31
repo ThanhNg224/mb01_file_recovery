@@ -3,7 +3,7 @@ package com.meta.brain.file.recovery.ui.results
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.meta.brain.file.recovery.data.model.MediaEntry
-import com.meta.brain.file.recovery.data.repository.RestoreRepository
+import com.meta.brain.file.recovery.data.repository.FileOperationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,7 +53,7 @@ sealed class DeleteState {
  */
 @HiltViewModel
 class ResultsViewModel @Inject constructor(
-    private val restoreRepository: RestoreRepository
+    private val fileOperationRepository: FileOperationRepository
 ) : ViewModel() {
 
     // Media items state
@@ -131,7 +131,86 @@ class ResultsViewModel @Inject constructor(
     }
 
     /**
-     * Remove deleted items from the list
+     * Start restore operation
+     */
+    fun startRestore(destFolderName: String = "RELive/Restored") {
+        val itemsToRestore = _selectedItems.value.toList()
+        if (itemsToRestore.isEmpty()) {
+            _restoreState.value = RestoreState.Error("No items selected")
+            return
+        }
+
+        // Cancel any existing restore job
+        restoreJob?.cancel()
+
+        restoreJob = viewModelScope.launch {
+            try {
+                _restoreState.value = RestoreState.Running(0, itemsToRestore.size, "", 0, 0)
+
+                fileOperationRepository.restoreMediaFiles(itemsToRestore, destFolderName)
+                    .collect { progress ->
+                        _restoreState.value = RestoreState.Running(
+                            progress = progress.current,
+                            total = progress.total,
+                            currentFileName = progress.currentFileName,
+                            successCount = progress.successCount,
+                            failCount = progress.failCount
+                        )
+
+                        // Check if completed
+                        if (progress.current >= progress.total) {
+                            val destinationPath = "Downloads/$destFolderName"
+                            _restoreState.value = RestoreState.Done(
+                                successCount = progress.successCount,
+                                failCount = progress.failCount,
+                                destinationPath = destinationPath
+                            )
+
+                            // Clear selection after successful restore
+                            exitSelectionMode()
+                        }
+                    }
+            } catch (e: Exception) {
+                android.util.Log.e("ResultsViewModel", "Restore failed: ${e.message}", e)
+                _restoreState.value = RestoreState.Error(e.message ?: "Unknown error occurred")
+            }
+        }
+    }
+
+    /**
+     * Start delete operation
+     */
+    fun startDelete() {
+        val itemsToDelete = _selectedItems.value.toList()
+        if (itemsToDelete.isEmpty()) {
+            _deleteState.value = DeleteState.Error("No items selected")
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val result = fileOperationRepository.deleteMediaFiles(itemsToDelete)
+
+                // Remove successfully deleted items from the list
+                removeDeletedItems(result.successfulItems)
+
+                // Notify completion
+                _deleteState.value = DeleteState.Done(
+                    successCount = result.successCount,
+                    failCount = result.failCount
+                )
+
+                // Exit selection mode
+                exitSelectionMode()
+            } catch (e: Exception) {
+                android.util.Log.e("ResultsViewModel", "Delete failed: ${e.message}", e)
+                _deleteState.value = DeleteState.Error(e.message ?: "Unknown error occurred")
+            }
+        }
+    }
+
+    /**
+     * Remove deleted items from the list (called after deletion)
      */
     fun removeDeletedItems(deletedItems: List<MediaEntry>) {
         val updatedItems = _allItems.value.filterNot { deletedItems.contains(it) }
@@ -141,8 +220,9 @@ class ResultsViewModel @Inject constructor(
     }
 
     /**
-     * Notify delete completion with results
+     * Notify delete completion with results (deprecated - use startDelete instead)
      */
+    @Deprecated("Use startDelete() instead which handles deletion internally")
     fun notifyDeleteComplete(successCount: Int, failCount: Int) {
         _deleteState.value = DeleteState.Done(successCount, failCount)
     }
@@ -218,53 +298,6 @@ class ResultsViewModel @Inject constructor(
     }
 
     /**
-     * Start restore operation
-     */
-    fun startRestore(destFolderName: String = "RELive/Restored") {
-        val itemsToRestore = _selectedItems.value.toList()
-        if (itemsToRestore.isEmpty()) {
-            _restoreState.value = RestoreState.Error("No items selected")
-            return
-        }
-
-        // Cancel any existing restore job
-        restoreJob?.cancel()
-
-        restoreJob = viewModelScope.launch {
-            try {
-                _restoreState.value = RestoreState.Running(0, itemsToRestore.size, "", 0, 0)
-
-                restoreRepository.restoreMediaFiles(itemsToRestore, destFolderName)
-                    .collect { progress ->
-                        _restoreState.value = RestoreState.Running(
-                            progress = progress.current,
-                            total = progress.total,
-                            currentFileName = progress.currentFileName,
-                            successCount = progress.successCount,
-                            failCount = progress.failCount
-                        )
-
-                        // Check if completed
-                        if (progress.current >= progress.total) {
-                            val destinationPath = "Downloads/$destFolderName"
-                            _restoreState.value = RestoreState.Done(
-                                successCount = progress.successCount,
-                                failCount = progress.failCount,
-                                destinationPath = destinationPath
-                            )
-
-                            // Clear selection after successful restore
-                            exitSelectionMode()
-                        }
-                    }
-            } catch (e: Exception) {
-                android.util.Log.e("ResultsViewModel", "Restore failed: ${e.message}", e)
-                _restoreState.value = RestoreState.Error(e.message ?: "Unknown error occurred")
-            }
-        }
-    }
-
-    /**
      * Cancel ongoing restore operation
      */
     fun cancelRestore() {
@@ -284,14 +317,14 @@ class ResultsViewModel @Inject constructor(
      * Get total size of selected items
      */
     fun getSelectedTotalSize(): Long {
-        return restoreRepository.calculateTotalSize(_selectedItems.value.toList())
+        return fileOperationRepository.calculateTotalSize(_selectedItems.value.toList())
     }
 
     /**
      * Get formatted total size
      */
     fun getFormattedSelectedSize(): String {
-        return restoreRepository.formatSize(getSelectedTotalSize())
+        return fileOperationRepository.formatSize(getSelectedTotalSize())
     }
 
     override fun onCleared() {

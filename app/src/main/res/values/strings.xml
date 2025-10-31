@@ -195,7 +195,7 @@
     <string name="dialog_delete_photos">Do you want to delete these %1$d photos?</string>
     <string name="dialog_delete_files">Do you want to delete these %1$d files?</string>
     <string name="dialog_permission_required">Permission Required</string>
-    <string name="dialog_permission_message">File Recovery requires access to your device storage to search for lost or deleted files.\nYour data is safe — we do not upload or collect any personal files.</string>
+    <string name="dialog_permission_message">File Recovery requires access to your device storage to search for lost or deleted files.\nYour data is safe — we &lt;b>do not upload or collect&lt;/b> any personal files.</string>
     <string name="dialog_restore_complete">Restore Complete</string>
 
 </resources>

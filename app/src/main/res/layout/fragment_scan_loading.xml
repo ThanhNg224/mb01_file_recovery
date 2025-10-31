@@ -26,243 +26,244 @@
 
     <!-- Main Content -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_anchor="@+id/nestedScrollView"
+        app:layout_anchorGravity="center">
+
+        <!-- Scanning State Container -->
+        <LinearLayout
+            android:id="@+id/scanningContainer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="0dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Scanning State Container -->
-            <LinearLayout
-                android:id="@+id/scanningContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="0dp"
-                android:visibility="visible"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+            <!-- Animation Container -->
+            <FrameLayout
+                android:layout_width="280dp"
+                android:layout_height="280dp"
+                android:layout_gravity="center">
 
-                <!-- Animation Container -->
+                <!-- Lottie Ripple Animation with Gallery Icon -->
                 <FrameLayout
-                    android:layout_width="220dp"
-                    android:layout_height="220dp"
+                    android:id="@+id/scanningAnimationContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_gravity="center">
 
-                    <!-- Lottie Ripple Animation with Gallery Icon -->
-                    <FrameLayout
-                        android:id="@+id/scanningAnimationContainer"
+                    <!-- Lottie Ripple Animation  -->
+
+                    <!--  Icon in Center -->
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/scanAnimationView"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_gravity="center">
-
-                        <!-- Lottie Ripple Animation  -->
-
-                        <!--  Icon in Center -->
-
-                        <com.airbnb.lottie.LottieAnimationView
-                            android:id="@+id/scanAnimationView"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="center"
-                            android:contentDescription="@string/scanning_animation"
-                            app:lottie_autoPlay="false"
-                            app:lottie_loop="true"
-                            app:lottie_rawRes="@raw/scan_in_progress"
-                            app:lottie_renderMode="hardware"
-                            app:lottie_speed="1.0" />
-
-                        <ImageView
-                            android:id="@+id/ivGalleryIcon"
-                            android:layout_width="45dp"
-                            android:layout_height="40dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@string/scanning"
-                            android:src="@drawable/icon_photo"
-                            app:tint="?attr/colorPrimary" />
-
-                    </FrameLayout>
-
-                    <!-- Done Icon (shown at 100%) -->
-                    <ImageView
-                        android:id="@+id/ivDoneIcon"
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/done"
-                        android:contentDescription="@string/completed"
-                        android:visibility="gone"
-                        android:alpha="0" />
+                        android:contentDescription="@string/scanning_animation"
+                        app:lottie_autoPlay="false"
+                        app:lottie_loop="true"
+                        app:lottie_rawRes="@raw/scan_in_progress"
+                        app:lottie_renderMode="hardware"
+                        app:lottie_speed="1.0" />
+
+                    <ImageView
+                        android:id="@+id/ivGalleryIcon"
+                        android:layout_width="45dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/scanning"
+                        android:src="@drawable/icon_photo" />
 
                 </FrameLayout>
 
-                <!-- Percentage Text -->
-                <TextView
-                    android:id="@+id/tvPercent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:textColor="#2199FF"
-                    android:textSize="48sp"
-                    android:textStyle="bold"
-                    tools:text="23%" />
-
-                <!-- Hint Text with Loading Animation -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ProgressBar
-                        android:id="@+id/hintLoadingAnimation"
-                        style="?android:attr/progressBarStyleSmall"
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:layout_marginEnd="8dp"
-                        android:indeterminateTint="?attr/colorPrimary" />
-
-                    <TextView
-                        android:id="@+id/tvHint"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="14sp"
-                        tools:text="Scanning media files..." />
-
-                </LinearLayout>
-
-                <!-- Tip Text -->
-                <TextView
-                    android:id="@+id/tvTip"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
-                    android:paddingHorizontal="16dp"
-                    android:text="@string/scan_tip"
-                    android:textColor="?attr/colorOnBackground"
-                    android:alpha="0.6"
-                    android:textSize="14sp"
-                    android:gravity="center"
-                    />
-
-
-            </LinearLayout>
-
-            <!-- Empty Result State Container -->
-            <LinearLayout
-                android:id="@+id/emptyResultContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="24dp"
-                android:visibility="gone"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <!-- Done Icon -->
+                <!-- Done Icon (shown at 100%) -->
                 <ImageView
-                    android:id="@+id/completedAnimationView"
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/done"
-                    android:contentDescription="@string/completed" />
-
-                <!-- 100% Text -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/one_hundred_percent"
-                    android:textColor="?attr/colorPrimary"
-                    android:textSize="48sp"
-                    android:textStyle="bold" />
-
-                <!-- Completed Message -->
-                <TextView
-                    android:id="@+id/tvEmptyMessage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:gravity="center"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    tools:text="Completed! No photos found on your device!" />
-
-                <!-- Scan Other Documents Button -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnScanOther"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:paddingHorizontal="32dp"
-                    android:text="@string/scan_other_documents"
-                    android:textSize="16sp"
-                    app:cornerRadius="8dp" />
-
-            </LinearLayout>
-
-            <!-- Error State Container -->
-            <LinearLayout
-                android:id="@+id/errorContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="24dp"
-                android:visibility="gone"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <ImageView
+                    android:id="@+id/ivDoneIcon"
                     android:layout_width="120dp"
                     android:layout_height="120dp"
                     android:layout_gravity="center"
-                    android:src="@android:drawable/ic_dialog_alert"
-                    android:contentDescription="@string/error"
-                    app:tint="?attr/colorError" />
+                    android:alpha="0"
+                    android:contentDescription="@string/completed"
+                    android:src="@drawable/done"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
+            <!-- Percentage Text -->
+            <TextView
+                android:id="@+id/tvPercent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:textColor="#2199FF"
+                android:textSize="48sp"
+                android:textStyle="bold"
+                tools:text="23%" />
+
+            <!-- Hint Text with Loading Animation -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ProgressBar
+                    android:id="@+id/hintLoadingAnimation"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="8dp"
+                    android:indeterminateTint="?attr/colorPrimary" />
 
                 <TextView
-                    android:id="@+id/tvErrorMessage"
+                    android:id="@+id/tvHint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:gravity="center"
-                    android:textColor="?attr/colorError"
-                    android:textSize="16sp"
-                    tools:text="An error occurred" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnRetry"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="@string/retry"
-                    app:cornerRadius="8dp" />
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="14sp"
+                    tools:text="Scanning media files..." />
 
             </LinearLayout>
 
-            <!-- Ad Banner Placeholder -->
+            <!-- Tip Text -->
+            <TextView
+                android:id="@+id/tvTip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:alpha="0.6"
+                android:gravity="center"
+                android:paddingHorizontal="6dp"
+                android:text="@string/scan_tip"
+                android:textColor="?attr/colorOnBackground"
+                android:textSize="14sp" />
 
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
-    </androidx.core.widget.NestedScrollView>
+        <!-- Empty Result State Container -->
+        <LinearLayout
+            android:id="@+id/emptyResultContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- Done Icon -->
+            <ImageView
+                android:id="@+id/completedAnimationView"
+                android:layout_width="280dp"
+                android:layout_height="280dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/completed"
+                android:src="@drawable/done" />
+
+            <!-- 100% Text -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/one_hundred_percent"
+                android:textColor="#34C759"
+                android:textSize="48sp"
+                android:textStyle="bold" />
+
+            <!-- Completed Message -->
+            <TextView
+                android:id="@+id/tvEmptyMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="Completed! No photos found on your device!" />
+
+            <!-- Scan Other Documents Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnScanOther"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:paddingHorizontal="32dp"
+                android:text="@string/scan_other_documents"
+                android:textSize="16sp"
+                app:cornerRadius="8dp" />
+
+        </LinearLayout>
+
+        <!-- Error State Container -->
+        <LinearLayout
+            android:id="@+id/errorContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/error"
+                android:src="@android:drawable/ic_dialog_alert"
+                app:tint="?attr/colorError" />
+
+            <TextView
+                android:id="@+id/tvErrorMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:textColor="?attr/colorError"
+                android:textSize="16sp"
+                tools:text="An error occurred" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/retry"
+                app:cornerRadius="8dp" />
+
+        </LinearLayout>
+
+        <!-- Ad Banner Placeholder -->
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -87,15 +87,15 @@
             style="@style/Widget.Material3.Button.UnelevatedButton"
             android:layout_width="0dp"
             android:layout_height="56dp"
-            android:layout_weight="1"
             android:layout_marginStart="8dp"
+            android:layout_weight="1"
             android:background="@drawable/bg_button_primary"
+            android:fontFamily="sans-serif-light"
             android:text="Confirm"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:fontFamily="sans-serif-light"
             app:backgroundTint="@null"
             app:cornerRadius="28dp" />
 

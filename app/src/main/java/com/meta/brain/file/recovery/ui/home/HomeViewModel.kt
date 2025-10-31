@@ -36,6 +36,8 @@ data class HomeUiState(
 sealed class HomeUiEvent {
     data class NavigateToScan(val scanConfig: ScanConfig) : HomeUiEvent()
     object ShowPermissionDialog : HomeUiEvent()
+    // Note: ShowManageStorageDialog is currently not used for basic media scans
+    // It's kept for potential future deep file system operations that might require MANAGE_EXTERNAL_STORAGE
     data class ShowManageStorageDialog(val showDialog: Boolean) : HomeUiEvent()
     data class ShowToast(val message: String) : HomeUiEvent()
     data class ShowError(val message: String) : HomeUiEvent()
@@ -91,6 +93,7 @@ class HomeViewModel @Inject constructor(
      * Update permission state
      */
     fun updatePermissions(hasPermissions: Boolean) {
+        android.util.Log.d("HomeViewModel", "updatePermissions called with: $hasPermissions (previous: ${_homeUiState.value.hasPermissions})")
         _homeUiState.value = _homeUiState.value.copy(hasPermissions = hasPermissions)
     }
 
@@ -123,9 +126,11 @@ class HomeViewModel @Inject constructor(
      * Handle tile click with permission check
      */
     fun onTileClicked(depth: ScanDepth, mediaKind: MediaScanKind) {
+        android.util.Log.d("HomeViewModel", "onTileClicked - hasPermissions: ${_homeUiState.value.hasPermissions}")
         if (_homeUiState.value.hasPermissions) {
             navigateToScan(depth, mediaKind)
         } else {
+            android.util.Log.d("HomeViewModel", "Showing basic permission dialog")
             viewModelScope.launch {
                 _uiEvent.send(HomeUiEvent.ShowPermissionDialog)
             }
@@ -134,11 +139,20 @@ class HomeViewModel @Inject constructor(
 
     /**
      * Navigate to scan with configuration
+     * Note: For file recovery, we need MANAGE_EXTERNAL_STORAGE to:
+     * 1. Access deleted/hidden files in various locations
+     * 2. Write recovered files to recovery folder
+     * 3. Scan outside standard media directories
      */
     private fun navigateToScan(depth: ScanDepth, mediaKind: MediaScanKind) {
         viewModelScope.launch {
-            // Check for MANAGE_EXTERNAL_STORAGE permission if scanning documents on Android 11+
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !checkManageStoragePermission()) {
+            // Re-check MANAGE_EXTERNAL_STORAGE permission in real-time
+            // This ensures we get the current state, not cached state
+            val manageStorageGranted = checkManageStoragePermission()
+            android.util.Log.d("HomeViewModel", "navigateToScan - MANAGE_EXTERNAL_STORAGE granted: $manageStorageGranted")
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !manageStorageGranted) {
+                android.util.Log.d("HomeViewModel", "Showing MANAGE_EXTERNAL_STORAGE dialog")
                 _uiEvent.send(HomeUiEvent.ShowManageStorageDialog(true))
                 return@launch
             }
@@ -204,14 +218,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Request MANAGE_EXTERNAL_STORAGE permission dialog
-     */
-    fun showManageStoragePermissionDialog() {
-        viewModelScope.launch {
-            _uiEvent.send(HomeUiEvent.ShowManageStorageDialog(true))
-        }
-    }
 
     /**
      * Start deep scan with comprehensive file system scanning

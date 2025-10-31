@@ -490,39 +490,8 @@ class ResultsFragment : Fragment() {
     }
 
     private fun performBatchDelete() {
-        val selectedItems = resultsViewModel.selectedItems.value
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                var successCount = 0
-                var failCount = 0
-                val itemsToDelete = selectedItems.toList()
-                val successfullyDeleted = mutableListOf<MediaEntry>()
-
-                // Perform actual deletion - this is the only UI-layer responsibility
-                itemsToDelete.forEach { entry ->
-                    try {
-                        val deleted = requireContext().contentResolver.delete(entry.uri, null, null)
-                        if (deleted > 0) {
-                            successCount++
-                            successfullyDeleted.add(entry)
-                        } else {
-                            failCount++
-                        }
-                    } catch (e: Exception) {
-                        android.util.Log.e("ResultsFragment", "Failed to delete: ${e.message}", e)
-                        failCount++
-                    }
-                }
-
-                // Update ViewModel with results - business logic
-                resultsViewModel.removeDeletedItems(successfullyDeleted)
-                resultsViewModel.notifyDeleteComplete(successCount, failCount)
-
-            } catch (e: Exception) {
-                Snackbar.make(binding.root, "Error deleting files: ${e.message}", Snackbar.LENGTH_LONG).show()
-            }
-        }
+        // Delegate delete operation to ViewModel
+        resultsViewModel.startDelete()
     }
 
     private fun handleDeleteState(state: DeleteState) {

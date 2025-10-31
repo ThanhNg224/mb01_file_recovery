@@ -12,7 +12,7 @@
         android:id="@+id/layoutDateHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/app_bg_surface"
+        android:background="@android:color/transparent"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingTop="8dp"
@@ -29,15 +29,6 @@
             android:textStyle="bold"
             tools:text="2025-10-3" />
 
-        <!-- Item Count -->
-        <TextView
-            android:id="@+id/tvDateItemCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:textColor="@color/home_text_secondary"
-            android:textSize="12sp"
-            tools:text="(12)" />
 
         <!-- Select All for this Date Group -->
         <CheckBox

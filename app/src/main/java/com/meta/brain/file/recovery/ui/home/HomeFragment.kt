@@ -43,6 +43,12 @@ class HomeFragment : Fragment() {
 
         setupViews()
         observeViewModel()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Re-check permissions whenever the fragment comes back to foreground
+        // This handles the case when user returns from settings after granting permissions
         checkPermissions()
     }
 
@@ -153,22 +159,19 @@ class HomeFragment : Fragment() {
 
         viewModel.updatePermissions(allGranted)
 
-        // Debug logging
+        // Debug logging for basic permissions
         permissions.forEach { permission ->
             val granted = ContextCompat.checkSelfPermission(requireContext(), permission) ==
                 PackageManager.PERMISSION_GRANTED
             android.util.Log.d("HomeFragment", "Permission $permission: $granted")
         }
-        android.util.Log.d("HomeFragment", "All permissions granted: $allGranted")
+        android.util.Log.d("HomeFragment", "All basic permissions granted: $allGranted")
 
         // Check for MANAGE_EXTERNAL_STORAGE permission on Android 11+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val managePermissionGranted = viewModel.checkManageStoragePermission()
-            android.util.Log.d("HomeFragment", "MANAGE_EXTERNAL_STORAGE permission granted: $managePermissionGranted")
-
-            if (!managePermissionGranted) {
-                viewModel.showManageStoragePermissionDialog()
-            }
+            val managePermissionGranted = android.os.Environment.isExternalStorageManager()
+            android.util.Log.d("HomeFragment", "MANAGE_EXTERNAL_STORAGE granted: $managePermissionGranted")
+            android.util.Log.d("HomeFragment", "isExternalStorageManager() = $managePermissionGranted")
         }
     }
 

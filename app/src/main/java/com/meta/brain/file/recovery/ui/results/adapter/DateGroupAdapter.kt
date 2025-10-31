@@ -74,8 +74,6 @@ class DateGroupAdapter(
             // Set date label
             binding.tvDateLabel.text = dateGroup.date
 
-            // Set item count
-            binding.tvDateItemCount.text = "(${dateGroup.items.size})"
 
             // Set up media items grid
             if (mediaAdapter == null) {

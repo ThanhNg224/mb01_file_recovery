@@ -86,7 +86,6 @@ class MediaThumbnailAdapter(
 
             // Update selection UI
             binding.cbSelectItem.isChecked = isSelected
-            binding.viewSelectionOverlay.visibility = if (isSelected) View.VISIBLE else View.GONE
 
             // Update card stroke for selection
             binding.cardMedia.strokeWidth = if (isSelected) 4 else 0

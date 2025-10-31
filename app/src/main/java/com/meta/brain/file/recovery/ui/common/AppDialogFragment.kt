@@ -10,6 +10,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.meta.brain.file.recovery.R
@@ -129,11 +130,22 @@ class AppDialogFragment : DialogFragment() {
                 binding.btnNegative.visibility = View.GONE
             }
 
-            // If only one button, make it full width
+            // If only one button, center it and make it 2/3 width
             if (cfg.negativeText.isNullOrEmpty()) {
-                val params = binding.btnPositive.layoutParams as ViewGroup.MarginLayoutParams
-                params.marginStart = 0
-                binding.btnPositive.layoutParams = params
+                binding.btnNegative.visibility = View.GONE
+                binding.btnPositive.apply {
+                    val parent = parent as? LinearLayout
+                    parent?.gravity = android.view.Gravity.CENTER_HORIZONTAL
+
+                    val params = layoutParams as LinearLayout.LayoutParams
+                    params.width = 0
+                    params.weight = 0.66f
+                    params.marginStart = 0
+                    params.marginEnd = 0
+                    layoutParams = params
+
+                    gravity = android.view.Gravity.CENTER
+                }
             }
         }
     }

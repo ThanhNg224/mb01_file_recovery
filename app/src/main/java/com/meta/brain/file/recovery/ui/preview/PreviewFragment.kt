@@ -13,7 +13,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
@@ -25,8 +26,8 @@ import com.meta.brain.file.recovery.R
 import com.meta.brain.file.recovery.data.model.MediaEntry
 import com.meta.brain.file.recovery.databinding.BottomSheetInfoBinding
 import com.meta.brain.file.recovery.databinding.FragmentPreviewBinding
-import com.meta.brain.file.recovery.ui.results.ResultsViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 /**
@@ -40,7 +41,7 @@ class PreviewFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val args: PreviewFragmentArgs by navArgs()
-    private val resultsViewModel: ResultsViewModel by activityViewModels()
+    private val previewViewModel: PreviewViewModel by viewModels()
 
     private lateinit var pagerAdapter: PreviewPagerAdapter
     private var visibleItems: ArrayList<MediaEntry> = arrayListOf()
@@ -68,10 +69,61 @@ class PreviewFragment : Fragment() {
         setupToolbar()
         setupViewPager()
         setupClickToToggleChrome()
+        observeViewModel()
 
         // Handle back press
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             findNavController().navigateUp()
+        }
+    }
+
+    private fun observeViewModel() {
+        // Observe file operation state
+        viewLifecycleOwner.lifecycleScope.launch {
+            previewViewModel.fileOpState.collect { state ->
+                handleFileOpState(state)
+            }
+        }
+
+        // Observe UI events
+        viewLifecycleOwner.lifecycleScope.launch {
+            previewViewModel.uiEvent.collect { event ->
+                handleUiEvent(event)
+            }
+        }
+    }
+
+    private fun handleFileOpState(state: PreviewFileOpState) {
+        // Can be used to show loading indicators if needed
+        when (state) {
+            is PreviewFileOpState.Deleting -> {
+                // Optional: Show deleting indicator
+            }
+            is PreviewFileOpState.Restoring -> {
+                // Optional: Show restoring indicator
+            }
+            else -> {
+                // State handled by events
+            }
+        }
+    }
+
+    private fun handleUiEvent(event: PreviewUiEvent) {
+        when (event) {
+            is PreviewUiEvent.ShowMessage -> {
+                Snackbar.make(binding.root, event.message, Snackbar.LENGTH_SHORT).show()
+            }
+            is PreviewUiEvent.NavigateBack -> {
+                findNavController().navigateUp()
+            }
+            is PreviewUiEvent.NotifyFileChanged -> {
+                // Set result for ArchiveFragment or ResultsFragment to refresh
+                if (event.fromArchive) {
+                    findNavController().previousBackStackEntry?.savedStateHandle?.set("files_changed", true)
+                } else {
+                    findNavController().previousBackStackEntry?.savedStateHandle?.set("results_files_changed", true)
+                }
+            }
         }
     }
 
@@ -246,10 +298,7 @@ class PreviewFragment : Fragment() {
     }
 
     private fun restoreSingleFile(entry: MediaEntry) {
-        resultsViewModel.enterSelectionMode(entry)
-        resultsViewModel.startRestore()
-
-        Snackbar.make(binding.root, "Restoring ${entry.displayName}...", Snackbar.LENGTH_SHORT).show()
+        previewViewModel.restoreSingleFile(entry)
     }
 
     private fun deleteSingleFile(entry: MediaEntry) {
@@ -257,37 +306,12 @@ class PreviewFragment : Fragment() {
             .setTitle("Delete file?")
             .setMessage("This will permanently delete ${entry.displayName}. This action cannot be undone.")
             .setPositiveButton("Delete") { _, _ ->
-                performDelete(entry)
+                previewViewModel.deleteSingleFile(entry, args.fromArchive)
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
-    private fun performDelete(entry: MediaEntry) {
-        try {
-            val deleted = requireContext().contentResolver.delete(entry.uri, null, null)
-            if (deleted > 0) {
-                // Set result for ArchiveFragment or ResultsFragment to refresh
-                if (args.fromArchive) {
-                    findNavController().previousBackStackEntry?.savedStateHandle?.set("files_changed", true)
-                } else {
-                    // From Results fragment
-                    findNavController().previousBackStackEntry?.savedStateHandle?.set("results_files_changed", true)
-                }
-
-                Snackbar.make(binding.root, "File deleted", Snackbar.LENGTH_SHORT).show()
-
-                // Always navigate back after deletion to refresh the list
-                binding.viewPager.postDelayed({
-                    findNavController().navigateUp()
-                }, 500) // Small delay to show the snackbar message
-            } else {
-                Snackbar.make(binding.root, "Failed to delete file", Snackbar.LENGTH_SHORT).show()
-            }
-        } catch (e: Exception) {
-            Snackbar.make(binding.root, "Error: ${e.message}", Snackbar.LENGTH_SHORT).show()
-        }
-    }
 
     private fun shareFile(entry: MediaEntry) {
         try {
