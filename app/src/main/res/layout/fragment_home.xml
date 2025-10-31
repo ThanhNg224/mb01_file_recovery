@@ -124,8 +124,7 @@
                             android:src="@drawable/ic_folder_image2"
                             android:adjustViewBounds="true"
                             android:scaleType="fitCenter"
-                            android:contentDescription="@string/home_photo_btn"
-                            app:tint="@drawable/gradient_blue" />
+                            android:contentDescription="@string/home_photo_btn" />
 
                         <LinearLayout
                             android:layout_width="match_parent"

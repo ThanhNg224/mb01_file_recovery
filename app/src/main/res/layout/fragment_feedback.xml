@@ -15,15 +15,14 @@
         android:elevation="4dp"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIconTint="@color/black"
-        >
+        app:navigationIconTint="@color/black">
 
         <TextView
             android:id="@+id/tvToolbarTitle"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:fontFamily="@font/maven_pro"
-            tools:text="@string/feedback_title"
+            android:text="@string/feedback_title"
             android:textColor="@color/home_text_primary"
             android:gravity="center"
             android:textStyle="bold"

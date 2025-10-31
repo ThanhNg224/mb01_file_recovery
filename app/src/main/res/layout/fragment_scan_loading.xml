@@ -195,7 +195,7 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/one_hundred_percent"
                 android:textColor="#34C759"
-                android:textSize="38sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <!-- Completed Message -->
@@ -209,7 +209,7 @@
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                tools:text="Completed! No photos found on your device!" />
+                tools:text="No photos found on your device!" />
 
             <!-- Scan Other Documents Button -->
             <com.google.android.material.button.MaterialButton
@@ -220,6 +220,7 @@
                 android:paddingHorizontal="32dp"
                 android:text="@string/scan_other_documents"
                 android:textSize="16sp"
+                android:fontFamily="@font/maven_pro"
                 android:background="@drawable/gradient_blue"
                 app:cornerRadius="22dp" />
 

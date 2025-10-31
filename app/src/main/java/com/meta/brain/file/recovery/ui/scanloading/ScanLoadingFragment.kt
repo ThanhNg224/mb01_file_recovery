@@ -278,7 +278,7 @@ class ScanLoadingFragment : Fragment() {
         bindLoadingState(LoadingAnimationState.STOPPED)
 
         val targetName = args.scanConfig.getTargetDisplayName()
-        binding.tvEmptyMessage.text = "Completed! No $targetName found on your device!"
+        binding.tvEmptyMessage.text = "No $targetName found on your device!"
         binding.toolbar.title = "Scan Complete"
     }
 
